@@ -2,20 +2,19 @@ import axios from "axios";
 
 export const generateItinerary = async (description, detailLevel) => {
   const prompt = `
-Create a ${detailLevel || "morning"} travel itinerary for:
-${description}
+Create a travel itinerary in clear, readable text.
 
-Respond ONLY with a valid JSON array like:
-[
-  {
-    "time": "Morning",
-    "activity": "Visit place",
-    "location": "City",
-    "transport": "Metro",
-    "cost": "₹500",
-    "description": "Short description"
-  }
-]
+Trip details:
+- Description: ${description}
+- Detail level: ${detailLevel || "morning"}
+
+Guidelines:
+- Write in plain English
+- Use headings like "Day 1 Morning", "Afternoon", etc.
+- Mention places, transport, and approximate costs naturally
+- DO NOT use JSON
+- DO NOT use markdown
+- Just return readable text
 `;
 
   try {
@@ -37,36 +36,27 @@ Respond ONLY with a valid JSON array like:
       }
     );
 
-    const content = response.data.choices[0].message.content;
+    let content = response.data.choices[0].message.content;
 
-    // SAFE JSON PARSE
-    try {
-      return JSON.parse(content);
-    } catch {
-      return [
-        {
-          time: "Generated",
-          activity: "AI response",
-          location: "N/A",
-          transport: "N/A",
-          cost: "N/A",
-          description: content.slice(0, 200)
-        }
-      ];
+    // Clean any accidental markdown
+    content = content
+      .replace(/```/g, "")
+      .trim();
+
+    return {
+      text: content
+    };
+
+  } catch (error) {
+    console.error("🔥 OPENROUTER FULL ERROR 🔥");
+
+    if (error.response) {
+      console.error("STATUS:", error.response.status);
+      console.error("DATA:", JSON.stringify(error.response.data, null, 2));
+    } else {
+      console.error("MESSAGE:", error.message);
     }
 
-  } 
-   catch (error) {
-  console.error("🔥 OPENROUTER FULL ERROR 🔥");
-
-  if (error.response) {
-    console.error("STATUS:", error.response.status);
-    console.error("DATA:", JSON.stringify(error.response.data, null, 2));
-  } else {
-    console.error("MESSAGE:", error.message);
+    throw new Error("AI failed");
   }
-
-  throw new Error("AI failed");
-}
-
 };

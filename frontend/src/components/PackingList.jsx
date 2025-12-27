@@ -471,6 +471,14 @@ const PackingList = ({
                         </div>
                         
                         <div className="item-right">
+                          <button
+                              className={`tick-btn ${item.packed ? 'ticked' : ''}`}
+                              onClick={() => toggleItem(item.id)}
+                              title={item.packed ? 'Mark as unpacked' : 'Mark as packed'}
+                            >
+                              {item.packed ? '✅' : '❌'}
+                            </button>
+
                           <div className="quantity-control">
                             <button 
                               className="quantity-btn"

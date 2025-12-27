@@ -572,14 +572,12 @@
 
 /* Custom Item Card */
 .add-custom-card {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 12px;
-  padding: 25px;
-  margin: 25px 0;
-  color: white;
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+ background: white;
+  border-radius: 10px;
+  padding: 20px;
+  margin: 20px 0;
+  border: 1px solid #dee2e6;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .add-custom-card::before {
@@ -593,11 +591,10 @@
   pointer-events: none;
 }
 
-.card-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 15px;
+.card-heade,
+.card-description{
+  display: none;
+  
 }
 
 .card-icon {
@@ -617,12 +614,7 @@
   font-weight: 600;
 }
 
-.card-description {
-  margin: 0 0 20px 0;
-  opacity: 0.9;
-  font-size: 14px;
-  line-height: 1.5;
-}
+
 
 .custom-item-form {
   display: flex;
@@ -631,13 +623,11 @@
 }
 
 .custom-input {
-  flex: 1;
-  min-width: 200px;
+  flex: 2;
   padding: 12px 16px;
-  border: none;
+  border: 1px solid #ced4da;
   border-radius: 6px;
   font-size: 14px;
-  background: rgba(255, 255, 255, 0.9);
 }
 
 .custom-input:focus {
@@ -647,13 +637,11 @@
 }
 
 .category-select {
-  padding: 12px 16px;
-  border: none;
+   flex: 1;
+  padding: 10px 12px;
+  border: 1px solid #ced4da;
   border-radius: 6px;
   font-size: 14px;
-  background: rgba(255, 255, 255, 0.9);
-  color: #333;
-  min-width: 150px;
 }
 
 .category-select:focus {
@@ -664,44 +652,34 @@
 .form-button-group {
   display: flex;
   gap: 10px;
-  align-items: center;
 }
 
 .add-custom-item-btn {
-  padding: 12px 24px;
-  background: white;
-  color: #667eea;
-  border: none;
+ background: #007bff;
+  color: white;
+  padding: 10px 18px;
   border-radius: 6px;
+  border: none;
   font-size: 14px;
-  font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  white-space: nowrap;
 }
 
 .add-custom-item-btn:hover {
-  background: #f8f9fa;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background: #007bffc8;
+  
 }
 
 .cancel-custom-btn {
-  padding: 12px 16px;
-  background: transparent;
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+   background: #f8f9fa;
+  color: #495057;
+  border: 1px solid #dee2e6;
+  padding: 10px 16px;
   border-radius: 6px;
-  font-size: 14px;
   cursor: pointer;
-  transition: all 0.2s;
 }
 
 .cancel-custom-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background:#e9ecef
 }
 
 /* Alternative Card Style */
@@ -977,4 +955,21 @@
   .category-header {
     flex-wrap: wrap;
   }
+}
+/* Tick button */
+.tick-btn {
+  border: none;
+  background: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  margin-right: 8px;
+  transition: transform 0.2s ease;
+}
+
+.tick-btn:hover {
+  transform: scale(1.15);
+}
+
+.tick-btn.ticked {
+  color: #16a34a; /* green */
 }

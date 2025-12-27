@@ -1,419 +1,245 @@
-/* App.css - New Styles for Trip Planner */
-
+/* ================= RESET ================= */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-html, body, #root, .App {
-  min-height: 100vh;
-}
-
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-  background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
-  color: #333;
-}
-
+/* ================= APP LAYOUT ================= */
 .App {
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background: #f5f7fa;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
-/* Main Content */
+/* ================= MAIN CONTENT ================= */
 .main-content {
   flex: 1;
-  padding: 2rem;
-  max-width: 800px;
+  padding: 2rem 1rem;
+  max-width: 900px;
   margin: 0 auto;
   width: 100%;
 }
 
-/* Trip Planner Container */
+/* ================= TRIP PLANNER ================= */
 .trip-planner {
-  background: white;
-  border-radius: 16px;
-  padding: 2.5rem;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-  border: 1px solid #e0e6ed;
+  background: #ffffff;
+  padding: 2rem;
+  border-radius: 14px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
 }
 
 .planner-title {
-  color: #2d3748;
-  font-size: 2.2rem;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-size: 1.9rem;
   font-weight: 700;
-  margin-bottom: 1.5rem;
-  text-align: center;
+  color: #2d3748;
 }
 
-/* Sign In Prompt */
-.signin-prompt {
+/* ================= API STATUS ================= */
+.api-status {
   text-align: center;
-  margin-bottom: 1.5rem;
-  color: #4a5568;
-}
-
-.signin-link {
-  background: none;
-  border: none;
-  color: #4299e1;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
   font-weight: 600;
-  cursor: pointer;
-  padding: 0;
-  text-decoration: underline;
-  font-size: 1rem;
 }
 
-.signin-link:hover {
-  color: #3182ce;
+.api-status.available {
+  color: #16a34a;
 }
 
-/* Divider */
-.divider {
-  height: 1px;
-  background: linear-gradient(90deg, 
-    transparent, 
-    rgba(0, 0, 0, 0.1), 
-    transparent
-  );
-  margin: 2rem 0;
+.api-status.unavailable {
+  color: #dc2626;
 }
 
-/* Form Styles */
+/* ================= FORM ================= */
 .trip-form {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1.4rem;
 }
 
-.form-group label {
-  display: block;
-  color: #2d3748;
-  font-weight: 600;
-  margin-bottom: 0.8rem;
-  font-size: 1.1rem;
-}
-
-.trip-input {
-  width: 100%;
-  padding: 1rem;
-  border: 2px solid #e2e8f0;
-  border-radius: 10px;
-  font-size: 1rem;
-  font-family: inherit;
-  resize: vertical;
-  transition: all 0.3s ease;
-  color: #4a5568;
-}
-
-.trip-input:focus {
-  outline: none;
-  border-color: #48bbae;
-  box-shadow: 0 0 0 3px rgba(72, 187, 120, 0.1);
-}
-
-.trip-input::placeholder {
-  color: #a0aec0;
-}
-
-/* Radio Group */
-.radio-group {
-  display: flex;
-  flex-direction: column;
+/* ================= TRIP BUILDER GRID ================= */
+.trip-builder {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
 }
 
-.radio-option {
+/* Inputs & selects */
+.trip-builder input,
+.trip-builder select {
+  width: 100%;
+  padding: 0.75rem 0.85rem;
+  font-size: 0.95rem;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #1e293b;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.trip-builder input::placeholder {
+  color: #94a3b8;
+}
+
+.trip-builder input:focus,
+.trip-builder select:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+}
+
+.trip-builder input:disabled,
+.trip-builder select:disabled {
+  background: #f1f5f9;
+  cursor: not-allowed;
+}
+
+/* Make destination full width */
+.trip-builder input[type="text"] {
+  grid-column: span 2;
+}
+
+/* ================= RADIO GROUP ================= */
+.radio-group {
+  display: flex;
+  gap: 1.5rem;
+  font-size: 0.95rem;
+  padding-top: 0.3rem;
+}
+
+.radio-group label {
   display: flex;
   align-items: center;
-  gap: 0.8rem;
+  gap: 0.4rem;
   cursor: pointer;
-  padding: 1rem;
-  border: 2px solid #e2e8f0;
-  border-radius: 10px;
-  transition: all 0.3s ease;
+  color: #334155;
 }
 
-.radio-option:hover {
-  border-color: #c6f6d5;
-  background: #f0fff4;
-}
-
-.radio-option input[type="radio"] {
-  width: 20px;
-  height: 20px;
-  accent-color: #48bbae;
-}
-
-.radio-option span {
-  color: #2d3748;
-  font-weight: 500;
-}
-
-/* Get Itinerary Button */
-.get-itinerary-btn {
-  background: linear-gradient(135deg, #48bbae 0%, #48bbae 100%);
-  color: white;
-  border: none;
-  padding: 1rem 2rem;
-  border-radius: 10px;
-  font-size: 1.1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  width: 100%;
-  letter-spacing: 0.5px;
-  box-shadow: 0 4px 15px rgba(72, 187, 120, 0.2);
-}
-
-.get-itinerary-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(72, 187, 120, 0.3);
-}
-
-.get-itinerary-btn:active {
-  transform: translateY(0);
-}
-
-/* Sample Prompt */
-.sample-prompt {
-  margin-top: 2.5rem;
-  padding: 1.5rem;
-  background: #f7fafc;
-  border-radius: 10px;
-  border-left: 4px solid #48bbae;
-}
-
-.sample-title {
-  color: #2d3748;
-  font-weight: 600;
-  margin-bottom: 0.8rem;
+/* ================= SUBMIT BUTTON ================= */
+.trip-form button {
+  padding: 0.9rem;
   font-size: 1rem;
+  font-weight: 600;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #ffffff;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.sample-text {
-  color: #4a5568;
-  margin-bottom: 0.5rem;
-  font-size: 0.95rem;
-  padding-left: 1rem;
-  position: relative;
+.trip-form button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
 }
 
-.sample-text::before {
-  content: "•";
-  color: #48bb78;
-  position: absolute;
-  left: 0;
-  font-size: 1.2rem;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .main-content {
-    padding: 1rem;
-  }
-  
-  .trip-planner {
-    padding: 1.5rem;
-  }
-  
-  .planner-title {
-    font-size: 1.8rem;
-  }
-  
-  .radio-group {
-    flex-direction: column;
-  }
-}
-/* User welcome banner */
-.user-welcome {
-  background: linear-gradient(135deg, #48bbae20, #38a89d20);
-  padding: 1.5rem;
-  border-radius: 12px;
-  margin-bottom: 2rem;
-  text-align: center;
-  border: 2px solid #48bbae;
-}
-
-.user-welcome h3 {
-  color: #2d3748;
-  margin-bottom: 0.5rem;
-}
-
-.user-welcome p {
-  color: #4a5568;
-  margin: 0;
-}
-
-/* Demo note */
-.demo-note {
-  color: #718096;
-  font-size: 0.9rem;
-  margin-top: 0.5rem;
-}
-
-/* Disabled state */
-.trip-input:disabled,
-input:disabled + span {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.get-itinerary-btn:disabled {
+.trip-form button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-}
-
-.get-itinerary-btn:disabled:hover {
-  transform: none;
   box-shadow: none;
 }
-/* Add to App.css */
 
-/* Loading Spinner */
-.loading-spinner {
-  display: inline-block;
-  width: 20px;
-  height: 20px;
-  border: 3px solid #f3f3f3;
-  border-top: 3px solid #48bbae;
+/* ================= HOME LOADING ================= */
+.home-loading {
+  margin-top: 1.5rem;
+  padding: 1.2rem;
+  border-radius: 10px;
+  background: #f8fafc;
+  text-align: center;
+  color: #334155;
+  border: 1px solid #e2e8f0;
+}
+
+.home-loading p {
+  margin-top: 0.6rem;
+  font-size: 0.9rem;
+}
+
+/* ================= SPINNER ================= */
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 4px solid #e5e7eb;
+  border-top: 4px solid #2563eb;
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  margin-right: 10px;
+  margin: 0 auto;
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* Sample Buttons */
-.sample-btn {
-  display: block;
-  width: 100%;
-  background: #f7fafc;
-  border: 2px solid #e2e8f0;
-  border-radius: 8px;
-  padding: 0.8rem;
-  margin: 0.5rem 0;
-  color: #4a5568;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-align: left;
-}
-
-.sample-btn:hover {
-  background: #edf2f7;
-  border-color: #cbd5e0;
-  transform: translateX(5px);
-}
-
-/* Demo Notice */
-.demo-note {
-  color: #718096;
-  font-size: 0.9rem;
-  margin-top: 0.5rem;
-  font-style: italic;
-}
-
-/* Disabled state improvements */
-.get-itinerary-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.get-itinerary-btn:disabled:hover {
-  transform: none;
-  box-shadow: none;
-}
-/* Add these styles to App.css */
-
-/* Quick Tools */
-.quick-tools {
-  display: flex;
-  gap: 10px;
-  margin-top: 15px;
-  flex-wrap: wrap;
-}
-
-.tool-btn {
-  padding: 8px 16px;
-  background: white;
-  border: 2px solid #007bff;
-  border-radius: 20px;
-  color: #007bff;
-  cursor: pointer;
-  font-size: 14px;
-  transition: all 0.3s;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.tool-btn:hover {
-  background: #007bff;
-  color: white;
-  transform: translateY(-2px);
-}
-
-.packing-tool-btn {
-  border-color: #28a745;
-  color: #28a745;
-}
-
-.packing-tool-btn:hover {
-  background: #28a745;
-}
-
-/* Packing List Button in Form */
-.packing-list-btn {
-  background: #28a745 !important;
-  color: white !important;
-  border: 2px solid #28a745 !important;
-}
-
-.packing-list-btn:hover {
-  background: #218838 !important;
-  border-color: #1e7e34 !important;
-  transform: translateY(-2px);
-}
-
-/* Tools Dropdown in Header */
-.tools-dropdown {
-  position: relative;
-  display: inline-block;
-}
-
-.tools-link {
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .quick-tools {
-    justify-content: center;
+  to {
+    transform: rotate(360deg);
   }
-  
-  .tool-btn {
-    flex: 1;
-    min-width: 200px;
-    justify-content: center;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 600px) {
+  .trip-planner {
+    padding: 1.5rem;
   }
-  
-  .action-buttons {
+
+  .trip-builder {
+    grid-template-columns: 1fr;
+  }
+
+  .trip-builder input[type="text"] {
+    grid-column: span 1;
+  }
+
+  .radio-group {
     flex-direction: column;
+    gap: 0.6rem;
   }
-  
-  .get-itinerary-btn,
-  .popular-itineraries-btn,
-  .saved-itineraries-btn,
-  .packing-list-btn {
-    width: 100%;
-    margin-bottom: 10px;
-  }
+}
+.trip-form-header {
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.trip-form-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 0.3rem;
+}
+
+.trip-form-subtitle {
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+.trip-builder {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+}
+
+.field label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.35rem;
+}
+
+.field input,
+.field select {
+  padding: 0.6rem 0.7rem;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  font-size: 0.95rem;
+}
+
+.field input:focus,
+.field select:focus {
+  outline: none;
+  border-color: #2563eb;
 }
