@@ -16,7 +16,7 @@ const TripResults = ({ suggestions, onClose }) => {
 
   const shareTrip = () => {
     const shareText = `My AI-Powered Trip Plan:\n\n` +
-      suggestions.map(s => `⏰ ${s.time}\n📍 ${s.activity}\n🚗 ${s.transport}`).join('\n\n');
+      suggestions.map(s => ` ${s.time}\n ${s.activity}\n ${s.transport}`).join('\n\n');
     
     if (navigator.share) {
       navigator.share({
@@ -32,27 +32,27 @@ const TripResults = ({ suggestions, onClose }) => {
   return (
     <div className="trip-results">
       <div className="results-header">
-        <h2>🎉 Your AI-Powered Itinerary</h2>
+        <h2>Your AI-Powered Itinerary</h2>
         <button className="close-results" onClick={onClose}>×</button>
       </div>
 
       <div className="results-summary">
         <div className="summary-card">
-          <span className="summary-icon">⏱️</span>
+          <span className="summary-icon"></span>
           <div>
             <h4>Total Duration</h4>
             <p>{suggestions.length * 3} hours</p>
           </div>
         </div>
         <div className="summary-card">
-          <span className="summary-icon">💰</span>
+          <span className="summary-icon"></span>
           <div>
             <h4>Estimated Cost</h4>
             <p>₹{suggestions.reduce((sum, s) => sum + (parseInt(s.cost) || 0), 0)}</p>
           </div>
         </div>
         <div className="summary-card">
-          <span className="summary-icon">🚗</span>
+          <span className="summary-icon"></span>
           <div>
             <h4>Transport</h4>
             <p>Auto/Taxi/Walk</p>
@@ -69,11 +69,11 @@ const TripResults = ({ suggestions, onClose }) => {
             <div className="timeline-content">
               <div className="time-badge">{item.time}</div>
               <h3>{item.activity}</h3>
-              <p className="location">📍 {item.location}</p>
+              <p className="location"> {item.location}</p>
               <div className="details">
-                <span className="transport">🚗 {item.transport}</span>
-                <span className="duration">⏱️ {item.duration}</span>
-                <span className="cost">💰 {item.cost}</span>
+                <span className="transport"> {item.transport}</span>
+                <span className="duration"> {item.duration}</span>
+                <span className="cost"> {item.cost}</span>
               </div>
               <p className="description">{item.description}</p>
             </div>

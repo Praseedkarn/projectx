@@ -328,3 +328,92 @@ input:disabled + span {
   transform: none;
   box-shadow: none;
 }
+/* Add these styles to App.css */
+
+/* Quick Tools */
+.quick-tools {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+  flex-wrap: wrap;
+}
+
+.tool-btn {
+  padding: 8px 16px;
+  background: white;
+  border: 2px solid #007bff;
+  border-radius: 20px;
+  color: #007bff;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.tool-btn:hover {
+  background: #007bff;
+  color: white;
+  transform: translateY(-2px);
+}
+
+.packing-tool-btn {
+  border-color: #28a745;
+  color: #28a745;
+}
+
+.packing-tool-btn:hover {
+  background: #28a745;
+}
+
+/* Packing List Button in Form */
+.packing-list-btn {
+  background: #28a745 !important;
+  color: white !important;
+  border: 2px solid #28a745 !important;
+}
+
+.packing-list-btn:hover {
+  background: #218838 !important;
+  border-color: #1e7e34 !important;
+  transform: translateY(-2px);
+}
+
+/* Tools Dropdown in Header */
+.tools-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.tools-link {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .quick-tools {
+    justify-content: center;
+  }
+  
+  .tool-btn {
+    flex: 1;
+    min-width: 200px;
+    justify-content: center;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+  }
+  
+  .get-itinerary-btn,
+  .popular-itineraries-btn,
+  .saved-itineraries-btn,
+  .packing-list-btn {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+}

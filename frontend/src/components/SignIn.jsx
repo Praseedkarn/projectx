@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../styles/SignIn.css';
 
 const SignIn = ({ onClose, onLoginSuccess }) => {
@@ -7,11 +7,13 @@ const SignIn = ({ onClose, onLoginSuccess }) => {
     email: '',
     password: '',
     confirmPassword: '',
-    name: ''
+    name: '',
+    username: ''
   });
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   // Handle form input changes
   const handleInputChange = (e) => {
@@ -23,149 +25,132 @@ const SignIn = ({ onClose, onLoginSuccess }) => {
   };
 
   // Handle form submit
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setSuccess('');
+    setIsLoading(true);
 
-    if (isLogin) {
-      handleLogin();
-    } else {
-      handleSignUp();
+    try {
+      if (isLogin) {
+        await handleLogin();
+      } else {
+        await handleSignUp();
+      }
+    } catch (err) {
+      setError(err.message || 'Something went wrong');
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // LOGIN FUNCTION
-  const handleLogin = () => {
+  // LOCAL LOGIN FUNCTION - No backend needed
+  const handleLogin = async () => {
     const { email, password } = formData;
 
-    // 1. Get all users from localStorage
-    const users = JSON.parse(localStorage.getItem('travelUsers') || '[]');
-    
-    // 2. Find user with matching email
-    const user = users.find(u => u.email === email);
-    
-    if (!user) {
-      setError('User not found. Please sign up first.');
-      return;
+    if (!email || !password) {
+      throw new Error('Please fill in all fields');
     }
-    
-    // 3. Check password (for demo, plain text comparison)
-    if (user.password !== password) {
-      setError('Incorrect password');
-      return;
-    }
-    
-    // 4. Login successful - save session
-    const sessionData = {
-      email: user.email,
-      name: user.name,
+
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 800));
+
+    // Create mock user from form data
+    const mockUser = {
+      id: Date.now(),
+      username: email.split('@')[0],
+      email: email,
+      name: email.split('@')[0],
+      fullName: email.split('@')[0],
       isLoggedIn: true,
       loginTime: Date.now()
     };
-    
-    localStorage.setItem('currentUser', JSON.stringify(sessionData));
-    
-    // 5. Remember me option
+
+    // Save to localStorage
+    localStorage.setItem('user', JSON.stringify(mockUser));
+
+    // Remember me option
     if (rememberMe) {
       localStorage.setItem('rememberEmail', email);
+    } else {
+      localStorage.removeItem('rememberEmail');
     }
-    
-    // 6. Show success and close
-    setSuccess(`Welcome back, ${user.name}! `);
-    
-    // 7. Call parent callback and close modal
+
+    setSuccess(`🎉 Welcome back, ${mockUser.username}! (Demo Mode)`);
+
+    // Call parent callback and close modal
     setTimeout(() => {
-      if (onLoginSuccess) onLoginSuccess(sessionData);
+      if (onLoginSuccess) onLoginSuccess(mockUser);
       onClose();
     }, 1500);
   };
 
-  // SIGN UP FUNCTION
-  const handleSignUp = () => {
-    const { name, email, password, confirmPassword } = formData;
+  // LOCAL SIGN UP FUNCTION - No backend needed
+  const handleSignUp = async () => {
+    const { name, email, password, confirmPassword, username } = formData;
 
-    // 1. Validate
-    if (!name || !email || !password) {
-      setError('All fields are required');
-      return;
+    // Validation
+    if (!name || !email || !password || !username) {
+      throw new Error('All fields are required');
     }
-    
+
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
-      return;
+      throw new Error('Passwords do not match');
     }
-    
+
     if (password.length < 6) {
-      setError('Password must be at least 6 characters');
-      return;
+      throw new Error('Password must be at least 6 characters');
     }
-    
-    // 2. Check if email already exists
-    const users = JSON.parse(localStorage.getItem('travelUsers') || '[]');
-    const emailExists = users.some(u => u.email === email);
-    
-    if (emailExists) {
-      setError('Email already registered');
-      return;
-    }
-    
-    // 3. Create new user
-    const newUser = {
+
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 800));
+
+    // Create mock user
+    const mockUser = {
       id: Date.now(),
-      name: name,
+      username: username,
       email: email,
-      password: password, // ⚠️ For demo only - plain text!
-      createdAt: new Date().toISOString(),
-      trips: []
-    };
-    
-    // 4. Save to users list
-    users.push(newUser);
-    localStorage.setItem('travelUsers', JSON.stringify(users));
-    
-    // 5. Auto login
-    const sessionData = {
-      email: newUser.email,
-      name: newUser.name,
+      name: name,
+      fullName: name,
       isLoggedIn: true,
       loginTime: Date.now()
     };
-    
-    localStorage.setItem('currentUser', JSON.stringify(sessionData));
-    
-    // 6. Show success
-    setSuccess(`Account created successfully, ${name}! 🎉`);
-    
-    // 7. Call parent callback and close
+
+    // Save to localStorage
+    localStorage.setItem('user', JSON.stringify(mockUser));
+
+    setSuccess(`🎉 Account created successfully, ${mockUser.username}! (Demo Mode)`);
+
+    // Call parent callback and close
     setTimeout(() => {
-      if (onLoginSuccess) onLoginSuccess(sessionData);
+      if (onLoginSuccess) onLoginSuccess(mockUser);
       onClose();
     }, 1500);
   };
 
-  // Forgot password
-  const handleForgotPassword = () => {
-    const email = prompt('Enter your email to reset password:');
-    if (email) {
-      const users = JSON.parse(localStorage.getItem('travelUsers') || '[]');
-      const user = users.find(u => u.email === email);
-      
-      if (user) {
-        alert(`Password reset instructions sent to ${email} \n(For demo: Your password is "${user.password}")`);
-      } else {
-        alert('Email not found');
-      }
-    }
-  };
+  // Demo login buttons
+  const handleDemoLogin = async (email, password) => {
+    setFormData({
+      email: email,
+      password: password,
+      confirmPassword: '',
+      name: '',
+      username: ''
+    });
+    setIsLogin(true);
 
-  // Google sign in (demo)
-  const handleGoogleSignIn = () => {
-    alert('Google sign in would work with real Auth0 setup. For now, please use email sign in.');
+    // Auto-submit after 500ms
+    setTimeout(() => {
+      const form = document.querySelector('form');
+      if (form) {
+        const submitEvent = new Event('submit', { cancelable: true, bubbles: true });
+        form.dispatchEvent(submitEvent);
+      }
+    }, 500);
   };
 
   // Pre-fill email if remembered
-  React.useEffect(() => {
+  useEffect(() => {
     const rememberedEmail = localStorage.getItem('rememberEmail');
     if (rememberedEmail) {
       setFormData(prev => ({ ...prev, email: rememberedEmail }));
@@ -177,14 +162,21 @@ const SignIn = ({ onClose, onLoginSuccess }) => {
     <div className="signin-modal">
       <div className="signin-content">
         <button className="close-btn" onClick={onClose}>×</button>
-        
+
         <h2 className="signin-title">
-          {isLogin ? 'Welcome ! ' : 'Create Account 🎉'}
+          {isLogin ? 'Welcome Back! 👋' : 'Create Account 🎉'}
         </h2>
-        
+
         <p className="signin-subtitle">
-          {isLogin ? 'Sign in to your travel account' : 'Start your travel journey'}
+          {isLogin ? 'Sign in to your travel account' : 'Start your travel journey with us'}
+          <span className="demo-notice"> (Demo Mode)</span>
         </p>
+
+        {/* Connection Status */}
+        <div className="connection-status">
+          <div className="status-dot connected"></div>
+          <span>Mode: Local Demo ✅</span>
+        </div>
 
         {/* Success Message */}
         {success && (
@@ -200,34 +192,56 @@ const SignIn = ({ onClose, onLoginSuccess }) => {
           </div>
         )}
 
-        {/* Demo Notice */}
-        {/* <div className="demo-notice">
-          <small>⚠️ Demo: Passwords stored in plain text. For learning only.</small>
-        </div> */}
-
-        {/* Google Button */}
-        <button className="google-btn" onClick={handleGoogleSignIn}>
-          <span className="google-icon">G</span>
-          Continue with Google
-        </button>
+        {/* Demo Quick Login Buttons */}
+        <div className="demo-quick-login">
+          <p className="demo-title">Quick Demo Logins:</p>
+          <div className="demo-buttons">
+            <button
+              type="button"
+              className="demo-btn"
+              onClick={() => handleDemoLogin('test@test.com', 'test123')}
+            >
+              👤 Test Account
+            </button>
+            <button
+              type="button"
+              className="demo-btn"
+              onClick={() => handleDemoLogin('demo@user.com', 'demo123')}
+            >
+              🎯 Demo Account
+            </button>
+          </div>
+        </div>
 
         <div className="divider">
-          <span>or use email</span>
+          <span>or use your own demo credentials</span>
         </div>
 
         {/* Form */}
         <form onSubmit={handleSubmit}>
           {!isLogin && (
-            <div className="form-group">
-              <input
-                type="text"
-                name="name"
-                placeholder="Full Name"
-                value={formData.name}
-                onChange={handleInputChange}
-                required
-              />
-            </div>
+            <>
+              <div className="form-group">
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Full Name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  required={!isLogin}
+                />
+              </div>
+              <div className="form-group">
+                <input
+                  type="text"
+                  name="username"
+                  placeholder="Username"
+                  value={formData.username}
+                  onChange={handleInputChange}
+                  required={!isLogin}
+                />
+              </div>
+            </>
           )}
 
           <div className="form-group">
@@ -245,7 +259,7 @@ const SignIn = ({ onClose, onLoginSuccess }) => {
             <input
               type="password"
               name="password"
-              placeholder="Password"
+              placeholder="Password (min 6 chars)"
               value={formData.password}
               onChange={handleInputChange}
               required
@@ -260,7 +274,7 @@ const SignIn = ({ onClose, onLoginSuccess }) => {
                 placeholder="Confirm Password"
                 value={formData.confirmPassword}
                 onChange={handleInputChange}
-                required
+                required={!isLogin}
               />
             </div>
           )}
@@ -275,19 +289,22 @@ const SignIn = ({ onClose, onLoginSuccess }) => {
                 />
                 <span>Remember me</span>
               </label>
-              
-              <button 
-                type="button" 
-                className="forgot-password"
-                onClick={handleForgotPassword}
-              >
-                Forgot Password?
-              </button>
             </div>
           )}
 
-          <button type="submit" className="submit-btn">
-            {isLogin ? 'Sign In' : 'Create Account'}
+          <button
+            type="submit"
+            className="submit-btn"
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <>
+                <span className="loading-spinner"></span>
+                Processing...
+              </>
+            ) : (
+              isLogin ? 'Sign In (Demo)' : 'Create Account (Demo)'
+            )}
           </button>
         </form>
 
@@ -295,24 +312,31 @@ const SignIn = ({ onClose, onLoginSuccess }) => {
         <div className="switch-mode">
           <p>
             {isLogin ? "Don't have an account? " : "Already have an account? "}
-            <button 
+            <button
               className="switch-btn"
               onClick={() => {
                 setIsLogin(!isLogin);
                 setError('');
                 setSuccess('');
+                setFormData({
+                  email: formData.email,
+                  password: '',
+                  confirmPassword: '',
+                  name: '',
+                  username: ''
+                });
               }}
+              type="button"
             >
               {isLogin ? 'Sign Up' : 'Sign In'}
             </button>
           </p>
         </div>
 
-        {/* Demo Accounts */}
-        <div className="demo-accounts">
-          <p><small>Demo accounts:</small></p>
-          <p><small>Email: test@test.com | Password: test123</small></p>
-          <p><small>Email: user@demo.com | Password: demo123</small></p>
+        {/* Demo Info */}
+        <div className="api-info">
+          <p><small>Mode: Local Demo (No backend needed)</small></p>
+          <p><small>Data saved in browser localStorage</small></p>
         </div>
       </div>
     </div>

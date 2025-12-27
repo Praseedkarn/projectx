@@ -124,6 +124,7 @@
   position: relative;
 }
 
+/* FIXED: Changed from .header-profile-btn to .profile-btn to match JSX */
 .profile-btn {
   display: flex;
   align-items: center;
@@ -142,7 +143,7 @@
   border-color: #cbd5e0;
 }
 
-.profile-icon {
+.header-profile-icon {
   width: 32px;
   height: 32px;
   background: linear-gradient(45deg, #48bbae, #38a89d);
@@ -155,7 +156,7 @@
   font-size: 0.9rem;
 }
 
-.profile-name {
+.header-profile-name {
   font-weight: 500;
   font-size: 0.9rem;
   max-width: 120px;
@@ -165,7 +166,7 @@
 }
 
 /* Profile Dropdown */
-.profile-dropdown {
+.header-profile-dropdown {
   position: absolute;
   top: 100%;
   right: 0;
@@ -191,7 +192,7 @@
   }
 }
 
-.profile-info {
+.header-profile-info {
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -199,7 +200,7 @@
   border-bottom: 1px solid #e2e8f0;
 }
 
-.profile-avatar {
+.header-profile-avatar {
   width: 48px;
   height: 48px;
   background: linear-gradient(45deg, #48bbae, #38a89d);
@@ -212,24 +213,26 @@
   font-size: 1.2rem;
 }
 
-.profile-details h4 {
+.header-profile-details h4 {
   margin: 0;
   color: #2d3748;
   font-size: 1rem;
 }
 
-.profile-details p {
+.header-profile-details p {
   margin: 0.2rem 0 0;
   color: #718096;
   font-size: 0.85rem;
 }
 
-.dropdown-divider {
+.header-dropdown-divider {
   height: 1px;
   background: #e2e8f0;
   margin: 0.5rem 0;
 }
 
+/* FIXED: Changed .header-dropdown-item to target both .header-dropdown-item and .dropdown-item */
+.header-dropdown-item,
 .dropdown-item {
   display: block;
   width: 100%;
@@ -246,11 +249,13 @@
   gap: 10px;
 }
 
+.header-dropdown-item:hover,
 .dropdown-item:hover {
   background: #f7fafc;
   color: #2d3748;
 }
 
+/* FIXED: Corrected class name from .header-logout-item to .logout-item */
 .logout-item {
   color: #e53e3e;
 }
@@ -436,10 +441,11 @@
     display: flex;
   }
   
-  .profile-name {
+  .header-profile-name {
     display: none;
   }
   
+  /* FIXED: Changed to .profile-btn to match JSX */
   .profile-btn {
     padding: 0.5rem;
   }
@@ -458,6 +464,11 @@
     min-width: 250px;
     right: -10px;
   }
+  
+  /* FIXED: Show profile button only when user is logged in */
+  .profile-btn {
+    display: flex;
+  }
 }
 
 @media (max-width: 480px) {
@@ -469,12 +480,13 @@
     font-size: 1.3rem;
   }
   
-  .profile-btn {
-    display: none;
-  }
-  
   .signin-btn {
     padding: 0.6rem 1.2rem;
     font-size: 0.9rem;
+  }
+  
+  /* FIXED: Hide profile button on very small screens */
+  .profile-btn {
+    display: none;
   }
 }

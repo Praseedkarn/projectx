@@ -1,7 +1,16 @@
 import React, { useState } from 'react';
 import '../styles/Header.css';
 
-const Header = ({ user, onSignInClick, onLogoutClick }) => {
+const Header = ({ 
+  user, 
+  onSignInClick, 
+  onLogoutClick, 
+  onProfileClick, 
+  onHomeClick, 
+  onItinerariesClick,
+  onSavedClick,
+  onPackingListClick  // Add this prop
+}) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
 
@@ -27,10 +36,49 @@ const Header = ({ user, onSignInClick, onLogoutClick }) => {
     setShowProfileMenu(false);
   };
 
-  const handleNavClick = (item) => {
-    alert(`Navigating to ${item}`);
+  const handleHomeClick = (e) => {
+    e.preventDefault();
+    if (onHomeClick) {
+      onHomeClick();
+    }
     setIsMenuOpen(false);
-    setShowProfileMenu(false);
+  };
+
+  const handleItinerariesClick = (e) => {
+    e.preventDefault();
+    if (onItinerariesClick) {
+      onItinerariesClick();
+    }
+    setIsMenuOpen(false);
+  };
+
+  const handleSavedClick = (e) => {
+    e.preventDefault();
+    if (onSavedClick) {
+      onSavedClick();
+    }
+    setIsMenuOpen(false);
+  };
+
+  // In Header.jsx
+const handlePackingListClick = (e) => {
+  if (e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+  
+  if (onPackingListClick) {
+    onPackingListClick();
+  }
+  setIsMenuOpen(false);
+};
+
+  const handleToolsDropdown = (e) => {
+    e.stopPropagation();
+    // For desktop, directly open packing list
+    if (onPackingListClick) {
+      onPackingListClick();
+    }
   };
 
   // Close menus when clicking outside
@@ -51,9 +99,9 @@ const Header = ({ user, onSignInClick, onLogoutClick }) => {
       {/* Left: Logo + Desktop Navigation */}
       <div className="header-left">
         {/* Logo */}
-        <div className="logo-container" onClick={() => handleNavClick('Home')}>
+        <div className="logo-container" onClick={handleHomeClick}>
           <div className="logo-text-container">
-            <h2 className="logo-text">Project X</h2>
+            <h2 className="logo-text">PROJECT X</h2>
           </div>
         </div>
 
@@ -62,31 +110,48 @@ const Header = ({ user, onSignInClick, onLogoutClick }) => {
           <a 
             href="#home" 
             className="nav-link"
-            onClick={(e) => {
-              e.preventDefault();
-              handleNavClick('Home');
-            }}
+            onClick={handleHomeClick}
           >
             Home
           </a>
           
-          <a 
-            href="#tools" 
-            className="nav-link"
-            onClick={(e) => {
-              e.preventDefault();
-              handleNavClick('Tools');
-            }}
-          >
-            Tools
-          </a>
+          {user && (
+            <>
+              <a 
+                href="#itineraries" 
+                className="nav-link"
+                onClick={handleItinerariesClick}
+              >
+                Popular Itineraries
+              </a>
+              
+              <a 
+                href="#saved" 
+                className="nav-link"
+                onClick={handleSavedClick}
+              >
+                Saved Trips
+              </a>
+              
+              {/* Tools Dropdown for Desktop */}
+              <div className="tools-dropdown">
+                <a 
+                  href="#tools" 
+                  className="nav-link tools-link"
+                  onClick={handleToolsDropdown}
+                >
+                  🧳 Tools
+                </a>
+              </div>
+            </>
+          )}
           
           <a 
             href="#help" 
             className="nav-link"
             onClick={(e) => {
               e.preventDefault();
-              handleNavClick('Help');
+              alert('Help section coming soon!');
             }}
           >
             Help
@@ -106,31 +171,31 @@ const Header = ({ user, onSignInClick, onLogoutClick }) => {
                 toggleProfileMenu();
               }}
             >
-              <span className="profile-icon">
+              <span className="header-profile-icon">
                 {user.name?.charAt(0)?.toUpperCase() || 'U'}
               </span>
-              <span className="profile-name">{user.name}</span>
+              <span className="header-profile-name">{user.name}</span>
             </button>
 
             {/* Profile Dropdown */}
             {showProfileMenu && (
-              <div className="profile-dropdown" onClick={(e) => e.stopPropagation()}>
-                <div className="profile-info">
-                  <div className="profile-avatar">
+              <div className="header-profile-dropdown" onClick={(e) => e.stopPropagation()}>
+                <div className="header-profile-info">
+                  <div className="header-profile-avatar">
                     {user.name?.charAt(0)?.toUpperCase() || 'U'}
                   </div>
-                  <div className="profile-details">
+                  <div className="header-profile-details">
                     <h4>{user.name}</h4>
                     <p>{user.email}</p>
                   </div>
                 </div>
                 
-                <div className="dropdown-divider"></div>
+                <div className="header-dropdown-divider"></div>
                 
                 <button 
-                  className="dropdown-item"
+                  className="header-dropdown-item"
                   onClick={() => {
-                    handleNavClick('My Profile');
+                    if (onProfileClick) onProfileClick();
                     setShowProfileMenu(false);
                   }}
                 >
@@ -138,29 +203,29 @@ const Header = ({ user, onSignInClick, onLogoutClick }) => {
                 </button>
                 
                 <button 
-                  className="dropdown-item"
+                  className="header-dropdown-item"
                   onClick={() => {
-                    handleNavClick('My Trips');
+                    handlePackingListClick();
                     setShowProfileMenu(false);
                   }}
                 >
-                  🗺️ My Trips
+                  🧳 Packing List
                 </button>
                 
                 <button 
-                  className="dropdown-item"
+                  className="header-dropdown-item"
                   onClick={() => {
-                    handleNavClick('Settings');
+                    alert('Settings coming soon!');
                     setShowProfileMenu(false);
                   }}
                 >
                   ⚙️ Settings
                 </button>
                 
-                <div className="dropdown-divider"></div>
+                <div className="header-dropdown-divider"></div>
                 
                 <button 
-                  className="dropdown-item logout-item"
+                  className="header-dropdown-item logout-item"
                   onClick={handleLogout}
                 >
                   🚪 Logout
@@ -203,7 +268,7 @@ const Header = ({ user, onSignInClick, onLogoutClick }) => {
               </div>
             ) : (
               <div className="mobile-signin-prompt">
-                <p>Welcome to Project X! ✈️</p>
+                <p>Welcome to TravelPlanner! ✈️</p>
                 <button 
                   className="mobile-signin-btn"
                   onClick={handleSignIn}
@@ -216,43 +281,76 @@ const Header = ({ user, onSignInClick, onLogoutClick }) => {
             <div className="mobile-nav-links">
               <button 
                 className="mobile-nav-item"
-                onClick={() => handleNavClick('Home')}
+                onClick={handleHomeClick}
               >
                 🏠 Home
-              </button>
-              
-              <button 
-                className="mobile-nav-item"
-                onClick={() => handleNavClick('Tools')}
-              >
-                🛠️ Tools
-              </button>
-              
-              <button 
-                className="mobile-nav-item"
-                onClick={() => handleNavClick('Help')}
-              >
-                ❓ Help
               </button>
               
               {user && (
                 <>
                   <button 
                     className="mobile-nav-item"
-                    onClick={() => handleNavClick('My Trips')}
+                    onClick={handleItinerariesClick}
                   >
-                    🗺️ My Trips
+                    📋 Popular Itineraries
                   </button>
                   
                   <button 
                     className="mobile-nav-item"
-                    onClick={() => handleNavClick('Settings')}
+                    onClick={handleSavedClick}
+                  >
+                    ⭐ Saved Trips
+                  </button>
+                  
+                  <button 
+                    className="mobile-nav-item"
+                    onClick={handlePackingListClick}
+                  >
+                    🧳 Packing List
+                  </button>
+                  
+                  
+                  
+                  
+                </>
+              )}
+              
+              {user && (
+                <>
+                  <button 
+                    className="mobile-nav-item"
+                    onClick={() => {
+                      if (onProfileClick) onProfileClick();
+                      setIsMenuOpen(false);
+                    }}
+                  >
+                    👤 My Profile
+                  </button>
+                  
+                  <button 
+                    className="mobile-nav-item"
+                    onClick={() => {
+                      alert('Settings coming soon!');
+                      setIsMenuOpen(false);
+                    }}
                   >
                     ⚙️ Settings
                   </button>
                 </>
               )}
             </div>
+            
+            <div className="mobile-divider"></div>
+            
+            <button 
+              className="mobile-nav-item help-item"
+              onClick={() => {
+                alert('Help section coming soon!');
+                setIsMenuOpen(false);
+              }}
+            >
+              ❓ Help
+            </button>
             
             {user && (
               <>
