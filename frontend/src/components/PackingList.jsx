@@ -539,8 +539,32 @@ const PackingList = ({
                     className="quick-add-btn"
                     onClick={() => addQuickItem('Snacks', 'food')}
                   >
-                    Snacks
+                    Books
                   </button>
+                  <button 
+                    className="quick-add-btn"
+                    onClick={() => addQuickItem('Snacks', 'food')}
+                  >
+                    charger
+                  </button>
+                  <button 
+                    className="quick-add-btn"
+                    onClick={() => addQuickItem('Snacks', 'food')}
+                  >
+                    laptop
+                  </button>
+                  {/* <button 
+                    className="quick-add-btn"
+                    onClick={() => addQuickItem('Snacks', 'food')}
+                  >
+                    
+                  </button>
+                  <button 
+                    className="quick-add-btn"
+                    onClick={() => addQuickItem('Snacks', 'food')}
+                  >
+                    Snacks
+                  </button> */}
                 </div>
                 
                 <button 
