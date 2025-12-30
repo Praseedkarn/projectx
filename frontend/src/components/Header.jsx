@@ -65,7 +65,7 @@ useEffect(() => {
   return () => window.removeEventListener("scroll", handleScroll);
 }, [lastScrollY]);
 
-
+  
 
 
   return (
@@ -75,7 +75,7 @@ useEffect(() => {
   transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]
   ${hideHeader ? "-translate-y-full" : "translate-y-0"}`}>
       <div
-  className={`relative bg-[#fdfcf7] px-6 pt-5 overflow-hidden
+  className={`relative bg-[#fdfcf7] px-6 pt-5 
   transition-[max-height,padding] duration-500
   ease-[cubic-bezier(0.22,1,0.36,1)]
   ${
@@ -138,7 +138,13 @@ useEffect(() => {
 
             {/* PROFILE MENU */}
             {showProfileMenu && user && (
-              <div className="absolute right-0 top-12 w-56 bg-white rounded-xl shadow-lg border">
+              <div className="absolute right-0 top-12 z-[9999]
+                w-56 rounded-xl border
+                bg-white/95 backdrop-blur-md
+                shadow-2xl
+                max-h-[70vh]
+                 overflow-y-auto
+                ">
                 <div className="px-4 py-3">
                   <p className="font-semibold">{user.name}</p>
                   <p className="text-xs text-gray-500">{user.email}</p>
@@ -176,7 +182,15 @@ useEffect(() => {
 
             {/* MOBILE MENU */}
             {isMenuOpen && (
-              <div className="absolute right-0 top-12 w-60 bg-white rounded-xl shadow-lg border p-3">
+              <div className="absolute right-0 top-12 z-[9999]
+                  w-60 rounded-xl border
+                  bg-white/95 backdrop-blur-md
+                  shadow-2xl
+                  p-3
+                  max-h-[75vh]
+                  overflow-y-auto
+                  overscroll-contain
+                  ">
                 <button onClick={() => go(onHomeClick)} className="menu-item">
                   Home
                 </button>

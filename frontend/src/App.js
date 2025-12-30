@@ -41,7 +41,7 @@ function App() {
   const [Month, setMonth] = useState("");
   const [Transport, setTransport] = useState("");
   const [selectedBlogSlug, setSelectedBlogSlug] = useState(null);
-
+  const [suggestions, setSuggestions]=useState("");
   /* ===== Load user ===== */
   useEffect(() => {
     const userData = localStorage.getItem("user");
@@ -113,7 +113,22 @@ function App() {
         Pace: ${pace}
         Month: ${Month}
         Transport: ${Transport}
-        Use hour-wise format and keep it relaxed.
+        Rules:
+        - Use HOUR-WISE format (Hour 1, Hour 2, etc.) and keep it relaxed.
+        - Max 3–4 nearby places only
+        - Keep travel time minimal
+        - Focus on cafes, parks, markets, viewpoints
+        - Include short food/snack suggestions
+        - No hotels or long-distance travel
+        - Simple bullet points
+        - Practical and relaxed flow
+        User Preferences / special Request:
+         
+        Budget:
+        - Mention estimated cost per activity
+        - End with TOTAL ESTIMATED COST for ${hours} hours
+        
+
       `;
     } else if (tripType === "day") {
         description = `
@@ -123,6 +138,20 @@ function App() {
         Pace: ${pace}
         Month: ${Month}
         Transport: ${Transport}
+        Rules:
+          - Morning / Afternoon / Evening
+          - Max 2–3 main attractions
+          - Include breakfast, lunch, and evening food spots
+          - Keep travel distances short
+          - Mention local specialties
+          - Avoid rushing and overcrowding
+          - Add practical tips (best time, ticket tips)
+          - Easy-to-follow formatting
+          User Preferences / special Request:
+
+            Budget:
+          - Show cost for food, transport, attractions
+          - End with TOTAL DAY BUDGET (one clear number)
         `;
     } else {
       description = `
@@ -133,6 +162,23 @@ function App() {
         Detail level: ${detailLevel}
         Month: ${Month}
         Transport: ${Transport}
+         Rules:
+          - Day-wise structured plan (Day 1, Day 2, etc.)
+          - Max 3–4 activities per day
+          - First day should be light, last day relaxed
+          - Include local food recommendations daily
+          - Suggest transport options between places
+          - Mention approximate daily cost (rough estimate)
+          - Consider weather and season
+          - Avoid unrealistic travel distances
+          - Clear headings and bullet points
+
+        User Preferences / special Request:
+
+        Budget:
+          - Show DAILY estimated cost breakdown
+          - Include food, transport, attractions
+          - End with TOTAL TRIP COST (sum of all days)
         `;
     }
 
@@ -399,7 +445,6 @@ function App() {
                       <option>Walking</option>
                     </select>
                   </div>
-
                   {(tripType === "day" || tripType === "multi") && (
                     <div className="space-y-2 md:col-span-2">
                       <label className="text-sm font-medium">Budget</label>
@@ -414,6 +459,28 @@ function App() {
                       </select>
                     </div>
                   )}
+
+                  {/* <div className="suggestion-box">
+                    <label>Any special preferences? (optional)</label>
+                    <textarea
+                      placeholder="Eg: avoid crowds, add cafes, photography spots, local food, slow travel..."
+                      value={suggestions}
+                      onChange={(e) => setSuggestions(e.target.value)}
+                      rows={4}
+                    />
+                  </div> */}
+
+                  <div className="suggestion-box">
+                  <label >
+                    Any special preferences? (optional)
+                  </label>
+                  <input
+                    value={suggestions}
+                    onChange={(e) => setPlace(e.target.value)}
+                    placeholder="Eg: avoid crowds, add cafes, photography sports, local food..... "
+                    className="w-full rounded-xl border border-gray-200 px-4 py-3"
+                  />
+                </div>
                 </div>
 
                 {/* ===== ACTION AREA ===== */}
