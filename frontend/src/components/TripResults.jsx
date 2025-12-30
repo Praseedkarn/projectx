@@ -56,7 +56,7 @@ const TripResults = ({ suggestions, loading, onClose }) => {
           text-slate-700
           text-[15px]
           leading-[1.7]
-          font-mono
+          font-serif
 
           whitespace-pre-wrap
           break-words

@@ -11,6 +11,8 @@ import ItineraryDetail from "./components/ItineraryDetail";
 import SavedItineraries from "./components/SavedItineraries";
 import PackingList from "./components/PackingList";
 import ItinerarySlider from "./components/ItinerarySlider";
+import BlogDetail from "./components/BlogDetail";
+import Blogs from "./components/Blogs";
 
 import { generateTravelItinerary } from "./services/api";
 
@@ -25,7 +27,8 @@ function App() {
   const [activeComponent, setActiveComponent] = useState("home");
   const [selectedItineraryId, setSelectedItineraryId] = useState(null);
   const [apiStatus, setApiStatus] = useState("checking");
-
+  const headerRef = useRef(null);
+  const [headerHeight, setHeaderHeight] = useState(0);
   /* ===== Trip Builder States ===== */
   const [tripType, setTripType] = useState("multi");
   const [days, setDays] = useState(3);
@@ -37,7 +40,8 @@ function App() {
   const [detailLevel, setDetailLevel] = useState("morning");
   const [Month, setMonth] = useState("");
   const [Transport, setTransport] = useState("");
-  
+  const [selectedBlogSlug, setSelectedBlogSlug] = useState(null);
+
   /* ===== Load user ===== */
   useEffect(() => {
     const userData = localStorage.getItem("user");
@@ -57,6 +61,20 @@ function App() {
     };
     checkAPI();
   }, [currentUser]);
+
+  useEffect(() => {
+  if (!headerRef.current) return;
+
+  const updateHeight = () => {
+    setHeaderHeight(headerRef.current.offsetHeight);
+  };
+
+  updateHeight(); // initial
+  window.addEventListener("resize", updateHeight);
+
+  return () => window.removeEventListener("resize", updateHeight);
+}, [activeComponent]);
+
 
   /* ===== Auth ===== */
   const handleLoginSuccess = (user) => {
@@ -153,6 +171,7 @@ function App() {
   return (
     <div className="App">
       <Header
+      ref={headerRef}
         variant={activeComponent === "home" ? "home" : "compact"}
         user={currentUser}
         onSignInClick={() => setShowSignIn(true)}
@@ -162,7 +181,19 @@ function App() {
         onSavedClick={() => setActiveComponent("saved")}
         onPackingListClick={() => setActiveComponent("packing")}
         onProfileClick={() => setActiveComponent("profile")}
+        onBlogsClick={()=>setActiveComponent("blogs")}
       />
+
+      <div
+  style={{
+    height:
+      activeComponent === "home"
+        ? headerHeight + 480   // 👈 extra space for hero
+        : headerHeight,
+  }}
+  className="transition-[height] duration-500"
+/>
+
 
       {showSignIn && (
         <SignIn
@@ -171,7 +202,7 @@ function App() {
         />
       )}
 
-      <main className="bg-[#d7f26e]/80 px-4 pt-24 pb-24 overflow-hidden">
+      <main className="bg-[#d7f26e]/80 px-4  pb-24 overflow-hidden">
 
         {/* ===== HERO (HOME ONLY) ===== */}
         {activeComponent === "home" && (
@@ -492,6 +523,23 @@ function App() {
               />
           </div>
         )}
+
+          {activeComponent === "blogs" && (
+            <Blogs
+              onBlogClick={(slug) => {
+                setSelectedBlogSlug(slug);
+                setActiveComponent("blog-detail");
+              }}
+            />
+          )}
+
+          {activeComponent === "blog-detail" && (
+            <BlogDetail
+              slug={selectedBlogSlug}
+              onBack={() => setActiveComponent("blogs")}
+            />
+          )}
+
 
         {/* RESULTS */}
         {activeComponent === "results" && (

@@ -2,247 +2,59 @@
 @tailwind components;
 @tailwind utilities;
 
+
+
+html,
+body {
+  background-color: #d7f26e;
+  overscroll-behavior: none;
+}
+
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+.animate-page {
+  animation: pageFade 0.35s ease-out;
 }
 
-/* ================= APP LAYOUT ================= */
-.App {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  background: #6e9bdd;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-}
-
-/* ================= MAIN CONTENT ================= */
-.main-content {
-  flex: 1;
-  padding: 2rem 1rem;
-  max-width: 900px;
-  margin: 0 auto;
-  width: 100%;
-}
-
-/* ================= TRIP PLANNER ================= */
-.trip-planner {
-  background: #ffffff;
-  padding: 2rem;
-  border-radius: 14px;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
-}
-
-.planner-title {
-  text-align: center;
-  margin-bottom: 1.5rem;
-  font-size: 1.9rem;
-  font-weight: 700;
-  color: #2d3748;
-}
-
-/* ================= API STATUS ================= */
-.api-status {
-  text-align: center;
-  margin-bottom: 1rem;
-  font-size: 0.9rem;
-  font-weight: 600;
-}
-
-.api-status.available {
-  color: #16a34a;
-}
-
-.api-status.unavailable {
-  color: #dc2626;
-}
-
-/* ================= FORM ================= */
-.trip-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1.4rem;
-}
-
-/* ================= TRIP BUILDER GRID ================= */
-.trip-builder {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
-}
-
-/* Inputs & selects */
-.trip-builder input,
-.trip-builder select {
-  width: 100%;
-  padding: 0.75rem 0.85rem;
-  font-size: 0.95rem;
-  border-radius: 8px;
-  border: 1px solid #cbd5e1;
-  background: #ffffff;
-  color: #1e293b;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.trip-builder input::placeholder {
-  color: #94a3b8;
-}
-
-.trip-builder input:focus,
-.trip-builder select:focus {
-  outline: none;
-  border-color: #2563eb;
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
-}
-
-.trip-builder input:disabled,
-.trip-builder select:disabled {
-  background: #f1f5f9;
-  cursor: not-allowed;
-}
-
-/* Make destination full width */
-.trip-builder input[type="text"] {
-  grid-column: span 2;
-}
-
-/* ================= RADIO GROUP ================= */
-.radio-group {
-  display: flex;
-  gap: 1.5rem;
-  font-size: 0.95rem;
-  padding-top: 0.3rem;
-}
-
-.radio-group label {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  cursor: pointer;
-  color: #334155;
-}
-
-/* ================= SUBMIT BUTTON ================= */
-.trip-form button {
-  padding: 0.9rem;
-  font-size: 1rem;
-  font-weight: 600;
-  border-radius: 10px;
-  border: none;
-  cursor: pointer;
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
-  color: #ffffff;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.trip-form button:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
-}
-
-.trip-form button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  box-shadow: none;
-}
-
-/* ================= HOME LOADING ================= */
-.home-loading {
-  margin-top: 1.5rem;
-  padding: 1.2rem;
-  border-radius: 10px;
-  background: #f8fafc;
-  text-align: center;
-  color: #334155;
-  border: 1px solid #e2e8f0;
-}
-
-.home-loading p {
-  margin-top: 0.6rem;
-  font-size: 0.9rem;
-}
-
-/* ================= SPINNER ================= */
-.spinner {
-  width: 36px;
-  height: 36px;
-  border: 4px solid #e5e7eb;
-  border-top: 4px solid #2563eb;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin: 0 auto;
-}
-
-@keyframes spin {
+@keyframes pageFade {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
   to {
-    transform: rotate(360deg);
+    opacity: 1;
+    transform: translateY(0);
   }
 }
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.6s ease;
+}
 
-/* ================= RESPONSIVE ================= */
-@media (max-width: 600px) {
-  .trip-planner {
-    padding: 1.5rem;
+.reveal.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
   }
-
-  .trip-builder {
-    grid-template-columns: 1fr;
-  }
-
-  .trip-builder input[type="text"] {
-    grid-column: span 1;
-  }
-
-  .radio-group {
-    flex-direction: column;
-    gap: 0.6rem;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
-.trip-form-header {
-  margin-bottom: 1rem;
-  text-align: center;
-}
-
-.trip-form-title {
-  font-size: 1.3rem;
-  font-weight: 700;
-  color: #1f2937;
-  margin-bottom: 0.3rem;
-}
-
-.trip-form-subtitle {
-  font-size: 0.9rem;
-  color: #6b7280;
-}
-.trip-builder {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1rem;
-}
-
-.field {
-  display: flex;
-  flex-direction: column;
-}
-
-.field label {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #374151;
-  margin-bottom: 0.35rem;
-}
-
-.field input,
-.field select {
-  padding: 0.6rem 0.7rem;
-  border-radius: 8px;
-  border: 1px solid #cbd5e1;
-  font-size: 0.95rem;
-}
-
-.field input:focus,
-.field select:focus {
-  outline: none;
-  border-color: #2563eb;
+@keyframes fadeLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }

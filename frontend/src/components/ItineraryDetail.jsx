@@ -47,6 +47,15 @@ const ItineraryDetail = ({ itineraryId, onBack }) => {
       </div>
     );
   }
+// ===== BUILD MAP WITH ALL LOCATIONS =====
+          const mapLocations =  Array.from(
+            new Set(
+              itineraryDetails?.days?.flatMap((day) => day.places || []) || []
+            )
+          );
+          const mapQuery = mapLocations.join(" | ");
+          const mapUrl = `https://www.google.com/maps?q=${encodeURIComponent(mapQuery)}&output=embed`;
+
 
   return (
     <section className="bg-[#fdfcf7] px-4 pt-24 pb-24">
@@ -105,15 +114,93 @@ const ItineraryDetail = ({ itineraryId, onBack }) => {
 
         {/* ===== OVERVIEW ===== */}
         {activeTab === "overview" && (
-          <div className="bg-white rounded-[32px] shadow-lg p-8 space-y-4">
-            <h3 className="text-lg font-semibold">Highlights</h3>
-            <ul className="list-disc pl-5 space-y-2 text-gray-600">
-              {itineraryDetails.highlights.map((h, i) => (
-                <li key={i}>{h}</li>
-              ))}
-            </ul>
-          </div>
-        )}
+          <div className="bg-white rounded-[32px] shadow-lg p-8 md:p-10 space-y-10
+           animate-[fadeUp_0.5s_ease-out]">
+            {/* <h3 className="text-lg font-semibold">Highlights</h3> */}
+            {/* ===== LOCATIONS COVERED ===== */}
+              <div className="pt-4">
+                {/* ===== MAP PINPOINTS ===== */}
+                <div className="space-y-5">
+                  <h3 className="text-lg font-semibold text-gray-800">
+                    Trip Flow
+                  </h3>
+
+                  {/* <div className="w-full h-[360px] rounded-2xl overflow-hidden border">
+                    <iframe
+                      title="Trip locations map"
+                      src={mapUrl}
+                      className="w-full h-full"
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                    />
+                  </div> */}
+
+                  {/* <p className="mt-2 text-xs text-gray-500">
+                    All major places in this itinerary are marked on the map.
+                  </p> */}
+                </div>
+
+                            <div className="space-y-4">
+                    {itineraryDetails.days.map((day, idx) => (
+                      <div
+                        key={day.day}
+                        style={{ animationDelay: `${idx * 80}ms` }}
+                        className="flex gap-4 items-start
+                                  animate-[fadeLeft_0.4s_ease-out_forwards]
+                                  opacity-0"
+                      >
+
+            
+                      <div className="shrink-0">
+                        <span className="inline-flex items-center justify-center
+                                        h-8 w-8 rounded-full
+                                        bg-[#5b7c67]/10
+                                        text-[#5b7c67]
+                                        text-sm font-semibold">
+                          {day.day}
+                        </span>
+                      </div>
+
+                      {/* PLACES */}
+                      <div className="text-gray-600 leading-relaxed">
+                        <span className="font-medium text-gray-800">
+                          Day {day.day}:
+                        </span>{" "}
+                        {day.places.join(" → ")}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+
+                {/* <h3 className="text-lg font-semibold mb-3">
+                  📍 Places Covered
+                </h3>
+
+                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-gray-600 text-sm">
+                  {mapLocations.map((place, idx) => (
+                    <li key={idx} className="flex items-start gap-2">
+                      <span className="mt-1">•</span>
+                      <span>{place}</span>
+                    </li>
+                  ))}
+                </ul> */}
+              </div>
+                  <div className="border-t border-gray-100" />
+                  <h3 className="text-lg font-semibold text-gray-800">
+                      ✨ Highlights
+                    </h3>
+                 <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3
+                     text-gray-600 text-sm">
+                    {itineraryDetails.highlights.map((h, i) => (
+                      <li key={i} className="flex gap-2 items-start">
+                        <span className="mt-1 text-[#5b7c67]">•</span>
+                        <span>{h}</span>
+                      </li>
+                    ))}
+                              </ul>
+                </div>
+              )}
 
         {/* ===== DAILY ITINERARY ===== */}
         {activeTab === "itinerary" && (

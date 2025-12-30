@@ -6,28 +6,28 @@ const itineraries = [
     title: "Goa Beach Escape",
     duration: "5 days",
     location: "Goa, India",
-    image: "/slider/goa.jpg", // you can add later
+    image: "/goa.jpg", // you can add later
   },
   {
     id: 2,
     title: "Manali Adventure",
     duration: "6 days",
     location: "Himachal Pradesh",
-    image: "/slider/manali.jpg",
+    image: "manali2.webp",
   },
   {
     id: 3,
     title: "Jaipur Heritage",
     duration: "3 days",
     location: "Rajasthan",
-    image: "/slider/jaipur.jpg",
+    image: "/jaipur.webp",
   },
   {
     id: 4,
     title: "Kerala Backwaters",
     duration: "4 days",
     location: "Kerala",
-    image: "/slider/kerala.jpg",
+    image: "kerala.webp",
   },
 ];
 
@@ -44,12 +44,12 @@ const ItinerarySlider = ({ onItineraryClick = () => {} }) => {
   };
 
   return (
-  <div className="relative w-full max-w-6xl mx-auto py-8">
+  <div className="relative w-full max-w-6xl mx-auto py-4 mt-2">
 
     {/* SLIDER WINDOW */}
     <div className="overflow-hidden">
       <div
-        className="flex transition-transform duration-500 ease-out"
+        className="flex transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
         style={{
           transform: `translateX(-${index * 100}%)`,
         }}

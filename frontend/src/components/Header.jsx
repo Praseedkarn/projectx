@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState ,useEffect , forwardRef } from "react";
 
 const Header = ({
   user,
@@ -10,9 +10,15 @@ const Header = ({
   onItinerariesClick,
   onSavedClick,
   onPackingListClick,
-}) => {
+  onBlogsClick,
+},ref) => {
+  
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [hideHeader , setHideHeader ]=useState(false);
+  const [lastScrollY ,setLastScrollY ]=useState(0);
+  const [lastRevealY , setLastRevealY]=useState(0);
+  const [showHero , setShowHero]=useState(true);
 
   const closeAllMenus = () => {
     setIsMenuOpen(false);
@@ -25,13 +31,60 @@ const Header = ({
     fn && fn();
   };
 
+useEffect(() => {
+  let ticking = false;
+
+  const handleScroll = () => {
+    if (ticking) return;
+
+    window.requestAnimationFrame(() => {
+      const currentY = window.scrollY;
+
+      // HEADER HIDE / SHOW
+      if (currentY > lastScrollY && currentY > 80) {
+        setHideHeader(true);
+      } else {
+        setHideHeader(false);
+      }
+
+      // HERO VISIBILITY (with buffer)
+      if (currentY < 100) {
+        setShowHero(true);
+      } else if (currentY > 160) {
+        setShowHero(false);
+      }
+
+      setLastScrollY(currentY);
+      ticking = false;
+    });
+
+    ticking = true;
+  };
+
+  window.addEventListener("scroll", handleScroll, { passive: true });
+  return () => window.removeEventListener("scroll", handleScroll);
+}, [lastScrollY]);
+
+
+
+
   return (
-    <header className="bg-[#d7f26e]/80">
+    <header 
+    ref={ref}
+    className={` fixed top-0 left-0 w-full z-50
+  transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]
+  ${hideHeader ? "-translate-y-full" : "translate-y-0"}`}>
       <div
-        className={`relative bg-[#fdfcf7] ${
-          variant === "home" ? "rounded-b-[72px] pb-24" : "pb-6"
-        } px-6 pt-5 overflow-hidden`}
-      >
+  className={`relative bg-[#fdfcf7] px-6 pt-5 overflow-hidden
+  transition-[max-height,padding] duration-500
+  ease-[cubic-bezier(0.22,1,0.36,1)]
+  ${
+    variant === "home" && showHero
+      ? "rounded-b-[72px] pb-24 max-h-[520px]"
+      : "pb-6 max-h-[88px]"
+  }`}
+>
+
         {/* ===== TOP BAR ===== */}
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           {/* LOGO */}
@@ -45,7 +98,7 @@ const Header = ({
           {/* DESKTOP NAV */}
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-[#5b6f00]">
             <button onClick={() => go(onHomeClick)}>Home</button>
-
+            <button onClick={() => go(onBlogsClick)}>Blogs</button>
             {user && (
               <>
                 <button onClick={() => go(onItinerariesClick)}>
@@ -163,19 +216,28 @@ const Header = ({
         </div>
 
         {/* ===== HERO (HOME ONLY) ===== */}
-        {variant === "home" && (
-          
-          <div className="mt-28 text-center max-w-3xl mx-auto">
-            <img src="" alt="" />
+       {variant === "home" && (
+  <div
+    className={`mt-28 text-center max-w-3xl mx-auto
+      transition-all duration-500
+      ease-[cubic-bezier(0.22,1,0.36,1)]
+      ${
+        showHero
+          ? "opacity-100 translate-y-0"
+          : "opacity-0 -translate-y-6 pointer-events-none"
+      }`}
+  >
+    <h1 className="text-4xl md:text-6xl font-semibold italic text-[#5b6f00]">
+      Off the beaten path
+    </h1>
+    <p className="mt-4 text-lg italic text-gray-500">
+      thoughtful trips built around how you travel
+    </p>
+  </div>
+)}
+
             
-            <h1 className="text-4xl md:text-6xl font-semibold italic text-[#5b6f00]">
-              Off the beaten path
-            </h1>
-            <p className="mt-4 text-lg italic text-gray-500">
-              thoughtful trips built around how you travel
-            </p>
-          </div>
-        )}
+      
       </div>
 
       <style>{`

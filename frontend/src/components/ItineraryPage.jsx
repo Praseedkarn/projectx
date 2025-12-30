@@ -555,13 +555,13 @@ const ItineraryPage = ({ onBack, onItineraryClick, onViewSaved }) => {
   };
 
  return (
-    <section className="bg-[#d7f26e] px-4 pt-24 pb-24 overflow-hidden">
+    <section className="bg-[#f6f8f5] px-4 pt-24 pb-24 overflow-hidden">
       {/* <span className="absolute top-20 right-20 text-6xl opacity-30 rotate-12 z-0">
     ✈️
   </span> */}
 
-      <div className="absolute bottom-32 right-16 w-56 h-56
-                bg-yellow-300/50 rounded-full blur-3xl" />
+      {/* <div className="absolute bottom-32 right-16 w-56 h-56
+                bg-[#5b7c67]/80 rounded-full blur-3xl" /> */}
       <div className=" relative x-10 max-w-5xl mx-auto space-y-10">
 
         {/* ===== HEADER BAR ===== */}
@@ -585,8 +585,8 @@ const ItineraryPage = ({ onBack, onItineraryClick, onViewSaved }) => {
         </div>
 
         {/* ===== HERO CARD ===== */}
-        <div className="bg-white rounded-[32px] p-8 md:p-10 shadow-lg text-center">
-          <h1 className="text-2xl md:text-3xl font-semibold text-gray-800">
+        <div className="bg-white rounded-[32px] p-8 md:p-10 shadow-[0_10px_40px_rgba(0,0,0,0.06)] text-center">
+          <h1 className="text-2xl md:text-3xl font-semibold text-gray-900">
             Popular Travel Itineraries
           </h1>
           <p className="text-sm text-gray-500 mt-2">
@@ -602,7 +602,7 @@ const ItineraryPage = ({ onBack, onItineraryClick, onViewSaved }) => {
             <div
               key={itinerary.id}
               onClick={() => handleItineraryClick(itinerary)}
-              className="p-6 cursor-pointer hover:bg-gray-50 transition"
+              className="p-6 cursor-pointer hover:bg-[#5b7c67]/5 transition"
             >
               <h3 className="text-lg font-semibold text-gray-800">
                 <span className="text-gray-400 mr-2">
@@ -627,7 +627,7 @@ const ItineraryPage = ({ onBack, onItineraryClick, onViewSaved }) => {
         </div>
 
         {/* ===== INSTRUCTIONS ===== */}
-        <div className="bg-white rounded-[32px] p-6 md:p-8 shadow-lg text-sm text-gray-600 space-y-3">
+        <div className="bg-[#fafafa] rounded-[32px] p-6 md:p-8 shadow-lg text-sm text-gray-600 space-y-3">
           <p>
             💡 <strong>How to use:</strong> Click any itinerary above to view
             day-by-day plans, activities, and travel tips.

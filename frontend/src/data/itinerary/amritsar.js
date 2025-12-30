@@ -15,6 +15,8 @@ const amritsarItinerary = {
     "Wagah Border ceremony",
     "Amritsar street food tour"
   ],
+ 
+
   image:
     "https://images.unsplash.com/photo-1609943241842-8e26d0e57e32",
 
