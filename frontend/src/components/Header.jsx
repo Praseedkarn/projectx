@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
-import "../styles/Header.css";
+import React, { useState } from "react";
 
 const Header = ({
   user,
+  variant = "home", // "home" | "compact"
   onSignInClick,
   onLogoutClick,
   onProfileClick,
@@ -14,239 +14,182 @@ const Header = ({
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
 
-  /* ================= HELPERS ================= */
-
   const closeAllMenus = () => {
     setIsMenuOpen(false);
     setShowProfileMenu(false);
   };
 
-  const safeCall = (fn) => fn && fn();
-
-  /* ================= HANDLERS ================= */
-
-  const handleHome = (e) => {
-    e?.preventDefault();
-    safeCall(onHomeClick);
+  /* ===== SAFE NAVIGATION HANDLERS ===== */
+  const go = (fn) => {
     closeAllMenus();
+    fn && fn();
   };
-
-  const handleItineraries = (e) => {
-    e?.preventDefault();
-    safeCall(onItinerariesClick);
-    closeAllMenus();
-  };
-
-  const handleSaved = (e) => {
-    e?.preventDefault();
-    safeCall(onSavedClick);
-    closeAllMenus();
-  };
-
-  const handlePackingList = (e) => {
-    e?.preventDefault();
-    e?.stopPropagation();
-    safeCall(onPackingListClick);
-    closeAllMenus();
-  };
-
-  const handleLogout = () => {
-    safeCall(onLogoutClick);
-    closeAllMenus();
-  };
-
-  /* ================= CLICK OUTSIDE ================= */
-
-  useEffect(() => {
-    const handleClickOutside = () => closeAllMenus();
-    document.addEventListener("click", handleClickOutside);
-    return () => document.removeEventListener("click", handleClickOutside);
-  }, []);
-
-  /* ================= RENDER ================= */
 
   return (
-    <header className="header">
-      {/* LEFT */}
-      <div className="header-left">
-        {/* Logo */}
-        <div className="logo-container" onClick={handleHome}>
-          <h2 className="logo-text">PROJECT X</h2>
-        </div>
-
-        {/* Desktop Nav */}
-        <nav className="desktop-nav-links">
-          <a href="#home" className="nav-link" onClick={handleHome}>
-            Home
-          </a>
-
-          {user && (
-            <>
-              <a href="#itineraries" className="nav-link" onClick={handleItineraries}>
-                Popular Itineraries
-              </a>
-
-              <a href="#saved" className="nav-link" onClick={handleSaved}>
-                Saved Trips
-              </a>
-
-              
-            </>
-          )}
-
-          <a
-            href="#help"
-            className="nav-link"
-            onClick={(e) => {
-              e.preventDefault();
-              alert("Help section coming soon!");
-            }}
+    <header className="bg-[#d7f26e]/80">
+      <div
+        className={`relative bg-[#fdfcf7] ${
+          variant === "home" ? "rounded-b-[72px] pb-24" : "pb-6"
+        } px-6 pt-5 overflow-hidden`}
+      >
+        {/* ===== TOP BAR ===== */}
+        <div className="max-w-6xl mx-auto flex items-center justify-between">
+          {/* LOGO */}
+          <button
+            onClick={() => go(onHomeClick)}
+            className="text-3xl font-extrabold tracking-wide text-[#c8e24a]"
           >
-            Help
-          </a>
-        </nav>
-      </div>
+            PROJECT X
+          </button>
 
-      {/* RIGHT */}
-      <div className="header-right">
-        {/* Profile / Sign In */}
-        {user ? (
-          <div className="profile-container">
+          {/* DESKTOP NAV */}
+          <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-[#5b6f00]">
+            <button onClick={() => go(onHomeClick)}>Home</button>
+
+            {user && (
+              <>
+                <button onClick={() => go(onItinerariesClick)}>
+                  Itineraries
+                </button>
+                <button onClick={() => go(onSavedClick)}>Saved</button>
+              </>
+            )}
+
+            <button onClick={() => alert("Help coming soon")}>Help</button>
+          </nav>
+
+          {/* RIGHT */}
+          <div className="relative flex items-center gap-3">
+            {/* PROFILE */}
+            {user ? (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowProfileMenu((p) => !p);
+                }}
+                className="flex items-center gap-2 px-3 py-1.5 border border-[#5b6f00]/30 rounded-full"
+              >
+                <span className="w-7 h-7 rounded-full bg-[#5b6f00]/10 flex items-center justify-center font-semibold">
+                  {user.name?.[0]?.toUpperCase() || "U"}
+                </span>
+                <span className="hidden sm:block text-sm">{user.name}</span>
+              </button>
+            ) : (
+              <button
+                onClick={onSignInClick}
+                className="px-4 py-2 rounded-full bg-[#5b7c67] text-white text-sm"
+              >
+                Sign in
+              </button>
+            )}
+
+            {/* PROFILE MENU */}
+            {showProfileMenu && user && (
+              <div className="absolute right-0 top-12 w-56 bg-white rounded-xl shadow-lg border">
+                <div className="px-4 py-3">
+                  <p className="font-semibold">{user.name}</p>
+                  <p className="text-xs text-gray-500">{user.email}</p>
+                </div>
+                <div className="border-t">
+                  <button onClick={() => go(onProfileClick)} className="menu-item">
+                    My profile
+                  </button>
+                  <button
+                    onClick={() => go(onPackingListClick)}
+                    className="menu-item"
+                  >
+                    Packing list
+                  </button>
+                  <button
+                    onClick={() => go(onLogoutClick)}
+                    className="menu-item text-red-600"
+                  >
+                    Logout
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* MOBILE BUTTON */}
             <button
-              className="profile-btn"
               onClick={(e) => {
                 e.stopPropagation();
-                setShowProfileMenu((prev) => !prev);
+                setIsMenuOpen((p) => !p);
               }}
+              className="md:hidden w-9 h-9 rounded-full border flex items-center justify-center"
             >
-              <span className="header-profile-icon">
-                {user.name?.charAt(0)?.toUpperCase() || "U"}
-              </span>
-              <span className="header-profile-name">{user.name}</span>
+              ☰
             </button>
 
-            {showProfileMenu && (
-              <div
-                className="header-profile-dropdown"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div className="header-profile-info">
-                  <div className="header-profile-avatar">
-                    {user.name?.charAt(0)?.toUpperCase() || "U"}
-                  </div>
-                  <div>
-                    <h4>{user.name}</h4>
-                    <p>{user.email}</p>
-                  </div>
-                </div>
-
-                <div className="header-dropdown-divider" />
-
-                <button className="header-dropdown-item" onClick={onProfileClick}>
-                   My Profile
+            {/* MOBILE MENU */}
+            {isMenuOpen && (
+              <div className="absolute right-0 top-12 w-60 bg-white rounded-xl shadow-lg border p-3">
+                <button onClick={() => go(onHomeClick)} className="menu-item">
+                  Home
                 </button>
-
-                <button className="header-dropdown-item" onClick={handlePackingList}>
-                   Packing List
-                </button>
-
-                <button
-                  className="header-dropdown-item"
-                  onClick={() => alert("Settings coming soon!")}
-                >
-                   Settings
-                </button>
-
-                <div className="header-dropdown-divider" />
-
-                <button
-                  className="header-dropdown-item logout-item"
-                  onClick={handleLogout}
-                >
-                   Logout
-                </button>
+                {user && (
+                  <>
+                    <button
+                      onClick={() => go(onItinerariesClick)}
+                      className="menu-item"
+                    >
+                      Itineraries
+                    </button>
+                    <button
+                      onClick={() => go(onSavedClick)}
+                      className="menu-item"
+                    >
+                      Saved
+                    </button>
+                    <button
+                      onClick={() => go(onPackingListClick)}
+                      className="menu-item"
+                    >
+                      Packing list
+                    </button>
+                  </>
+                )}
+                {user && (
+                  <button
+                    onClick={() => go(onLogoutClick)}
+                    className="menu-item text-red-600"
+                  >
+                    Logout
+                  </button>
+                )}
               </div>
             )}
           </div>
-        ) : (
-          <button className="signin-btn" onClick={onSignInClick}>
-            Sign In
-          </button>
-        )}
+        </div>
 
-        {/* Hamburger */}
-        <button
-          className={`hamburger-btn ${isMenuOpen ? "active" : ""}`}
-          onClick={(e) => {
-            e.stopPropagation();
-            setIsMenuOpen((prev) => !prev);
-          }}
-        >
-          <span className="hamburger-line" />
-          <span className="hamburger-line" />
-          <span className="hamburger-line" />
-        </button>
-
-        {/* Mobile Menu */}
-        {isMenuOpen && (
-          <div className="mobile-dropdown" onClick={(e) => e.stopPropagation()}>
-            {user ? (
-              <div className="mobile-user-info">
-                <div className="mobile-avatar">
-                  {user.name?.charAt(0)?.toUpperCase() || "U"}
-                </div>
-                <div>
-                  <h4>{user.name}</h4>
-                  <p>{user.email}</p>
-                </div>
-              </div>
-            ) : (
-              <div className="mobile-signin-prompt">
-                <p>Welcome to Project X </p>
-                <button className="mobile-signin-btn" onClick={onSignInClick}>
-                  Sign In / Sign Up
-                </button>
-              </div>
-            )}
-
-            <div className="mobile-nav-links">
-              <button className="mobile-nav-item" onClick={handleHome}>
-                 Home
-              </button>
-
-              {user && (
-                <>
-                  <button className="mobile-nav-item" onClick={handleItineraries}>
-                     Popular Itineraries
-                  </button>
-                  <button className="mobile-nav-item" onClick={handleSaved}>
-                     Saved Trips
-                  </button>
-                  <button className="mobile-nav-item" onClick={handlePackingList}>
-                     Packing List
-                  </button>
-                  <button className="mobile-nav-item" onClick={onProfileClick}>
-                     My Profile
-                  </button>
-                </>
-              )}
-
-              <button
-                className="mobile-nav-item"
-                onClick={() => alert("Help coming soon!")}
-              >
-                ❓ Help
-              </button>
-
-              {user && (
-                <button className="mobile-logout-btn" onClick={handleLogout}>
-                  🚪 Logout
-                </button>
-              )}
-            </div>
+        {/* ===== HERO (HOME ONLY) ===== */}
+        {variant === "home" && (
+          
+          <div className="mt-28 text-center max-w-3xl mx-auto">
+            <img src="" alt="" />
+            
+            <h1 className="text-4xl md:text-6xl font-semibold italic text-[#5b6f00]">
+              Off the beaten path
+            </h1>
+            <p className="mt-4 text-lg italic text-gray-500">
+              thoughtful trips built around how you travel
+            </p>
           </div>
         )}
       </div>
+
+      <style>{`
+        .menu-item {
+          display: block;
+          width: 100%;
+          padding: 0.6rem 1rem;
+          text-align: left;
+          font-size: 0.875rem;
+        }
+        .menu-item:hover {
+          background: #f9fafb;
+        }
+      `}</style>
     </header>
   );
 };

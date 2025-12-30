@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import "./App.css";
 
 import Header from "./components/Header";
@@ -10,11 +10,12 @@ import ItineraryPage from "./components/ItineraryPage";
 import ItineraryDetail from "./components/ItineraryDetail";
 import SavedItineraries from "./components/SavedItineraries";
 import PackingList from "./components/PackingList";
+import ItinerarySlider from "./components/ItinerarySlider";
 
 import { generateTravelItinerary } from "./services/api";
-import { detailedItineraries } from "./components/ItineraryDetail";
 
 function App() {
+  const formCardRef = useRef(null);
   const [showSignIn, setShowSignIn] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
 
@@ -36,7 +37,7 @@ function App() {
   const [detailLevel, setDetailLevel] = useState("morning");
   const [Month, setMonth] = useState("");
   const [Transport, setTransport] = useState("");
-
+  
   /* ===== Load user ===== */
   useEffect(() => {
     const userData = localStorage.getItem("user");
@@ -89,84 +90,47 @@ function App() {
 
     if (tripType === "hours") {
       description = `
-      You are a professional travel planner.
-
         Create a realistic ${hours}-hour itinerary in ${place}.
         Traveler type: ${group}
         Pace: ${pace}
         Month: ${Month}
         Transport: ${Transport}
-        Rules:
-        - Use HOUR-WISE format (Hour 1, Hour 2, etc.)
-        - Max 3–4 nearby places only
-        - Keep travel time minimal
-        - Focus on cafes, parks, markets, viewpoints
-        - Include short food/snack suggestions
-        - No hotels or long-distance travel
-        - Simple bullet points
-        - Practical and relaxed flow
-        Budget:
-        - Mention estimated cost per activity
-        - End with TOTAL ESTIMATED COST for ${hours} hours
-        `;
+        Use hour-wise format and keep it relaxed.
+      `;
     } else if (tripType === "day") {
-      description = `
-      You are a professional travel planner .
-
-          Create a realistic 1-day itinerary for ${place}.
-          Traveler type: ${group}
-          Budget: ${budget}
-          Pace: ${pace}
-          Month: ${Month}
-          Transport: ${Transport}
-          Rules:
-          - Morning / Afternoon / Evening
-          - Max 2–3 main attractions
-          - Include breakfast, lunch, and evening food spots
-          - Keep travel distances short
-          - Mention local specialties
-          - Avoid rushing and overcrowding
-          - Add practical tips (best time, ticket tips)
-          - Easy-to-follow formatting
-            Budget:
-          - Show cost for food, transport, attractions
-          - End with TOTAL DAY BUDGET (one clear number)
-
-          `;
+        description = `
+        Create a realistic 1-day itinerary for ${place}.
+        Traveler type: ${group}
+        Budget: ${budget}
+        Pace: ${pace}
+        Month: ${Month}
+        Transport: ${Transport}
+        `;
     } else {
       description = `
-      You are a professional travel planner .
-          Create a realistic ${days}-day itinerary for ${place}.
-          Traveler type: ${group}
-          Budget: ${budget}
-          Pace: ${pace}
-          Detail level: ${detailLevel}
-          Month: ${Month}
-          Transport: ${Transport}
-          Rules:
-          - Day-wise structured plan (Day 1, Day 2, etc.)
-          - Max 3–4 activities per day
-          - First day should be light, last day relaxed
-          - Include local food recommendations daily
-          - Suggest transport options between places
-          - Mention approximate daily cost (rough estimate)
-          - Consider weather and season
-          - Avoid unrealistic travel distances
-          - Clear headings and bullet points
-
-        
-        Budget:
-          - Show DAILY estimated cost breakdown
-          - Include food, transport, attractions
-          - End with TOTAL TRIP COST (sum of all days)
-          `;
+        Create a realistic ${days}-day itinerary for ${place}.
+        Traveler type: ${group}
+        Budget: ${budget}
+        Pace: ${pace}
+        Detail level: ${detailLevel}
+        Month: ${Month}
+        Transport: ${Transport}
+        `;
     }
 
     setLoading(true);
 
     try {
       const aiResponse = await generateTravelItinerary(description, detailLevel);
-      setTripSuggestions(aiResponse);
+
+      setTripSuggestions({
+        text:
+          aiResponse?.text ||
+          aiResponse?.result ||
+          aiResponse?.choices?.[0]?.message?.content ||
+          String(aiResponse),
+      });
+
       setApiStatus("available");
       setActiveComponent("results");
 
@@ -189,6 +153,7 @@ function App() {
   return (
     <div className="App">
       <Header
+        variant={activeComponent === "home" ? "home" : "compact"}
         user={currentUser}
         onSignInClick={() => setShowSignIn(true)}
         onLogoutClick={handleLogout}
@@ -196,132 +161,348 @@ function App() {
         onItinerariesClick={() => setActiveComponent("itineraries")}
         onSavedClick={() => setActiveComponent("saved")}
         onPackingListClick={() => setActiveComponent("packing")}
-        onProfileClick={()=>setActiveComponent("profile")}
+        onProfileClick={() => setActiveComponent("profile")}
       />
 
       {showSignIn && (
-        <SignIn onClose={() => setShowSignIn(false)} onLoginSuccess={handleLoginSuccess} />
+        <SignIn
+          onClose={() => setShowSignIn(false)}
+          onLoginSuccess={handleLoginSuccess}
+        />
       )}
 
-      <main className="main-content">
+      <main className="bg-[#d7f26e]/80 px-4 pt-24 pb-24 overflow-hidden">
+
+        {/* ===== HERO (HOME ONLY) ===== */}
         {activeComponent === "home" && (
-          <div className="trip-planner">
-            <h1 className="planner-title">Plan Your Trip</h1>
+          <div className="max-w-6xl mx-auto mb-20 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div className="space-y-5 text-center md:text-left">
+              <h2 className="text-3xl md:text-4xl font-semibold text-gray-800">
+                Plan smarter journeys
+              </h2>
+              <p className="text-gray-600">
+                Handpicked itineraries for every kind of traveler
+              </p>
+              <button
+                onClick={() =>
+                  formCardRef.current?.scrollIntoView({ behavior: "smooth" })
+                }
+                className="rounded-full bg-[#5b7c67] px-6 py-3 text-white"
+              >
+                ✍️ Start Planning
+              </button>
+            </div>
 
-            {currentUser && apiStatus !== "checking" && (
-              <div className={`api-status ${apiStatus}`}>
-                {apiStatus === "available" ? "✅ AI Assistant Ready" : "⚠️ AI Offline"}
-              </div>
-            )}
+            <div className="flex justify-center md:justify-end">
+              <img
+                src="/world_map_PNG34.png"
+                alt="Map"
+                className="w-72 md:w-96 opacity-90 -rotate-2 drop-shadow-xl"
+              />
+            </div>
+          </div>
+        )}
+        {/* HOME */}
+        {activeComponent === "home" && (
+          <div className="max-w-6xl mx-auto space-y-24">
+            <div ref = {formCardRef} className="bg-white rounded-[32px] shadow-lg p-8">
 
-            <form className="trip-form" onSubmit={handleSubmit}>
-              <div className="trip-form-header">
-                <h2>Build Your Trip Preferences</h2>
-                <p>Tell us a few details so the AI can plan your trip perfectly</p>
-              </div>
+              {/* card header */}
+                <div className="text-center space-y-2 mb-8">
+                  <h2 className="text-2xl md:text-3xl font-semibold text-gray-800">
+                    Build your trip
+                  </h2>
+                  <p className="text-sm text-gray-500">
+                    A few details are all we need to plan your perfect journey
+                  </p>
 
-              {/* Trip Type */}
-              <div className="field">
-                <label>Trip Type</label>
-                <select value={tripType} onChange={(e) => setTripType(e.target.value)}>
-                  <option value="hours">Few Hours</option>
-                  <option value="day">1 Day</option>
-                  <option value="multi">Multiple Days</option>
-                </select>
-              </div>
-
-              {tripType === "hours" && (
-                <div className="field">
-                  <label>Number of Hours</label>
-                  <input type="number" min="1" max="12" value={hours} onChange={(e) => setHours(e.target.value)} />
+                  {/* ===== AI STATUS ===== */}
+                  {currentUser && apiStatus !== "checking" && (
+                    <div
+                      className={`inline-flex items-center gap-2 mt-3 px-3 py-1.5
+                        rounded-full text-xs font-medium
+                        ${
+                          apiStatus === "available"
+                            ? "bg-green-50 text-green-700"
+                            : "bg-red-50 text-red-600"
+                        }`}
+                    >
+                      <span
+                        className={`h-2 w-2 rounded-full ${
+                          apiStatus === "available" ? "bg-green-500" : "bg-red-500"
+                        }`}
+                      />
+                      {apiStatus === "available"
+                        ? "AI assistant is online"
+                        : "AI assistant is offline"}
+                    </div>
+                  )}
                 </div>
-              )}
 
-              {tripType === "multi" && (
-                <div className="field">
-                  <label>Number of Days</label>
-                  <input type="number" min="2" value={days} onChange={(e) => setDays(e.target.value)} />
-                </div>
-              )}
 
-              {/* Common fields */}
-              <div className="field">
-                <label>Destination</label>
-                <input value={place} onChange={(e) => setPlace(e.target.value)} />
-              </div>
+             <form onSubmit={handleSubmit} className="space-y-6">
 
-              <div className="field">
-                <label>Travel Group</label>
-                <select value={group} onChange={(e) => setGroup(e.target.value)}>
-                  <option>Solo</option>
-                  <option>Couple</option>
-                  <option>Family</option>
-                  <option>Friends</option>
-                </select>
-              </div>
-
-              {(tripType === "day" || tripType === "multi") && (
-                <div className="field">
-                  <label>Budget</label>
-                  <select value={budget} onChange={(e) => setBudget(e.target.value)}>
-                    <option>Low</option>
-                    <option>Medium</option>
-                    <option>Luxury</option>
+                {/* ===== Trip Type ===== */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">
+                    Trip type
+                  </label>
+                  <select
+                    value={tripType}
+                    onChange={(e) => setTripType(e.target.value)}
+                    className="w-full rounded-xl border border-gray-200 px-4 py-3
+                              focus:outline-none focus:ring-2 focus:ring-[#5b7c67]/30"
+                  >
+                    <option value="hours">Few hours</option>
+                    <option value="day">One day</option>
+                    <option value="multi">Multiple days</option>
                   </select>
                 </div>
-              )}
 
-              <div className="field">
-                <label>Travel Pace</label>
-                <select value={pace} onChange={(e) => setPace(e.target.value)}>
-                  <option>Slow & Relex</option>
-                  <option>Balanced (Sightseeing +Rest)</option>
-                  <option>Fast (Tight schedule)</option>
-                </select>
-              </div>
-              <div className="field">
-                <label>Travel Month</label>
-                <select value={Month} onChange={(e) => setMonth(e.target.value)}>
-                  <option>January</option>
-                  <option>February</option>
-                  <option>March</option>
-                  <option>April</option>
-                  <option>May</option>
-                  <option>June</option>
-                  <option>July</option>
-                  <option>August</option>
-                  <option>September</option>
-                  <option>October</option>
-                  <option>November</option>
-                  <option>December</option>
-                </select>
-              </div>
-              <div className="field">
-                <label>Transport</label>
-                <select value={Transport} onChange={(e) => setTransport(e.target.value)}>
-                  <option>Public Transport </option>
-                  <option>Rented car</option>
-                  <option>Walking</option>
-                </select>
-              </div>
-              <button type="submit" disabled={loading}>
-                {loading ? "⚡ Planning with AI..." : "✨ Generate AI Itinerary"}
-              </button>
-              {loading && (
-                <div className="home-loading">
-                  <div className="spinner"></div>
-                  <p>Analyzing destinations, routes & experiences…</p>
+                {/* ===== Conditional Fields ===== */}
+                {tripType === "hours" && (
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700">
+                      Number of hours
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      max="12"
+                      value={hours}
+                      onChange={(e) => setHours(e.target.value)}
+                      className="w-full rounded-xl border border-gray-200 px-4 py-3"
+                    />
+                  </div>
+                )}
+
+                {tripType === "multi" && (
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700">
+                      Number of days
+                    </label>
+                    <input
+                      type="number"
+                      min="2"
+                      value={days}
+                      onChange={(e) => setDays(e.target.value)}
+                      className="w-full rounded-xl border border-gray-200 px-4 py-3"
+                    />
+                  </div>
+                )}
+
+                {/* ===== Destination ===== */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">
+                    Destination
+                  </label>
+                  <input
+                    value={place}
+                    onChange={(e) => setPlace(e.target.value)}
+                    placeholder="Enter city or place"
+                    className="w-full rounded-xl border border-gray-200 px-4 py-3"
+                  />
                 </div>
-              )}
 
-            </form>
+                {/* ===== Grid Fields ===== */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Travel group</label>
+                    <select
+                      value={group}
+                      onChange={(e) => setGroup(e.target.value)}
+                      className="w-full rounded-xl border px-4 py-3"
+                    >
+                      <option>Solo</option>
+                      <option>Couple</option>
+                      <option>Family</option>
+                      <option>Friends</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Travel pace</label>
+                    <select
+                      value={pace}
+                      onChange={(e) => setPace(e.target.value)}
+                      className="w-full rounded-xl border px-4 py-3"
+                    >
+                      <option>Slow & relaxed</option>
+                      <option>Balanced</option>
+                      <option>Fast</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Month</label>
+                    <select
+                      value={Month}
+                      onChange={(e) => setMonth(e.target.value)}
+                      className="w-full rounded-xl border px-4 py-3"
+                    >
+                      <option>January</option>
+                      <option>February</option>
+                      <option>March</option>
+                      <option>April</option>
+                      <option>May</option>
+                      <option>June</option>
+                      <option>July</option>
+                      <option>August</option>
+                      <option>September</option>
+                      <option>October</option>
+                      <option>November</option>
+                      <option>December</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Transport</label>
+                    <select
+                      value={Transport}
+                      onChange={(e) => setTransport(e.target.value)}
+                      className="w-full rounded-xl border px-4 py-3"
+                    >
+                      <option>Public transport</option>
+                      <option>Rented car</option>
+                      <option>Walking</option>
+                    </select>
+                  </div>
+
+                  {(tripType === "day" || tripType === "multi") && (
+                    <div className="space-y-2 md:col-span-2">
+                      <label className="text-sm font-medium">Budget</label>
+                      <select
+                        value={budget}
+                        onChange={(e) => setBudget(e.target.value)}
+                        className="w-full rounded-xl border px-4 py-3"
+                      >
+                        <option>Low</option>
+                        <option>Medium</option>
+                        <option>Luxury</option>
+                      </select>
+                    </div>
+                  )}
+                </div>
+
+                {/* ===== ACTION AREA ===== */}
+                <div className="pt-6 border-t border-gray-100 space-y-3">
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full rounded-full bg-[#5b7c67] py-4 text-white
+                              font-medium hover:bg-[#4a6a58]
+                              transition disabled:opacity-60"
+                  >
+                    {loading ? "Planning your trip…" : "Generate itinerary"}
+                  </button>
+
+                  {loading && (
+                    <p className="text-center text-sm text-gray-500">
+                      Analyzing destinations, routes & experiences…
+                    </p>
+                  )}
+                </div>
+              </form>
+            </div>
+            {/* ===== FORM CARD 2 ===== */}
+                  <div className="bg-white rounded-[40px] p-8 md:p-12 shadow-xl space-y-12">
+
+              {/* ===== CARD HEADER ===== */}
+              <div className="text-center space-y-3">
+                <h2 className="text-3xl font-semibold text-gray-800">
+                  What is PROJECT X?
+                </h2>
+                <p className="text-gray-600 text-base leading-relaxed">
+                  Project X is an AI-powered travel planning platform designed to help
+                  travelers create realistic, well-paced itineraries based on their
+                  available time, travel style, budget, and destination.
+                  <br />
+                  <br />
+                  Whether you have just a few hours or multiple days, Project X analyzes
+                  travel flow and activities to help you plan smarter, stress-free journeys.
+                </p>
+              </div>
+
+              {/* ===== INNER INFO CARDS ===== */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                {/* CARD 1 */}
+                <div className="bg-[#6b8e23] text-white rounded-3xl p-6 flex flex-col justify-between">
+                  <div>
+                    <h4 className="text-xl font-semibold mb-2">Smart budgeting</h4>
+                    <p className="text-sm opacity-90">
+                      Plan trips that align with your budget — without compromising
+                      experiences.
+                    </p>
+                  </div>
+                </div>
+
+                {/* CARD 2 */}
+              <div className="bg-[#6b8e23] text-white rounded-3xl p-6 flex flex-col justify-between">
+                <div>
+                  <h4 className="text-xl font-semibold mb-2">Discover better routes</h4>
+                  <p className="text-sm opacity-90">
+                    AI understands travel flow, timing, and realistic movement
+                    between places.
+                  </p>
+                </div>
+              </div>
+
+                {/* CARD 3 */}
+                <div className="bg-[#6b8e23] text-white rounded-3xl p-6 flex flex-col justify-between">
+                  <div>
+                    <h4 className="text-xl font-semibold mb-2">Travel your way</h4>
+                    <p className="text-sm opacity-90">
+                      Your time. Your pace. Your interests.
+                      No generic itineraries.
+                    </p>
+                  </div>
+                </div>
+
+                {/* CARD 4 */}
+                <div className="bg-[#6b8e23] text-white rounded-3xl p-6 flex flex-col justify-between">
+                  <div>
+                    <h4 className="text-xl font-semibold mb-2">Built for the future</h4>
+                    <p className="text-sm opacity-90">
+                      Saved trips, packing lists, map timelines,
+                      and deeper personalization coming soon.
+                    </p>
+                  </div>
+                </div>
+
+              </div>
+             
+            </div>
+            <div className="text-center max-w-3xl mx-auto mb-12">
+              <h2 className="text-4xl md:text-4xl font-semibold text-gray-800">
+                Explore ready-made itineraries
+              </h2>
+
+              <p className="mt-3 text-gray-500 text-sm md:text-base">
+                Hand-crafted travel plans you can explore, customize, or use instantly.
+                Click any card to see the full day-by-day itinerary.
+              </p>
+            </div>
+              <ItinerarySlider
+              onItineraryClick={(id) => {
+                setSelectedItineraryId(id);
+                setActiveComponent("itinerary-detail");
+              }}
+              />
           </div>
         )}
 
+        {/* RESULTS */}
         {activeComponent === "results" && (
-          <TripResults suggestions={tripSuggestions} onClose={() => setActiveComponent("home")} />
+          <TripResults
+            suggestions={tripSuggestions}
+            loading={loading}
+            onClose={() => setActiveComponent("home")}
+          />
         )}
 
+        {/* ITINERARIES */}
         {activeComponent === "itineraries" && (
           <ItineraryPage
             onBack={() => setActiveComponent("home")}
@@ -332,6 +513,15 @@ function App() {
           />
         )}
 
+        {/* ITINERARY DETAIL */}
+        {activeComponent === "itinerary-detail" && (
+          <ItineraryDetail
+            itineraryId={selectedItineraryId}
+            onBack={() => setActiveComponent("itineraries")}
+          />
+        )}
+
+        {/* PROFILE */}
         {activeComponent === "profile" && (
           <ProfilePage
             user={currentUser}
@@ -339,12 +529,6 @@ function App() {
             onLogout={handleLogout}
             onPackingListClick={() => setActiveComponent("packing")}
           />
-        )}
-
-
-        {activeComponent === "itinerary-detail" && (
-          <ItineraryDetail itineraryId={selectedItineraryId}
-          onBack={()=>setActiveComponent("itineraries")} />
         )}
 
         {activeComponent === "saved" && <SavedItineraries />}

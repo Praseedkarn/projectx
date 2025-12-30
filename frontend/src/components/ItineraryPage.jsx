@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import '../styles/ItineraryPage.css';
+// import '../styles/ItineraryPage.css';
 
 const ItineraryPage = ({ onBack, onItineraryClick, onViewSaved }) => {
   // Sample popular itineraries data
@@ -554,73 +554,103 @@ const ItineraryPage = ({ onBack, onItineraryClick, onViewSaved }) => {
     return savedItineraries.some(item => item.id === id);
   };
 
-  return (
-    <div className="itinerary-page">
-      <div className="page-header">
-        <button className="back-button" onClick={onBack}>
-          ← Back to Home
-        </button>
-        
-        {savedCount > 0 && onViewSaved && (
-          <button 
-            className="view-saved-btn"
-            onClick={onViewSaved}
-          >
-            ⭐ View Saved ({savedCount})
-          </button>
-        )}
-      </div>
-      
-      <div className="hero-section">
-        <h1 className="page-title">Popular Travel Itineraries</h1>
-        <p className="page-subtitle">
-          Click on any itinerary to view detailed trip information. 
-          {savedCount > 0 && ` You have ${savedCount} saved ${savedCount === 1 ? 'itinerary' : 'itineraries'}.`}
-        </p>
-      </div>
+ return (
+    <section className="bg-[#d7f26e] px-4 pt-24 pb-24 overflow-hidden">
+      {/* <span className="absolute top-20 right-20 text-6xl opacity-30 rotate-12 z-0">
+    ✈️
+  </span> */}
 
-   <div className="simple-itinerary-list">
-  {popularItineraries.map((itinerary) => (
-    <div
-      key={itinerary.id}
-      className="simple-itinerary-row"
-      onClick={() => handleItineraryClick(itinerary)}
-    >
-      <div className="row-title">
-        <span className='row-id'>{itinerary.id}. </span>{itinerary.title}
+      <div className="absolute bottom-32 right-16 w-56 h-56
+                bg-yellow-300/50 rounded-full blur-3xl" />
+      <div className=" relative x-10 max-w-5xl mx-auto space-y-10">
+
+        {/* ===== HEADER BAR ===== */}
+        <div className="flex items-center justify-between">
+          <button
+            onClick={onBack}
+            className="text-sm font-medium text-black hover:underline"
+          >
+            ← Back to Home
+          </button>
+
+          {savedCount > 0 && onViewSaved && (
+            <button
+              onClick={onViewSaved}
+              className="rounded-full bg-[#5b7c67] px-4 py-2
+                         text-white text-sm font-medium"
+            >
+              ⭐ View Saved ({savedCount})
+            </button>
+          )}
         </div>
 
-      <div className="row-meta">
-        <span>{itinerary.duration}</span>
-        <span>•</span>
-        <span>{itinerary.location}</span>
-        <span>•</span>
-        <span>{itinerary.difficulty}</span>
+        {/* ===== HERO CARD ===== */}
+        <div className="bg-white rounded-[32px] p-8 md:p-10 shadow-lg text-center">
+          <h1 className="text-2xl md:text-3xl font-semibold text-gray-800">
+            Popular Travel Itineraries
+          </h1>
+          <p className="text-sm text-gray-500 mt-2">
+            Click any itinerary to view full details
+            {savedCount > 0 &&
+              ` · You have ${savedCount} saved ${savedCount === 1 ? "itinerary" : "itineraries"}`}
+          </p>
+        </div>
+
+        {/* ===== ITINERARY LIST ===== */}
+        <div className="bg-white rounded-[32px] shadow-lg divide-y">
+          {popularItineraries.map((itinerary) => (
+            <div
+              key={itinerary.id}
+              onClick={() => handleItineraryClick(itinerary)}
+              className="p-6 cursor-pointer hover:bg-gray-50 transition"
+            >
+              <h3 className="text-lg font-semibold text-gray-800">
+                <span className="text-gray-400 mr-2">
+                  {itinerary.id}.
+                </span>
+                {itinerary.title}
+              </h3>
+
+              <div className="text-sm text-gray-500 mt-1 flex flex-wrap gap-2">
+                <span>{itinerary.duration}</span>
+                <span>•</span>
+                <span>{itinerary.location}</span>
+                <span>•</span>
+                <span>{itinerary.difficulty}</span>
+              </div>
+
+              <p className="text-sm text-gray-600 mt-2">
+                {itinerary.description}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        {/* ===== INSTRUCTIONS ===== */}
+        <div className="bg-white rounded-[32px] p-6 md:p-8 shadow-lg text-sm text-gray-600 space-y-3">
+          <p>
+            💡 <strong>How to use:</strong> Click any itinerary above to view
+            day-by-day plans, activities, and travel tips.
+          </p>
+
+          <p>
+            ⭐ <strong>Save feature:</strong> Save itineraries to access them
+            later quickly.
+          </p>
+
+          {savedCount > 0 && onViewSaved && (
+            <button
+              onClick={onViewSaved}
+              className="mt-4 rounded-full border px-6 py-3
+                         text-sm font-medium hover:bg-gray-50"
+            >
+              ⭐ View All Saved Itineraries ({savedCount})
+            </button>
+          )}
+        </div>
+
       </div>
-
-      <div className="row-description">
-        {itinerary.description}
-      </div>
-    </div>
-  ))}
-</div>
-
-
-
-      
-      <div className="instructions">
-        <p>💡 <strong>How to use:</strong> Click on any itinerary button above to see detailed trip information including day-by-day plans, activities, accommodations, and travel tips.</p>
-        <p>⭐ <strong>Save feature:</strong> Click the "Save" button on any itinerary to add it to your saved collection for easy access later.</p>
-        {savedCount > 0 && onViewSaved && (
-          <button 
-            className="view-saved-bottom-btn"
-            onClick={onViewSaved}
-          >
-            ⭐ View All Saved Itineraries ({savedCount})
-          </button>
-        )}
-      </div>
-    </div>
+    </section>
   );
 };
 

@@ -310,7 +310,7 @@ const PackingList = ({
         <button className="back-button" onClick={onBack}>
           ← Back
         </button>
-        <h1>🧳 Personalized Packing List</h1>
+        <h1> Personalized Packing List</h1>
         <div className="header-actions">
           {!showTripForm && items.length > 0 && (
             <>

@@ -133,3 +133,47 @@
     transform: rotate(360deg);
   }
 }
+.results-body {
+  min-height: 300px;
+  padding: 1rem;
+}
+
+.ai-text-output {
+  white-space: pre-wrap;
+  font-family: "Courier New", monospace;
+  line-height: 1.6;
+  font-size: 15px;
+}
+
+.no-data {
+  color: #888;
+  text-align: center;
+  margin-top: 2rem;
+}
+.trip-results {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.results-body {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.ai-text-output {
+  white-space: pre-wrap;
+  font-family: "Courier New", monospace;
+  line-height: 1.6;
+  font-size: 15px;
+  width: 100%;
+  max-width: 900px;
+}
+
+.no-data {
+  color: #888;
+  text-align: center;
+}
