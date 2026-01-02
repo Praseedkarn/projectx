@@ -15,6 +15,14 @@ const thai = {
     "Phuket's Patong Beach nightlife",
     'Thai massage and street food'
   ],
+  highlight360Views: [
+  { label: "Phi Phi Islands", place: "Phi Phi Islands, Thailand" },
+  { label: "Patong Beach", place: "Patong Beach, Phuket" },
+  { label: "Grand Palace", place: "Grand Palace, Bangkok" },
+  { label: "Railay Beach", place: "Railay Beach, Krabi" },
+  { label: "Ayutthaya", place: "Ayutthaya Historical Park, Thailand" }
+],
+
   image:
     'https://tse4.mm.bing.net/th/id/OIP.3rdnjivyuroOrluf1X7I6wHaE8?rs=1&pid=ImgDetMain&o=7&rm=3',
 

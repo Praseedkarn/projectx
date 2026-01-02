@@ -15,7 +15,7 @@ const [success, setSuccess] = useState(false);
     fetch("http://localhost:5001/api/blogs")
       .then((res) => res.json())
       .then((data) => {
-        setBlogs(data);
+        setBlogs(data.blogs || []);
         setLoading(false);
       })
       .catch(() => setLoading(false));
@@ -55,7 +55,10 @@ const handleSubmit = async (e) => {
 
     // refresh blogs
     const updated = await fetch("http://localhost:5001/api/blogs");
-    setBlogs(await updated.json());
+    const refreshed = await updated.json();
+    setBlogs(refreshed.blogs || []);
+
+
   } catch {
     alert("Failed to submit story");
   } finally {

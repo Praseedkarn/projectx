@@ -15,6 +15,14 @@ const annapurnaCircuitItinerary = {
     "Himalayan mountain panoramas",
     "Traditional Gurung & Tibetan villages"
   ],
+  highlight360Views: [
+  { label: "Thorong La Pass", place: "Thorong La Pass, Nepal" },
+  { label: "Manang Village", place: "Manang, Nepal" },
+  { label: "Muktinath Temple", place: "Muktinath Temple, Nepal" },
+  { label: "Gangapurna Lake", place: "Gangapurna Lake, Manang" },
+  { label: "Annapurna Range", place: "Annapurna Himalaya, Nepal" }
+],
+
   image:
     "https://images.unsplash.com/photo-1544735716-6e1d6e5c3d6f",
 

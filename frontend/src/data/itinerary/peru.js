@@ -15,6 +15,14 @@ const peru = {
     "Lima's world-class cuisine",
     'Andean culture and textiles'
   ],
+  highlight360Views: [
+  { label: "Machu Picchu", place: "Machu Picchu, Peru" },
+  { label: "Cusco", place: "Cusco, Peru" },
+  { label: "Sacred Valley", place: "Sacred Valley, Peru" },
+  { label: "Rainbow Mountain", place: "Vinicunca Rainbow Mountain, Peru" },
+  { label: "Lake Titicaca", place: "Lake Titicaca, Peru" }
+],
+
   image:
     'https://th.bing.com/th/id/OIP.mpxO9V6mGlMghTh2RxHmTQHaDt?w=297&h=174&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3',
 

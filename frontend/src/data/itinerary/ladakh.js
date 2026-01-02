@@ -16,6 +16,14 @@ const ladakhItinerary = {
     "Pangong Lake sunrise",
     "Himalayan desert landscapes"
   ],
+  highlight360Views: [
+  { label: "Pangong Lake", place: "Pangong Lake, Ladakh" },
+  { label: "Nubra Valley", place: "Nubra Valley, Ladakh" },
+  { label: "Khardung La", place: "Khardung La Pass, Ladakh" },
+  { label: "Leh Palace", place: "Leh Palace, Ladakh" },
+  { label: "Magnetic Hill", place: "Magnetic Hill, Ladakh" }
+],
+
   image:
     "https://images.unsplash.com/photo-1623914324573-4c0c14b7d98d",
 

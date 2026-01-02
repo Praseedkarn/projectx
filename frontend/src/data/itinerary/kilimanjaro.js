@@ -15,6 +15,14 @@ const kilimanjaroItinerary = {
     "Glacier views",
     "Celebration at summit"
   ],
+  highlight360Views: [
+  { label: "Mount Kilimanjaro", place: "Mount Kilimanjaro, Tanzania" },
+  { label: "Uhuru Peak", place: "Uhuru Peak, Tanzania" },
+  { label: "Machame Camp", place: "Machame Camp, Kilimanjaro" },
+  { label: "Barranco Wall", place: "Barranco Wall, Kilimanjaro" },
+  { label: "Shira Plateau", place: "Shira Plateau, Kilimanjaro" }
+],
+
   image:
     "https://images.unsplash.com/photo-1549880338-65ddcdfd017b",
 

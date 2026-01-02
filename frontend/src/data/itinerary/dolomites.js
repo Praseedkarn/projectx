@@ -15,6 +15,14 @@ const dolomitesItinerary = {
     "Scenic cable cars and mountain refuges",
     "Traditional alpine villages"
   ],
+  highlight360Views: [
+  { label: "Tre Cime di Lavaredo", place: "Tre Cime di Lavaredo, Italy" },
+  { label: "Alpe di Siusi", place: "Alpe di Siusi, Italy" },
+  { label: "Cinque Torri", place: "Cinque Torri, Cortina d'Ampezzo" },
+  { label: "Passo Falzarego", place: "Passo Falzarego, Italy" },
+  { label: "Val Gardena", place: "Val Gardena, Italy" }
+],
+
   image:
     "https://images.unsplash.com/photo-1566228015668-4c45dbc4e2f5",
 

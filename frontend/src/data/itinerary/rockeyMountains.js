@@ -15,6 +15,14 @@ const rockyMountainsItinerary = {
     "Aspen mountain town",
     "Vail alpine village"
   ],
+  highlight360Views: [
+  { label: "Rocky Mountains", place: "Rocky Mountains National Park, USA" },
+  { label: "Trail Ridge Road", place: "Trail Ridge Road, Colorado" },
+  { label: "Bear Lake", place: "Bear Lake, Rocky Mountains" },
+  { label: "Emerald Lake", place: "Emerald Lake, Colorado" },
+  { label: "Moraine Park", place: "Moraine Park, Colorado" }
+],
+
   image:
     "https://images.unsplash.com/photo-1508261305436-74f27b51c6c2",
 

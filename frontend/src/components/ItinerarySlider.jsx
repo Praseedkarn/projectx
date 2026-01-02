@@ -2,28 +2,28 @@ import { useState } from "react";
 
 const itineraries = [
   {
-    id: 1,
+    id: 10,
     title: "Goa Beach Escape",
     duration: "5 days",
     location: "Goa, India",
     image: "/goa.jpg", // you can add later
   },
   {
-    id: 2,
-    title: "Manali Adventure",
+    id: 33,
+    title: "Sikkim ",
     duration: "6 days",
-    location: "Himachal Pradesh",
+    location: "Sikkim , india",
     image: "manali2.webp",
   },
   {
-    id: 3,
+    id: 12,
     title: "Jaipur Heritage",
     duration: "3 days",
     location: "Rajasthan",
     image: "/jaipur.webp",
   },
   {
-    id: 4,
+    id: 13,
     title: "Kerala Backwaters",
     duration: "4 days",
     location: "Kerala",

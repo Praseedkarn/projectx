@@ -14,6 +14,14 @@ const japan = {
     'Hiroshima Peace Memorial',
     'Traditional ryokan and onsen experience'
   ],
+  highlight360Views: [
+  { label: "Shibuya Crossing", place: "Shibuya Crossing, Tokyo" },
+  { label: "Fushimi Inari", place: "Fushimi Inari Shrine, Kyoto" },
+  { label: "Arashiyama Bamboo Grove", place: "Arashiyama Bamboo Grove, Kyoto" },
+  { label: "Osaka Castle", place: "Osaka Castle, Japan" },
+  { label: "Mount Fuji", place: "Mount Fuji, Japan" }
+],
+
   image: 'https://www.postposmo.com/wp-content/uploads/2020/07/CULTURA-JAPONESA-1.jpg',
 
   days: [

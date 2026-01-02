@@ -123,7 +123,7 @@ function App() {
         - Simple bullet points
         - Practical and relaxed flow
         User Preferences / special Request:
-         
+         ${suggestions||"None"}
         Budget:
         - Mention estimated cost per activity
         - End with TOTAL ESTIMATED COST for ${hours} hours
@@ -148,7 +148,7 @@ function App() {
           - Add practical tips (best time, ticket tips)
           - Easy-to-follow formatting
           User Preferences / special Request:
-
+      ${suggestions||"None"}
             Budget:
           - Show cost for food, transport, attractions
           - End with TOTAL DAY BUDGET (one clear number)
@@ -174,7 +174,7 @@ function App() {
           - Clear headings and bullet points
 
         User Preferences / special Request:
-
+      ${suggestions || "None"}
         Budget:
           - Show DAILY estimated cost breakdown
           - Include food, transport, attractions
@@ -183,7 +183,8 @@ function App() {
     }
 
     setLoading(true);
-
+    setTripSuggestions(null);
+    setActiveComponent("results");
     try {
       const aiResponse = await generateTravelItinerary(description, detailLevel);
 
@@ -196,7 +197,7 @@ function App() {
       });
 
       setApiStatus("available");
-      setActiveComponent("results");
+      
 
       const saved = JSON.parse(localStorage.getItem("userTrips") || "[]");
       saved.push({
@@ -231,14 +232,14 @@ function App() {
       />
 
       <div
-  style={{
-    height:
-      activeComponent === "home"
-        ? headerHeight + 480   // 👈 extra space for hero
-        : headerHeight,
-  }}
-  className="transition-[height] duration-500"
-/>
+        style={{
+          height:
+            activeComponent === "home"
+              ? headerHeight + 480   // 👈 extra space for hero
+              : headerHeight,
+        }}
+        className="transition-[height] duration-500"
+      />
 
 
       {showSignIn && (
@@ -255,10 +256,11 @@ function App() {
           <div className="max-w-6xl mx-auto mb-20 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             <div className="space-y-5 text-center md:text-left">
               <h2 className="text-3xl md:text-4xl font-semibold text-gray-800">
-                Plan smarter journeys
+                What is PROJECT X ?
               </h2>
               <p className="text-gray-600">
-                Handpicked itineraries for every kind of traveler
+                {/* Handpicked itineraries for every kind of traveler */}
+                Project X is an AI-powered travel planning platform designed to help travelers create realistic, well-paced itineraries based on their available time, travel style, budget, and destination.
               </p>
               <button
                 onClick={() =>
@@ -266,7 +268,7 @@ function App() {
                 }
                 className="rounded-full bg-[#5b7c67] px-6 py-3 text-white"
               >
-                ✍️ Start Planning
+                 Start Planning
               </button>
             </div>
 
@@ -274,7 +276,12 @@ function App() {
               <img
                 src="/world_map_PNG34.png"
                 alt="Map"
-                className="w-72 md:w-96 opacity-90 -rotate-2 drop-shadow-xl"
+                className=" w-72 md:w-96
+                opacity-95
+                -rotate-2
+                drop-shadow-[0_25px_40px_rgba(91,124,103,0.35)]
+                transition-transform duration-500
+                hover:rotate-0 hover:scale-105"
               />
             </div>
           </div>
@@ -476,7 +483,7 @@ function App() {
                   </label>
                   <input
                     value={suggestions}
-                    onChange={(e) => setPlace(e.target.value)}
+                    onChange={(e) => setSuggestions(e.target.value)}
                     placeholder="Eg: avoid crowds, add cafes, photography sports, local food..... "
                     className="w-full rounded-xl border border-gray-200 px-4 py-3"
                   />
@@ -507,7 +514,7 @@ function App() {
                   <div className="bg-white rounded-[40px] p-8 md:p-12 shadow-xl space-y-12">
 
               {/* ===== CARD HEADER ===== */}
-              <div className="text-center space-y-3">
+              {/* <div className="text-center space-y-3">
                 <h2 className="text-3xl font-semibold text-gray-800">
                   What is PROJECT X?
                 </h2>
@@ -520,54 +527,115 @@ function App() {
                   Whether you have just a few hours or multiple days, Project X analyzes
                   travel flow and activities to help you plan smarter, stress-free journeys.
                 </p>
-              </div>
+              </div> */}
 
               {/* ===== INNER INFO CARDS ===== */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
                 {/* CARD 1 */}
-                <div className="bg-[#6b8e23] text-white rounded-3xl p-6 flex flex-col justify-between">
-                  <div>
-                    <h4 className="text-xl font-semibold mb-2">Smart budgeting</h4>
-                    <p className="text-sm opacity-90">
-                      Plan trips that align with your budget — without compromising
-                      experiences.
-                    </p>
-                  </div>
-                </div>
+               <div className="bg-[#6b8e23] text-white rounded-3xl p-6 flex items-center gap-6">
 
-                {/* CARD 2 */}
-              <div className="bg-[#6b8e23] text-white rounded-3xl p-6 flex flex-col justify-between">
-                <div>
-                  <h4 className="text-xl font-semibold mb-2">Discover better routes</h4>
+                {/* LEFT — TEXT */}
+                <div className="w-1/2 space-y-2">
+                  <h4 className="text-xl font-semibold">
+                    AI-Generated Itineraries
+                  </h4>
                   <p className="text-sm opacity-90">
-                    AI understands travel flow, timing, and realistic movement
-                    between places.
+                    Instantly generate realistic, well-paced travel plans using AI.
+                    From a few hours to multi-day trips — customized by budget, pace,
+                    travel group, and season.
                   </p>
                 </div>
+
+                {/* RIGHT — IMAGE */}
+                <div className="w-1/2 flex justify-center">
+                  <img
+                    src="/point.png"
+                    alt="AI Generated"
+                    className="w-28 md:w-32 opacity-90"
+                  />
+                </div>
+
               </div>
 
-                {/* CARD 3 */}
-                <div className="bg-[#6b8e23] text-white rounded-3xl p-6 flex flex-col justify-between">
-                  <div>
-                    <h4 className="text-xl font-semibold mb-2">Travel your way</h4>
-                    <p className="text-sm opacity-90">
-                      Your time. Your pace. Your interests.
-                      No generic itineraries.
-                    </p>
-                  </div>
+                {/* CARD 2 */}
+              
+            <div className="bg-[#6b8e23] text-white rounded-3xl p-6 flex items-center gap-6">
+
+                {/* LEFT — TEXT */}
+                <div className="w-1/2 space-y-2">
+                  <h4 className="text-xl font-semibold">
+                    Save Your Itineraries
+                  </h4>
+                  <p className="text-sm opacity-90">
+                    Save your favorite trips and access them anytime. Revisit past plans, compare journeys, and continue planning without starting from scratch.
+                  </p>
                 </div>
 
-                {/* CARD 4 */}
-                <div className="bg-[#6b8e23] text-white rounded-3xl p-6 flex flex-col justify-between">
-                  <div>
-                    <h4 className="text-xl font-semibold mb-2">Built for the future</h4>
-                    <p className="text-sm opacity-90">
-                      Saved trips, packing lists, map timelines,
-                      and deeper personalization coming soon.
-                    </p>
-                  </div>
+                {/* RIGHT — IMAGE */}
+                <div className="w-1/2 flex justify-center">
+                  <img
+                    src="/map-location.png"
+                    alt="AI Generated"
+                    className="w-28 md:w-32 opacity-90"
+                  />
                 </div>
+
+              </div>
+                {/* CARD 3 */}
+               
+
+
+                <div className="bg-[#6b8e23] text-white rounded-3xl p-6 flex items-center gap-6">
+
+                {/* LEFT — TEXT */}
+                <div className="w-1/2 space-y-2">
+                  <h4 className="text-xl font-semibold">
+                    Explore with Maps & 360° Views
+                  </h4>
+                  <p className="text-sm opacity-90">
+                   Visualize your journey using interactive maps and Google 360° views. Explore locations before you travel and understand routes day-by-day.
+                  </p>
+                </div>
+
+                {/* RIGHT — IMAGE */}
+                <div className="w-1/2 flex justify-center">
+                  <img
+                    src="\360-camera.png"
+                    alt="AI Generated"
+                    className="w-28 md:w-32 opacity-90"
+                  />
+                </div>
+
+              </div>
+
+
+              <div className="bg-[#6b8e23] text-white rounded-3xl p-6 flex items-center gap-6">
+
+                {/* LEFT — TEXT */}
+                <div className="w-1/2 space-y-2">
+                  <h4 className="text-xl font-semibold">
+                    Smart Packing & Planning
+                  </h4>
+                  <p className="text-sm opacity-90">
+                                            Use built-in packing lists and day-wise plans to stay organized.
+                        Designed for real travel — not rushed, not generic.
+                  </p>
+                </div>
+
+                {/* RIGHT — IMAGE */}
+                <div className="w-1/2 flex justify-center">
+                  <img
+                    src="/passport.png"
+                    alt="AI Generated"
+                    className="w-28 md:w-32 opacity-90"
+                  />
+                </div>
+
+              </div>
+
+                {/* CARD 4 */}
+                
 
               </div>
              

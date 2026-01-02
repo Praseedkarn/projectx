@@ -16,6 +16,14 @@ const goa = {
     'Sunset cruise on Mandovi River',
     'Goan seafood and Portuguese-influenced cuisine'
   ],
+  highlight360Views: [
+  { label: "Baga Beach", place: "Baga Beach, Goa" },
+  { label: "Calangute Beach", place: "Calangute Beach, Goa" },
+  { label: "Dudhsagar Falls", place: "Dudhsagar Falls, Goa" },
+  { label: "Basilica of Bom Jesus", place: "Basilica of Bom Jesus, Goa" },
+  { label: "Anjuna Beach", place: "Anjuna Beach, Goa" }
+],
+
   image:
     'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80',
 

@@ -15,6 +15,14 @@ const rishikeshItinerary = {
     "Laxman Jhula & Ram Jhula",
     "Spiritual ashrams"
   ],
+  highlight360Views: [
+  { label: "Laxman Jhula", place: "Laxman Jhula, Rishikesh" },
+  { label: "Ram Jhula", place: "Ram Jhula, Rishikesh" },
+  { label: "Ganga Aarti", place: "Triveni Ghat, Rishikesh" },
+  { label: "Beatles Ashram", place: "Beatles Ashram, Rishikesh" },
+  { label: "Neer Garh Waterfall", place: "Neer Garh Waterfall, Rishikesh" }
+],
+
   image:
     "https://images.unsplash.com/photo-1587474260584-136574528ed5",
 

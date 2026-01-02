@@ -16,6 +16,14 @@ const swissAlpsItinerary = {
     "Scenic Swiss train journeys",
     "Snow activities & cable cars"
   ],
+  highlight360Views: [
+  { label: "Jungfraujoch", place: "Jungfraujoch, Switzerland" },
+  { label: "Matterhorn", place: "Matterhorn, Zermatt" },
+  { label: "Lauterbrunnen Valley", place: "Lauterbrunnen Valley, Switzerland" },
+  { label: "Grindelwald", place: "Grindelwald, Switzerland" },
+  { label: "Interlaken", place: "Interlaken, Switzerland" }
+],
+
 
   image:
     "https://images.unsplash.com/photo-1508264165352-258a6c54b6c1",

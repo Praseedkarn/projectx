@@ -15,6 +15,14 @@ const mountFujiItinerary = {
     "Mountain hut overnight stay",
     "Japanese alpine culture"
   ],
+  highlight360Views: [
+  { label: "Mount Fuji", place: "Mount Fuji, Japan" },
+  { label: "Lake Kawaguchi", place: "Lake Kawaguchi, Japan" },
+  { label: "Chureito Pagoda", place: "Chureito Pagoda, Japan" },
+  { label: "Fuji 5th Station", place: "Fuji Subaru Line 5th Station" },
+  { label: "Oshino Hakkai", place: "Oshino Hakkai, Japan" }
+],
+
   image:
     "https://images.unsplash.com/photo-1549692520-acc6669e2f0c",
 

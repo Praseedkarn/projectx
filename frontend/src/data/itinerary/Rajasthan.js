@@ -16,6 +16,14 @@ const Rajasthan = {
     'Pushkar Camel Fair (if timed)',
     'Traditional Rajasthani folk performances'
   ],
+  highlight360Views: [
+  { label: "Amber Fort", place: "Amber Fort, Jaipur" },
+  { label: "Mehrangarh Fort", place: "Mehrangarh Fort, Jodhpur" },
+  { label: "City Palace Udaipur", place: "City Palace, Udaipur" },
+  { label: "Jaisalmer Fort", place: "Jaisalmer Fort, Rajasthan" },
+  { label: "Sam Sand Dunes", place: "Sam Sand Dunes, Jaisalmer" }
+],
+
   image:
     'https://th.bing.com/th/id/OIP.07U1zvyRX_KBE_gc1oDpiwHaE7?w=177&h=150&c=6&o=7&dpr=1.3&pid=1.7&rm=3',
 

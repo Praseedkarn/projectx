@@ -15,6 +15,29 @@ const amritsarItinerary = {
     "Wagah Border ceremony",
     "Amritsar street food tour"
   ],
+  highlight360Views: [
+  {
+    label: "Golden Temple",
+    place: "Golden Temple, Amritsar"
+  },
+  {
+    label: "Akal Takht",
+    place: "Akal Takht, Amritsar"
+  },
+  {
+    label: "Jallianwala Bagh",
+    place: "Jallianwala Bagh, Amritsar"
+  },
+  {
+    label: "Wagah Border",
+    place: "Wagah Border Attari"
+  },
+  {
+    label: "Hall Bazaar",
+    place: "Hall Bazaar, Amritsar"
+  }
+],
+
  
 
   image:

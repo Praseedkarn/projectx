@@ -16,6 +16,14 @@ const California = {
     'Santa Barbara mission and wineries',
     'Los Angeles Hollywood landmarks'
   ],
+  highlight360Views: [
+  { label: "Golden Gate Bridge", place: "Golden Gate Bridge, San Francisco" },
+  { label: "17-Mile Drive", place: "17-Mile Drive, Pebble Beach" },
+  { label: "Bixby Creek Bridge", place: "Bixby Creek Bridge, Big Sur" },
+  { label: "Hearst Castle", place: "Hearst Castle, San Simeon" },
+  { label: "Santa Monica Pier", place: "Santa Monica Pier, Los Angeles" }
+],
+
   image:
     'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80',
 

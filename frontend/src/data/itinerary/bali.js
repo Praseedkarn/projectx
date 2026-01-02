@@ -14,6 +14,14 @@ const baliItinerary= {
         'Experience Balinese culture and dance',
         'Relax on beautiful beaches'
       ],
+      highlight360Views: [
+  { label: "Uluwatu Temple", place: "Uluwatu Temple, Bali" },
+  { label: "Tanah Lot Temple", place: "Tanah Lot Temple, Bali" },
+  { label: "Tegallalang Rice Terraces", place: "Tegallalang Rice Terraces, Bali" },
+  { label: "Seminyak Beach", place: "Seminyak Beach, Bali" },
+  { label: "Kelingking Beach", place: "Kelingking Beach, Nusa Penida" }
+],
+
       image: 'https://www.pigsflycheap.com/wp-content/uploads/2021/02/Bali-Travel-Guide.jpg', // You can add actual images
       days: [
         {

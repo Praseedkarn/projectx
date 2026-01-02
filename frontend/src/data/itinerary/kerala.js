@@ -16,6 +16,14 @@ const Kerala = {
     'Village canoe ride',
     'Seafood and coconut-based cuisine'
   ],
+  highlight360Views: [
+  { label: "Alleppey Backwaters", place: "Alappuzha Backwaters, Kerala" },
+  { label: "Munnar Tea Gardens", place: "Munnar Tea Gardens, Kerala" },
+  { label: "Varkala Beach", place: "Varkala Beach, Kerala" },
+  { label: "Athirappilly Falls", place: "Athirappilly Falls, Kerala" },
+  { label: "Kovalam Beach", place: "Kovalam Beach, Kerala" }
+],
+
   image:
     'https://th.bing.com/th/id/OIP.qo6WJ1xZzNnY6Kz7m9aX5AHaE7?w=177&h=150&c=6&o=7&pid=1.7',
 

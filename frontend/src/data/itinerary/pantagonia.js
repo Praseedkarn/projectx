@@ -16,6 +16,14 @@ const patagoniaItinerary = {
     "Perito Moreno Glacier walkways",
     "Untouched Patagonian landscapes"
   ],
+  highlight360Views: [
+  { label: "Torres del Paine", place: "Torres del Paine National Park, Chile" },
+  { label: "Perito Moreno Glacier", place: "Perito Moreno Glacier, Argentina" },
+  { label: "Fitz Roy", place: "Mount Fitz Roy, Argentina" },
+  { label: "El Chaltén", place: "El Chaltén, Argentina" },
+  { label: "Grey Glacier", place: "Grey Glacier, Patagonia" }
+],
+
   image:
     "https://images.unsplash.com/photo-1508264165352-258a6c54b6c1",
 

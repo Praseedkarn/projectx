@@ -14,6 +14,14 @@ const European={
         'European cuisine and wine tasting',
         'Historic architecture and art'
       ],
+      highlight360Views: [
+  { label: "Eiffel Tower", place: "Eiffel Tower, Paris" },
+  { label: "Colosseum", place: "Colosseum, Rome" },
+  { label: "Vatican City", place: "Vatican City" },
+  { label: "Amsterdam Canals", place: "Amsterdam Canals" },
+  { label: "Louvre Museum", place: "Louvre Museum, Paris" }
+],
+
       image: 'https://th.bing.com/th/id/OIP.UaeRxMvk3LZjTRNpFuFGwwHaEK?w=335&h=187&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3',
   days: [
         {

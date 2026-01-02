@@ -16,6 +16,14 @@ const icelandRingRoadItinerary = {
     "Myvatn geothermal area",
     "Northern Lights (seasonal)"
   ],
+  highlight360Views: [
+  { label: "Skogafoss", place: "Skogafoss, Iceland" },
+  { label: "Geysir", place: "Geysir, Iceland" },
+  { label: "Gullfoss", place: "Gullfoss, Iceland" },
+  { label: "Reynisfjara Beach", place: "Reynisfjara Beach, Iceland" },
+  { label: "Northern Lights Spot", place: "Thingvellir National Park, Iceland" }
+],
+
   image:
     "https://images.unsplash.com/photo-1501785888041-af3ef285b470",
 

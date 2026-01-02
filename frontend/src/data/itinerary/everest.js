@@ -15,6 +15,14 @@
     'Everest Base Camp hike',
     'Sherpa villages and culture'
   ],
+  highlight360Views: [
+  { label: "Everest Base Camp", place: "Everest Base Camp, Nepal" },
+  { label: "Kala Patthar", place: "Kala Patthar, Nepal" },
+  { label: "Namche Bazaar", place: "Namche Bazaar, Nepal" },
+  { label: "Tengboche Monastery", place: "Tengboche Monastery, Nepal" },
+  { label: "Khumbu Glacier", place: "Khumbu Glacier, Nepal" }
+],
+
   image: 'https://th.bing.com/th/id/OIP.5U_1A4n3u5g6B8A3gEbc7AHaE8?w=177&h=150&c=6&o=7&pid=1.7',
   days: [
     {

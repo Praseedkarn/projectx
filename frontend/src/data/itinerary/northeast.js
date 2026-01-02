@@ -15,6 +15,13 @@ const northEastItinerary = {
     "Umiam Lake",
     "Kaziranga National Park"
   ],
+highlight360Views: [
+  { label: "Shillong", place: "Shillong, Meghalaya" },
+  { label: "Cherrapunji", place: "Cherrapunji, Meghalaya" },
+  { label: "Kaziranga", place: "Kaziranga National Park, Assam" },
+  { label: "Tawang Monastery", place: "Tawang Monastery, Arunachal Pradesh" },
+  { label: "Ziro Valley", place: "Ziro Valley, Arunachal Pradesh" }
+],
 
   image:
     "https://images.unsplash.com/photo-1600508774634-4e11d34730e2",

@@ -16,6 +16,14 @@ const Kashmir = {
     'Betaab Valley and Lidder River in Pahalgam',
     'Local Kashmiri cuisine and handicrafts'
   ],
+  highlight360Views: [
+  { label: "Dal Lake", place: "Dal Lake, Srinagar" },
+  { label: "Gulmarg", place: "Gulmarg, Kashmir" },
+  { label: "Pahalgam", place: "Pahalgam, Kashmir" },
+  { label: "Sonamarg", place: "Sonamarg, Kashmir" },
+  { label: "Shankaracharya Temple", place: "Shankaracharya Temple, Srinagar" }
+],
+
   image:
     'https://images.unsplash.com/photo-1599731974853-8fe1d8b6c9e7?ixlib=rb-4.0.3&auto=format&fit=crop&w-2000&q=80',
 

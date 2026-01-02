@@ -15,6 +15,14 @@ const santoriniItinerary = {
     "Red & Black Sand Beaches",
     "Luxury cliffside stays"
   ],
+  highlight360Views: [
+  { label: "Oia Village", place: "Oia, Santorini" },
+  { label: "Fira", place: "Fira, Santorini" },
+  { label: "Red Beach", place: "Red Beach, Santorini" },
+  { label: "Blue Dome Church", place: "Blue Domed Church, Santorini" },
+  { label: "Santorini Caldera", place: "Santorini Caldera" }
+],
+
   image:
     "https://images.unsplash.com/photo-1505731132164-cca903c4e9c4",
 

@@ -15,6 +15,14 @@ const goldenTriangleItinerary = {
     "Amber Fort in Jaipur",
     "Local bazaars and cuisine"
   ],
+  highlight360Views: [
+  { label: "Taj Mahal", place: "Taj Mahal, Agra" },
+  { label: "Amber Fort", place: "Amber Fort, Jaipur" },
+  { label: "Hawa Mahal", place: "Hawa Mahal, Jaipur" },
+  { label: "India Gate", place: "India Gate, Delhi" },
+  { label: "Qutub Minar", place: "Qutub Minar, Delhi" }
+],
+
 
   image:
     "https://images.unsplash.com/photo-1548013146-72479768bada",

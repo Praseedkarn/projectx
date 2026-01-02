@@ -15,6 +15,14 @@ const sikkimItinerary = {
     "Lachung mountain village",
     "Buddhist culture and scenic drives"
   ],
+  highlight360Views: [
+  { label: "Nathula Pass", place: "Nathula Pass, Sikkim" },
+  { label: "Tsomgo Lake", place: "Tsomgo Lake, Sikkim" },
+  { label: "Gangtok", place: "Gangtok, Sikkim" },
+  { label: "Yumthang Valley", place: "Yumthang Valley, Sikkim" },
+  { label: "Rumtek Monastery", place: "Rumtek Monastery, Sikkim" }
+],
+
   image:
     "https://images.unsplash.com/photo-1613921568536-4d5a8b1b0b1a",
 

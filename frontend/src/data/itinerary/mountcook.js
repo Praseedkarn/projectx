@@ -15,6 +15,14 @@ const mountCookItinerary = {
     "Alpine stargazing",
     "Scenic alpine walks"
   ],
+  highlight360Views: [
+  { label: "Mount Cook", place: "Aoraki Mount Cook, New Zealand" },
+  { label: "Hooker Valley", place: "Hooker Valley Track, New Zealand" },
+  { label: "Tasman Glacier", place: "Tasman Glacier, New Zealand" },
+  { label: "Lake Pukaki", place: "Lake Pukaki, New Zealand" },
+  { label: "Mueller Hut", place: "Mueller Hut Route, New Zealand" }
+],
+
   image:
     "https://images.unsplash.com/photo-1502784444185-480c19d4f7b9",
 

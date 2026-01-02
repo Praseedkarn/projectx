@@ -15,6 +15,14 @@ const Australia = {
     'Twelve Apostles on Great Ocean Road',
     "Melbourne's laneways and coffee culture"
   ],
+  highlight360Views: [
+  { label: "Sydney Opera House", place: "Sydney Opera House" },
+  { label: "Sydney Harbour Bridge", place: "Sydney Harbour Bridge" },
+  { label: "Jervis Bay", place: "Hyams Beach, Jervis Bay" },
+  { label: "Twelve Apostles", place: "Twelve Apostles, Great Ocean Road" },
+  { label: "Melbourne Laneways", place: "Melbourne CBD Laneways" }
+],
+
   image:
     'https://tse3.mm.bing.net/th/id/OIP.ouD3b4m-r_RtaWXEaGYobQHaHY?rs=1&pid=ImgDetMain&o=7&rm=3',
 

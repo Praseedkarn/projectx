@@ -90,10 +90,24 @@ useEffect(() => {
           {/* LOGO */}
           <button
             onClick={() => go(onHomeClick)}
-            className="text-3xl font-extrabold tracking-wide text-[#c8e24a]"
+            className="flex items-center gap-3"
           >
-            PROJECT X
+            {/* TEXT FIRST */}
+            <span className="font-heading italic text-3xl md:text-4xl
+               text-[#5b6f00] tracking-wide">
+              PROJECT
+            </span>
+
+            {/* LOGO IMAGE */}
+            <img
+              src="/logo.png"
+              alt="Project X logo"
+              className="w-8 h-8 md:w-9 md:h-9
+               transition-transform duration-300
+               group-hover:scale-110"
+            />
           </button>
+
 
           {/* DESKTOP NAV */}
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-[#5b6f00]">
@@ -228,31 +242,74 @@ useEffect(() => {
             )}
           </div>
         </div>
+        {/* ✈️ DECORATIVE IMAGE */}
+{variant === "home" && (
+  <img
+    src="/airplane.png"
+    alt="Travel path"
+    className="
+      absolute
+      bottom-[80px]     /* 👈 controls vertical position */
+      left-1/2
+      left-16 md:left-24
+      w-28 md:w-36       /* 👈 smaller size */
+      opacity-20
+      drop-shadow-[0_20px_30px_rgba(91,111,0,0.25)]
+      pointer-events-none
+      z-0
+    "
+  />
+)}
+
+{/* ✈️ RIGHT DECORATIVE IMAGE */}
+{variant === "home" && (
+  <img
+    src="/t.png"
+    alt="Travel path right"
+    className="
+      absolute
+      bottom-[130px]          /* slightly different height = natural look */
+      right-6 sm:right-12 md:right-24
+      w-24 md:w-32            /* a bit smaller for depth */
+      opacity-20
+      rotate-6
+      scale-x-[-1]            /* 👈 mirror horizontally */
+      pointer-events-none
+      z-0
+    "
+  />
+)}
+
+
+
 
         {/* ===== HERO (HOME ONLY) ===== */}
        {variant === "home" && (
-  <div
-    className={`mt-28 text-center max-w-3xl mx-auto
-      transition-all duration-500
-      ease-[cubic-bezier(0.22,1,0.36,1)]
-      ${
-        showHero
-          ? "opacity-100 translate-y-0"
-          : "opacity-0 -translate-y-6 pointer-events-none"
-      }`}
-  >
-    <h1 className="text-4xl md:text-6xl font-semibold italic text-[#5b6f00]">
-      Off the beaten path
-    </h1>
-    <p className="mt-4 text-lg italic text-gray-500">
-      thoughtful trips built around how you travel
-    </p>
-  </div>
-)}
 
-            
-      
-      </div>
+        
+        <div
+          className={`mt-28 text-center max-w-3xl mx-auto
+            transition-all duration-500
+            ease-[cubic-bezier(0.22,1,0.36,1)]
+            ${
+              showHero
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 -translate-y-6 pointer-events-none"
+            }`}
+        >
+
+          <h1 className="text-4xl md:text-6xl font-semibold italic text-[#5b6f00]">
+            Off the beaten path
+          </h1>
+          <p className="mt-4 text-lg italic text-gray-500">
+            thoughtful trips built around how you travel
+          </p>
+          
+        </div>
+
+
+      )}
+        </div>
 
       <style>{`
         .menu-item {

@@ -15,6 +15,14 @@ const incaTrailItinerary = {
     "Sun Gate (Inti Punku) sunrise",
     "Machu Picchu guided tour"
   ],
+  highlight360Views: [
+  { label: "Machu Picchu", place: "Machu Picchu, Peru" },
+  { label: "Huayna Picchu", place: "Huayna Picchu, Peru" },
+  { label: "Sacred Valley", place: "Sacred Valley, Peru" },
+  { label: "Cusco", place: "Cusco, Peru" },
+  { label: "Sun Gate", place: "Inti Punku, Peru" }
+],
+
   image:
     "https://images.unsplash.com/photo-1549298916-b41d501d3772",
 

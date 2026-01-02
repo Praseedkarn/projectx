@@ -16,6 +16,14 @@ const andamanItinerary = {
     "Island hopping experience",
     "Water sports activities"
   ],
+  highlight360Views: [
+  { label: "Radhanagar Beach", place: "Radhanagar Beach, Havelock Island" },
+  { label: "Elephant Beach", place: "Elephant Beach, Havelock Island" },
+  { label: "Cellular Jail", place: "Cellular Jail, Port Blair" },
+  { label: "Aberdeen Bazaar", place: "Aberdeen Bazaar, Port Blair" },
+  { label: "Havelock Island", place: "Havelock Island, Andaman" }
+],
+
 
   image:
     "https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1",

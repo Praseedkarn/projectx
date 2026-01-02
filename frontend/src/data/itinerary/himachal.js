@@ -16,6 +16,14 @@ const himachalItinerary = {
     "Scenic mountain drives",
     "Local Himachali culture"
   ],
+  highlight360Views: [
+  { label: "Shimla Mall Road", place: "Mall Road, Shimla" },
+  { label: "Manali Solang Valley", place: "Solang Valley, Manali" },
+  { label: "Rohtang Pass", place: "Rohtang Pass, Himachal Pradesh" },
+  { label: "Dharamshala", place: "Dharamshala, Himachal Pradesh" },
+  { label: "Kasol Parvati Valley", place: "Kasol, Himachal Pradesh" }
+],
+
 
   image:
     "https://images.unsplash.com/photo-1501785888041-af3ef285b470",

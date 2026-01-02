@@ -15,6 +15,15 @@ const Delhi = {
     'Old Delhi spice market and street food',
     'Lotus Temple and Akshardham'
   ],
+   highlight360Views: [
+    { label: "Red Fort", place: "Red Fort, Delhi" },
+    { label: "India Gate", place: "India Gate, Delhi" },
+    { label: "Qutub Minar", place: "Qutub Minar, Delhi" },
+    { label: "Humayun’s Tomb", place: "Humayun's Tomb, Delhi" },
+    { label: "Old Delhi Market", place: "Chandni Chowk, Delhi" },
+    { label: "Lotus Temple", place: "Lotus Temple, Delhi" },
+    { label: "Akshardham", place: "Akshardham Temple, Delhi" }
+  ],
   image:
     'https://images.unsplash.com/photo-1585506936724-fa0c19d00a15?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80',
 
