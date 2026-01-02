@@ -1,5 +1,4 @@
 const kilimanjaroItinerary = {
-  id: 28,
   title: "Kilimanjaro Summit Trek",
   duration: "8 days",
   location: "Mount Kilimanjaro, Tanzania",

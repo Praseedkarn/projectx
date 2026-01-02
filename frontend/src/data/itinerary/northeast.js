@@ -1,5 +1,4 @@
 const northEastItinerary = {
-  id: 17,
   title: "North East Explorer",
   duration: "7 days",
   location: "Meghalaya & Assam, India",

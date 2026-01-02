@@ -1,5 +1,4 @@
 const Kashmir = {
-  id: 11,
   title: 'Kashmir Valley',
   duration: '6 days',
   location: 'Srinagar → Gulmarg → Pahalgam, Kashmir',

@@ -1,5 +1,4 @@
 const himachalItinerary = {
-  id: 14,
   title: "Himachal Adventure Trail",
   duration: "6 days",
   location: "Himachal Pradesh, India",

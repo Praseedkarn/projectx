@@ -1,5 +1,4 @@
 const rishikeshItinerary = {
-  id: 34,
   title: "Rishikesh Yoga & Adventure",
   duration: "4 days",
   location: "Rishikesh, Uttarakhand, India",

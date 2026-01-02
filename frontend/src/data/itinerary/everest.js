@@ -1,5 +1,5 @@
  const Everest={
-  id: 14,
+  
   title: 'Everest Base Camp Trek',
   duration: '12 days',
   location: 'Lukla → Namche Bazaar → Everest Base Camp, Nepal',

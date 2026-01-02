@@ -1,5 +1,4 @@
 const thai = {
-  id: 6,
   title: 'Thai Islands',
   duration: '8 days',
   location: 'Phuket → Phi Phi Islands → Krabi',

@@ -1,5 +1,4 @@
 const japan = {
-  id: 3,
   title: 'Japanese Culture',
   duration: '14 days',
   location: 'Tokyo → Kyoto → Osaka → Hiroshima',

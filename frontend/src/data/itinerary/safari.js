@@ -1,5 +1,4 @@
 const safari = {
-  id: 7,
   title: 'Safari Experience',
   duration: '6 days',
   location: 'Masai Mara National Reserve, Kenya',

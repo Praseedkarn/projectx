@@ -1,5 +1,4 @@
 const udaipurItinerary = {
-  id: 32,
   title: "Udaipur Romantic Escape",
   duration: "4 days",
   location: "Udaipur, Rajasthan, India",

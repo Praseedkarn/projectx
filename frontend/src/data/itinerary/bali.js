@@ -1,5 +1,5 @@
 const baliItinerary= {
-      id: 1,
+      
       title: 'Bali Adventure',
       duration: '7 days',
       location: 'Bali, Indonesia',

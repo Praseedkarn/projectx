@@ -1,5 +1,5 @@
 const annapurnaCircuitItinerary = {
-  id: 29,
+
   title: "Annapurna Circuit Trek",
   duration: "10 days",
   location: "Besisahar → Manang → Thorong La Pass → Muktinath, Nepal",

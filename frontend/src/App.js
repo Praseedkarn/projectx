@@ -13,8 +13,10 @@ import PackingList from "./components/PackingList";
 import ItinerarySlider from "./components/ItinerarySlider";
 import BlogDetail from "./components/BlogDetail";
 import Blogs from "./components/Blogs";
-
+import TravelQuotes from "./components/TravelQuotes";
 import { generateTravelItinerary } from "./services/api";
+import AdminBlog from "./components/AdminBlog";
+
 
 function App() {
   const formCardRef = useRef(null);
@@ -42,6 +44,9 @@ function App() {
   const [Transport, setTransport] = useState("");
   const [selectedBlogSlug, setSelectedBlogSlug] = useState(null);
   const [suggestions, setSuggestions]=useState("");
+  const [activeBlog, setActiveBlog] = useState(null);
+
+
   /* ===== Load user ===== */
   useEffect(() => {
     const userData = localStorage.getItem("user");
@@ -110,8 +115,6 @@ function App() {
       description = `
         Create a realistic ${hours}-hour itinerary in ${place}.
         Traveler type: ${group}
-        Pace: ${pace}
-        Month: ${Month}
         Transport: ${Transport}
         Rules:
         - Use HOUR-WISE format (Hour 1, Hour 2, etc.) and keep it relaxed.
@@ -135,8 +138,6 @@ function App() {
         Create a realistic 1-day itinerary for ${place}.
         Traveler type: ${group}
         Budget: ${budget}
-        Pace: ${pace}
-        Month: ${Month}
         Transport: ${Transport}
         Rules:
           - Morning / Afternoon / Evening
@@ -158,9 +159,7 @@ function App() {
         Create a realistic ${days}-day itinerary for ${place}.
         Traveler type: ${group}
         Budget: ${budget}
-        Pace: ${pace}
-        Detail level: ${detailLevel}
-        Month: ${Month}
+       
         Transport: ${Transport}
          Rules:
           - Day-wise structured plan (Day 1, Day 2, etc.)
@@ -214,6 +213,16 @@ function App() {
       setLoading(false);
     }
   };
+ const handleBlogClick = (slug) => {
+  if (slug === "admin") {
+    setActiveComponent("admin-blog");
+  } else {
+    setSelectedBlogSlug(slug);
+    setActiveComponent("blog-detail");
+  }
+};
+
+
 
   return (
     <div className="App">
@@ -249,7 +258,11 @@ function App() {
         />
       )}
 
-      <main className="bg-[#d7f26e]/80 px-4  pb-24 overflow-hidden">
+      <main
+              className={`px-4 pb-24 overflow-hidden
+                ${activeComponent === "home" ? "bg-[#d7f26e]/80" : "bg-white"}
+              `}
+            >
 
         {/* ===== HERO (HOME ONLY) ===== */}
         {activeComponent === "home" && (
@@ -292,12 +305,12 @@ function App() {
             <div ref = {formCardRef} className="bg-white rounded-[32px] shadow-lg p-8">
 
               {/* card header */}
-                <div className="text-center space-y-2 mb-8">
+                <div className="text-center space-y-2 mb-10">
                   <h2 className="text-2xl md:text-3xl font-semibold text-gray-800">
-                    Build your trip
+                    Tell us your travel preferences
                   </h2>
                   <p className="text-sm text-gray-500">
-                    A few details are all we need to plan your perfect journey
+                    Just provide some basic information and we’ll plan your trip.
                   </p>
 
                   {/* ===== AI STATUS ===== */}
@@ -327,119 +340,148 @@ function App() {
              <form onSubmit={handleSubmit} className="space-y-6">
 
                 {/* ===== Trip Type ===== */}
-                <div className="space-y-2">
+                <div className="space-y-3  pb-6">
                   <label className="text-sm font-medium text-gray-700">
                     Trip type
                   </label>
-                  <select
-                    value={tripType}
-                    onChange={(e) => setTripType(e.target.value)}
-                    className="w-full rounded-xl border border-gray-200 px-4 py-3
-                              focus:outline-none focus:ring-2 focus:ring-[#5b7c67]/30"
-                  >
-                    <option value="hours">Few hours</option>
-                    <option value="day">One day</option>
-                    <option value="multi">Multiple days</option>
-                  </select>
+                 <div className="grid grid-cols-3 gap-3">
+                    {[
+                      { key: "hours", label: "Few hours" },
+                      { key: "day", label: "One day" },
+                      { key: "multi", label: "Multiple days" },
+                    ].map((t) => (
+                      <button
+                        key={t.key}
+                        type="button"
+                        onClick={() => setTripType(t.key)}
+                        className={`rounded-xl border p-4 text-sm transition text-center
+                          ${
+                            tripType === t.key
+                              ? "border-[#5b7c67] bg-[#5b7c67]/10 font-medium"
+                              : "hover:bg-gray-50"
+                          }`}
+                      >
+                        {t.label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
                 {/* ===== Conditional Fields ===== */}
                 {tripType === "hours" && (
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">
-                      Number of hours
-                    </label>
-                    <input
-                      type="number"
-                      min="1"
-                      max="12"
-                      value={hours}
-                      onChange={(e) => setHours(e.target.value)}
-                      className="w-full rounded-xl border border-gray-200 px-4 py-3"
-                    />
-                  </div>
+                   <div className="space-y-2  pb-6">
+                      <label className="text-sm font-medium text-gray-700">
+                        Number of hours
+                      </label>
+                      <input
+                        type="number"
+                        min={1}
+                        max={12}
+                        value={hours}
+                        onChange={(e) => setHours(Number(e.target.value))}
+                        className="w-full rounded-xl border border-gray-300 px-4 py-3"
+                      />
+                    </div>
                 )}
 
                 {tripType === "multi" && (
-                  <div className="space-y-2">
+                <div className="space-y-2  pb-6">
                     <label className="text-sm font-medium text-gray-700">
                       Number of days
                     </label>
                     <input
                       type="number"
-                      min="2"
+                      min={2}
                       value={days}
-                      onChange={(e) => setDays(e.target.value)}
-                      className="w-full rounded-xl border border-gray-200 px-4 py-3"
+                      onChange={(e) => setDays(Number(e.target.value))}
+                      className="w-full rounded-xl border border-gray-300 px-4 py-3"
                     />
                   </div>
                 )}
 
                 {/* ===== Destination ===== */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">
-                    Destination
-                  </label>
-                  <input
-                    value={place}
-                    onChange={(e) => setPlace(e.target.value)}
-                    placeholder="Enter city or place"
-                    className="w-full rounded-xl border border-gray-200 px-4 py-3"
-                  />
-                </div>
-
-                {/* ===== Grid Fields ===== */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Travel group</label>
-                    <select
-                      value={group}
-                      onChange={(e) => setGroup(e.target.value)}
-                      className="w-full rounded-xl border px-4 py-3"
-                    >
-                      <option>Solo</option>
-                      <option>Couple</option>
-                      <option>Family</option>
-                      <option>Friends</option>
-                    </select>
+                 <div className="space-y-2  pb-6">
+                    <label className="text-sm font-medium text-gray-700">
+                      What is destination of choice?
+                    </label>
+                    <input
+                      value={place}
+                      onChange={(e) => setPlace(e.target.value)}
+                      placeholder="Enter city or place"
+                      className="w-full rounded-xl border border-gray-300 px-4 py-3
+                                focus:outline-none focus:ring-2 focus:ring-[#5b7c67]/30"
+                    />
                   </div>
 
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Travel pace</label>
-                    <select
-                      value={pace}
-                      onChange={(e) => setPace(e.target.value)}
-                      className="w-full rounded-xl border px-4 py-3"
-                    >
-                      <option>Slow & relaxed</option>
-                      <option>Balanced</option>
-                      <option>Fast</option>
-                    </select>
-                  </div>
 
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Month</label>
-                    <select
-                      value={Month}
-                      onChange={(e) => setMonth(e.target.value)}
-                      className="w-full rounded-xl border px-4 py-3"
-                    >
-                      <option>January</option>
-                      <option>February</option>
-                      <option>March</option>
-                      <option>April</option>
-                      <option>May</option>
-                      <option>June</option>
-                      <option>July</option>
-                      <option>August</option>
-                      <option>September</option>
-                      <option>October</option>
-                      <option>November</option>
-                      <option>December</option>
-                    </select>
-                  </div>
 
+                   {/* ===== DATE ===== */}
+                          <div className="space-y-2  pb-6">
+                            <label className="text-sm font-medium text-gray-700">
+                              When are you planning to travel?
+                            </label>
+                            <input
+                              type="date"
+                              className="w-full rounded-xl border border-gray-300 px-4 py-3"
+                            />
+                          </div>
+
+                          {/* ===== BUDGET ===== */}
+                            {(tripType === "day" || tripType === "multi") && (
+                              <div className="space-y-3  pb-6">
+                                <label className="text-sm font-medium text-gray-700">
+                                  What is your budget?
+                                </label>
+
+                                <div className="grid grid-cols-3 gap-3">
+                                  {["Low", "Medium", "Luxury"].map((b) => (
+                                    <button
+                                      key={b}
+                                      type="button"
+                                      onClick={() => setBudget(b)}
+                                      className={`rounded-xl border p-4 text-sm text-center transition
+                                        ${
+                                          budget === b
+                                            ? "border-[#5b7c67] bg-[#5b7c67]/10"
+                                            : "hover:bg-gray-50"
+                                        }`}
+                                    >
+                                      <p className="font-medium">{b}</p>
+                                      <p className="text-xs text-gray-500 mt-1">
+                                        {b === "Low" && "Budget friendly"}
+                                        {b === "Medium" && "Balanced"}
+                                        {b === "Luxury" && "Premium"}
+                                      </p>
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* ===== TRAVEL GROUP ===== */}
+                            <div className="space-y-3  pb-6">
+                              <label className="text-sm font-medium text-gray-700">
+                                Who are you traveling with?
+                              </label>
+
+                              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                {["Solo", "Couple", "Family", "Friends"].map((g) => (
+                                  <button
+                                    key={g}
+                                    type="button"
+                                    onClick={() => setGroup(g)}
+                                    className={`rounded-xl border p-4 text-sm transition
+                                      ${
+                                        group === g
+                                          ? "border-[#5b7c67] bg-[#5b7c67]/10"
+                                          : "hover:bg-gray-50"
+                                      }`}
+                                  >
+                                    {g}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Transport</label>
                     <select
@@ -452,43 +494,21 @@ function App() {
                       <option>Walking</option>
                     </select>
                   </div>
-                  {(tripType === "day" || tripType === "multi") && (
-                    <div className="space-y-2 md:col-span-2">
-                      <label className="text-sm font-medium">Budget</label>
-                      <select
-                        value={budget}
-                        onChange={(e) => setBudget(e.target.value)}
-                        className="w-full rounded-xl border px-4 py-3"
-                      >
-                        <option>Low</option>
-                        <option>Medium</option>
-                        <option>Luxury</option>
-                      </select>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-700">
+                        Any special preferences? (optional)
+                      </label>
+                      <input
+                        value={suggestions}
+                        onChange={(e) => setSuggestions(e.target.value)}
+                        placeholder="Avoid crowds, cafes, photography spots, local food..."
+                        className="w-full rounded-xl border border-gray-300 px-4 py-3"
+                      />
                     </div>
-                  )}
-
-                  {/* <div className="suggestion-box">
-                    <label>Any special preferences? (optional)</label>
-                    <textarea
-                      placeholder="Eg: avoid crowds, add cafes, photography spots, local food, slow travel..."
-                      value={suggestions}
-                      onChange={(e) => setSuggestions(e.target.value)}
-                      rows={4}
-                    />
-                  </div> */}
-
-                  <div className="suggestion-box">
-                  <label >
-                    Any special preferences? (optional)
-                  </label>
-                  <input
-                    value={suggestions}
-                    onChange={(e) => setSuggestions(e.target.value)}
-                    placeholder="Eg: avoid crowds, add cafes, photography sports, local food..... "
-                    className="w-full rounded-xl border border-gray-200 px-4 py-3"
-                  />
-                </div>
-                </div>
+                {/* ===== Grid Fields ===== */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              </div>
 
                 {/* ===== ACTION AREA ===== */}
                 <div className="pt-6 border-t border-gray-100 space-y-3">
@@ -509,7 +529,12 @@ function App() {
                   )}
                 </div>
               </form>
+
+             {/* <TravelQuotes /> */}
+
             </div>
+
+            <TravelQuotes />
             {/* ===== FORM CARD 2 ===== */}
                   <div className="bg-white rounded-[40px] p-8 md:p-12 shadow-xl space-y-12">
 
@@ -660,13 +685,10 @@ function App() {
         )}
 
           {activeComponent === "blogs" && (
-            <Blogs
-              onBlogClick={(slug) => {
-                setSelectedBlogSlug(slug);
-                setActiveComponent("blog-detail");
-              }}
-            />
-          )}
+              <Blogs onBlogClick={handleBlogClick} />
+            )}
+
+
 
           {activeComponent === "blog-detail" && (
             <BlogDetail
@@ -684,6 +706,11 @@ function App() {
             onClose={() => setActiveComponent("home")}
           />
         )}
+
+        {activeComponent === "admin-blog" && (
+          <AdminBlog onBack={() => setActiveComponent("blogs")} />
+        )}
+
 
         {/* ITINERARIES */}
         {activeComponent === "itineraries" && (

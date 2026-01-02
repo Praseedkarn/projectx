@@ -1,5 +1,4 @@
 const swissAlpsItinerary = {
-  id: 21,
   title: "Swiss Alps Scenic Escape",
   duration: "6 days",
   location: "Switzerland",

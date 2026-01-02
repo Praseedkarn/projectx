@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { detailedItineraries } from "../data/itinerary";
+import { fetchItineraryByLegacyId } from "../services/api";
 
 /* ===== 360 STREET VIEW (NO API KEY) ===== */
 const StreetView360 = ({ place }) => {
@@ -28,30 +29,54 @@ const ItineraryDetail = ({ itineraryId, onBack }) => {
   const [selected360Place, setSelected360Place] = useState("");
 
   /* ===== LOAD ITINERARY ===== */
-  useEffect(() => {
-    const detail = detailedItineraries[itineraryId];
-    setItineraryDetails(detail || null);
-    setActiveTab("overview"); // 🔥 ensures tab resets correctly
+useEffect(() => {
+  const loadItinerary = async () => {
+    try {
+      // 1️⃣ Try static itinerary first
+      const staticData = detailedItineraries[itineraryId];
+
+      if (staticData) {
+        setItineraryDetails(staticData);
+      } else {
+        // 2️⃣ Fallback to DB
+        const dbData = await fetchItineraryByLegacyId(itineraryId);
+        setItineraryDetails(dbData);
+      }
+    } catch (error) {
+      console.error("Failed to load itinerary:", error);
+      setItineraryDetails(null);
+    }
+
+    setActiveTab("overview");
     setSelectedDay(1);
     window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [itineraryId]);
+  };
 
-  /* ===== 360 PLACES (DATA DRIVEN) ===== */
-  const highlight360Places =
+  loadItinerary();
+}, [itineraryId]);
+
+
+  /* ===== 360 PLACES ===== */
+ const highlight360Places =
   itineraryDetails?.highlight360Views ||
-  Array.from(
-    new Set(
-      itineraryDetails?.days
-        ?.flatMap((d) => d.places || [])
-        .map((p) => ({
-          label: p.split(",")[0],
-          place: p
-        })) || []
-    )
-  ).slice(0, 6);
+  (() => {
+    const unique = {};
+    (itineraryDetails?.days || []).forEach((day) => {
+      (day.places || []).forEach((p) => {
+        if (!unique[p]) {
+          unique[p] = {
+            label: p.split(",")[0],
+            place: p,
+          };
+        }
+      });
+    });
+    return Object.values(unique).slice(0, 6);
+  })();
 
 
-  /* ===== DEFAULT 360 PLACE ===== */
+
+  /* ===== DEFAULT 360 ===== */
   useEffect(() => {
     if (highlight360Places.length > 0) {
       setSelected360Place(highlight360Places[0].place);
@@ -65,9 +90,7 @@ const ItineraryDetail = ({ itineraryId, onBack }) => {
     const origin = day.places[0];
     const destination = day.places[day.places.length - 1];
     const waypoints =
-      day.places.length > 2
-        ? day.places.slice(1, -1).join("|")
-        : "";
+      day.places.length > 2 ? day.places.slice(1, -1).join("|") : "";
 
     const url =
       `https://www.google.com/maps/dir/?api=1` +
@@ -78,14 +101,11 @@ const ItineraryDetail = ({ itineraryId, onBack }) => {
     window.open(url, "_blank");
   };
 
-  /* ===== SAFE LOADING ===== */
+  /* ===== LOADING ===== */
   if (!itineraryDetails) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
-        <button
-          onClick={onBack}
-          className="rounded-full border px-6 py-2"
-        >
+        <button onClick={onBack} className="rounded-full border px-6 py-2">
           ← Back
         </button>
       </div>
@@ -96,20 +116,24 @@ const ItineraryDetail = ({ itineraryId, onBack }) => {
     <section className="bg-[#fdfcf7] px-4 pt-24 pb-24">
       <div className="max-w-5xl mx-auto space-y-12">
 
-        {/* ===== HEADER ===== */}
+        {/* ===== HERO / GUIDE HEADER ===== */}
         <div className="bg-white rounded-[32px] shadow-lg p-8 space-y-6 relative">
           <button
             onClick={onBack}
-            className="absolute top-6 left-6 text-sm text-gray-600 hover:underline z-10"
+            className="absolute top-6 left-6 text-sm text-gray-600 hover:underline"
           >
             ← Back
           </button>
 
-          <h1 className="text-2xl font-semibold pt-6">
+          <p className="text-xs uppercase tracking-widest text-gray-500 pt-6">
+            Your Complete Travel Guide
+          </p>
+
+          <h1 className="text-3xl font-semibold">
             {itineraryDetails.title}
           </h1>
 
-          <p className="text-gray-600">
+          <p className="text-gray-600 leading-relaxed max-w-3xl">
             {itineraryDetails.description}
           </p>
 
@@ -119,15 +143,16 @@ const ItineraryDetail = ({ itineraryId, onBack }) => {
             className="w-full rounded-2xl max-h-[420px] object-cover"
           />
 
-          <div className="flex flex-wrap gap-4 text-sm text-gray-600">
-            <span>📍 {itineraryDetails.location}</span>
-            <span>⏳ {itineraryDetails.duration}</span>
-            <span>⚡ {itineraryDetails.difficulty}</span>
-            <span>💰 {itineraryDetails.priceRange}</span>
+          {/* FACT BAR */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm text-gray-600">
+            <div>📍 <strong>Location</strong><br />{itineraryDetails.location}</div>
+            <div>⏳ <strong>Duration</strong><br />{itineraryDetails.duration}</div>
+            <div>⚡ <strong>Difficulty</strong><br />{itineraryDetails.difficulty}</div>
+            <div>💰 <strong>Budget</strong><br />{itineraryDetails.priceRange}</div>
           </div>
         </div>
 
-        {/* ===== TABS (FIXED) ===== */}
+        {/* ===== TABS ===== */}
         <div className="flex flex-wrap gap-3 justify-center">
           {["overview", "itinerary", "practical", "budget"].map((tab) => (
             <button
@@ -148,57 +173,71 @@ const ItineraryDetail = ({ itineraryId, onBack }) => {
         {activeTab === "overview" && (
           <div className="bg-white rounded-[32px] shadow-lg p-8 space-y-10">
 
-            {/* 360° */}
+            {/* BEST TIME */}
+            <div className="bg-[#f7f9f7] rounded-2xl p-5">
+              <h3 className="font-semibold mb-2">🌤 Best Time to Visit</h3>
+              <p className="text-sm text-gray-600">
+                {itineraryDetails.bestTime}
+              </p>
+            </div>
+
+            {/* 360 */}
             {highlight360Places.length > 0 && (
               <div className="space-y-6">
                 <h3 className="text-lg font-semibold">
-                  🌍 Explore in 360°
+                  🌍 Experience the Destination
                 </h3>
+                <p className="text-sm text-gray-600 max-w-2xl">
+                  Explore key landmarks included in this itinerary through immersive 360° views.
+                </p>
 
                 <div className="flex flex-wrap gap-3">
-  {highlight360Places.map(({ label, place }) => (
-    <button
-      key={place}
-      onClick={() => setSelected360Place(place)}
-      className={`px-4 py-2 rounded-full text-xs font-medium transition-all
-        ${
-          selected360Place === place
-            ? "bg-[#5b7c67] text-white shadow-md scale-105"
-            : "bg-white border hover:bg-gray-50 hover:scale-105"
-        }`}
-    >
-      📍 {label}
-    </button>
-  ))}
-</div>
+                  {highlight360Places.map(({ label, place }) => (
+                    <button
+                      key={place}
+                      onClick={() => setSelected360Place(place)}
+                      className={`px-4 py-2 rounded-full text-xs font-medium transition-all
+                        ${
+                          selected360Place === place
+                            ? "bg-[#5b7c67] text-white shadow-md scale-105"
+                            : "bg-white border hover:bg-gray-50 hover:scale-105"
+                        }`}
+                    >
+                      📍 {label}
+                    </button>
+                  ))}
+                </div>
 
-
-   <div className="rounded-2xl overflow-hidden border shadow-sm">
-  <div className="bg-[#f7f9f7] px-4 py-2 text-sm font-medium text-gray-700">
-    🌍 {selected360Place || "select a location"}
-  </div>
-  <StreetView360 place={selected360Place} />
-</div>
-
+                <div className="rounded-2xl overflow-hidden border shadow-sm">
+                  <div className="bg-[#f7f9f7] px-4 py-2 text-sm font-medium text-gray-700">
+                    🌍 {selected360Place}
+                  </div>
+                  <StreetView360 place={selected360Place} />
+                </div>
               </div>
             )}
 
-            {/* TEXT HIGHLIGHTS */}
-            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-600">
-              {itineraryDetails.highlights.map((h, i) => (
-                <li key={i} className="flex gap-2">
-                  <span className="text-[#5b7c67]">•</span>
-                  {h}
-                </li>
-              ))}
-            </ul>
+            {/* HIGHLIGHTS */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4">
+                ✨ Why Visit This Destination
+              </h3>
+
+              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-600">
+                {itineraryDetails.highlights.map((h, i) => (
+                  <li key={i} className="flex gap-2">
+                    <span className="text-[#5b7c67]">•</span>
+                    {h}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         )}
 
         {/* ===== ITINERARY ===== */}
         {activeTab === "itinerary" && (
           <div className="space-y-8">
-
             <div className="flex flex-wrap gap-3">
               {itineraryDetails.days.map((d) => (
                 <button
@@ -222,7 +261,9 @@ const ItineraryDetail = ({ itineraryId, onBack }) => {
                   key={day.day}
                   className="bg-white rounded-[32px] shadow-lg p-8 space-y-4"
                 >
-                  <h3 className="font-semibold">{day.title}</h3>
+                  <h3 className="text-lg font-semibold">
+                    Day {day.day}: {day.title}
+                  </h3>
 
                   <ul className="list-disc pl-5 text-gray-600">
                     {day.activities.map((a, i) => (
@@ -247,9 +288,8 @@ const ItineraryDetail = ({ itineraryId, onBack }) => {
         {/* ===== PRACTICAL ===== */}
         {activeTab === "practical" && (
           <div className="bg-white rounded-[32px] shadow-lg p-8 space-y-8">
-
             <div>
-              <h3 className="font-semibold mb-2">Inclusions</h3>
+              <h3 className="text-lg font-semibold mb-2">✔ What’s Included</h3>
               <ul className="list-disc pl-5 text-gray-600">
                 {itineraryDetails.inclusions.map((i, idx) => (
                   <li key={idx}>{i}</li>
@@ -258,7 +298,7 @@ const ItineraryDetail = ({ itineraryId, onBack }) => {
             </div>
 
             <div>
-              <h3 className="font-semibold mb-2">Exclusions</h3>
+              <h3 className="text-lg font-semibold mb-2">✖ What’s Not Included</h3>
               <ul className="list-disc pl-5 text-gray-600">
                 {itineraryDetails.exclusions.map((e, idx) => (
                   <li key={idx}>{e}</li>
@@ -267,7 +307,7 @@ const ItineraryDetail = ({ itineraryId, onBack }) => {
             </div>
 
             <div>
-              <h3 className="font-semibold mb-2">Travel Tips</h3>
+              <h3 className="text-lg font-semibold mb-2">💡 Travel Tips</h3>
               <ul className="list-disc pl-5 text-gray-600">
                 {itineraryDetails.tips.map((t, idx) => (
                   <li key={idx}>{t}</li>
@@ -280,6 +320,10 @@ const ItineraryDetail = ({ itineraryId, onBack }) => {
         {/* ===== BUDGET ===== */}
         {activeTab === "budget" && (
           <div className="bg-white rounded-[32px] shadow-lg p-8">
+            <h3 className="text-lg font-semibold mb-6">
+              💰 Estimated Trip Cost
+            </h3>
+
             {Object.entries(itineraryDetails.budget).map(([k, v]) => (
               <div
                 key={k}
@@ -291,7 +335,6 @@ const ItineraryDetail = ({ itineraryId, onBack }) => {
             ))}
           </div>
         )}
-
       </div>
     </section>
   );

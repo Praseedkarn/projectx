@@ -1,5 +1,4 @@
 const santoriniItinerary = {
-  id: 37,
   title: "Santorini Island Romance",
   duration: "4 days",
   location: "Santorini, Greece",

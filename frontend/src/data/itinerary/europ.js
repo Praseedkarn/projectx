@@ -1,5 +1,5 @@
 const European={
-      id: 2,
+      
       title: 'European Capitals',
       duration: '10 days',
       location: 'Paris, Rome, Amsterdam',

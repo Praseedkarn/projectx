@@ -1,5 +1,5 @@
 const Delhi = {
-  id: 9,
+  
   title: 'Delhi Heritage Tour',
   duration: '3 days',
   location: 'Delhi, India',

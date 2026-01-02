@@ -1,5 +1,5 @@
 const dolomitesItinerary = {
-  id: 26,
+  
   title: "Dolomites Hiking Tour",
   duration: "6 days",
   location: "Bolzano → Cortina d’Ampezzo → Val Gardena, Italy",

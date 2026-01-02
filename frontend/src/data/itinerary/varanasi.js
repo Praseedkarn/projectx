@@ -1,5 +1,4 @@
 const varanasiItinerary = {
-  id: 18,
   title: "Spiritual Varanasi Retreat",
   duration: "3 days",
   location: "Varanasi, India",

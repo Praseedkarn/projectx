@@ -1,5 +1,5 @@
 const ladakhItinerary = {
-  id: 35,
+  
   title: "Ladakh Monastery Trail",
   duration: "7 days",
   location: "Leh → Nubra Valley → Pangong Lake, Ladakh",

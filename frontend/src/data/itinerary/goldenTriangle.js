@@ -1,5 +1,4 @@
 const goldenTriangleItinerary = {
-  id: 15,
   title: "Golden Triangle Tour",
   duration: "4 days",
   location: "Delhi – Agra – Jaipur, India",

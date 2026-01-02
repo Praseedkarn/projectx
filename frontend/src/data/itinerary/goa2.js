@@ -1,5 +1,5 @@
 const goaItinerary = {
-  id: 16,
+  
   title: "Goa Beach Break",
   duration: "3 days",
   location: "Goa, India",

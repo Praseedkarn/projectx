@@ -5,6 +5,8 @@ import aiRoutes from "./routes/ai.routes.js";
 import connectDB from "./config/db.js";
 import blogRoutes from "./routes/blog.routes.js";
 import authRoutes from "./routes/auth.routes.js";
+import itineraryRoutes from "./routes/itinerary.routes.js";
+
 
 dotenv.config();
 
@@ -15,6 +17,8 @@ connectDB();
 app.use(cors());
 app.use(express.json());
 app.use("/api/auth",authRoutes);
+app.use("/api/itineraries", itineraryRoutes);
+
 
 // API routes
 app.use("/api/ai", aiRoutes);

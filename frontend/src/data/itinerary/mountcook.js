@@ -1,5 +1,4 @@
 const mountCookItinerary = {
-  id: 30,
   title: "Mount Cook Alpine Adventure",
   duration: "4 days",
   location: "Aoraki / Mount Cook National Park, New Zealand",
