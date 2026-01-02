@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react";
 import "./App.css";
-
 import Header from "./components/Header";
 import Footer from "./components/footer";
 import SignIn from "./components/SignIn";
@@ -22,16 +21,13 @@ function App() {
   const formCardRef = useRef(null);
   const [showSignIn, setShowSignIn] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
-
   const [tripSuggestions, setTripSuggestions] = useState(null);
   const [loading, setLoading] = useState(false);
-
   const [activeComponent, setActiveComponent] = useState("home");
   const [selectedItineraryId, setSelectedItineraryId] = useState(null);
   const [apiStatus, setApiStatus] = useState("checking");
   const headerRef = useRef(null);
   const [headerHeight, setHeaderHeight] = useState(0);
-  /* ===== Trip Builder States ===== */
   const [tripType, setTripType] = useState("multi");
   const [days, setDays] = useState(3);
   const [hours, setHours] = useState(4);
