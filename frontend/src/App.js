@@ -15,7 +15,9 @@ import Blogs from "./components/Blogs";
 import TravelQuotes from "./components/TravelQuotes";
 import { generateTravelItinerary } from "./services/api";
 import AdminBlog from "./components/AdminBlog";
-
+import FeatureCards from "./components/FeatureCards";
+import DistanceCalculator from "./components/DistanceCalculator";
+import ExploreCities from "./components/ExploreCities";
 
 function App() {
   const formCardRef = useRef(null);
@@ -49,6 +51,13 @@ function App() {
     if (userData) setCurrentUser(JSON.parse(userData));
   }, []);
 
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  }, [activeComponent]);
+
   /* ===== Check AI status ===== */
   useEffect(() => {
     const checkAPI = async () => {
@@ -69,6 +78,9 @@ function App() {
   const updateHeight = () => {
     setHeaderHeight(headerRef.current.offsetHeight);
   };
+
+
+
 
   updateHeight(); // initial
   window.addEventListener("resize", updateHeight);
@@ -255,7 +267,7 @@ function App() {
       )}
 
       <main
-              className={`px-4 pb-24 overflow-hidden
+              className={`px-2 lg:px- pb-24 overflow-hidden
                 ${activeComponent === "home" ? "bg-[#d7f26e]/80" : "bg-white"}
               `}
             >
@@ -297,8 +309,11 @@ function App() {
         )}
         {/* HOME */}
         {activeComponent === "home" && (
-          <div className="max-w-6xl mx-auto space-y-24">
-            <div ref = {formCardRef} className="bg-white rounded-[32px] shadow-lg p-8">
+          <div className="max-w-[1400px] mx-auto space-y-24">
+            <div ref = {formCardRef} className=" bg-white
+              rounded-3xl
+              shadow-[0_10px_30px_rgba(0,0,0,0.12)]
+              px-8 py-6">
 
               {/* card header */}
                 <div className="text-center space-y-2 mb-10">
@@ -333,35 +348,48 @@ function App() {
                 </div>
 
 
-             <form onSubmit={handleSubmit} className="space-y-6">
+             <form onSubmit={handleSubmit} className="space-y-4">
 
                 {/* ===== Trip Type ===== */}
-                <div className="space-y-3  pb-6">
-                  <label className="text-sm font-medium text-gray-700">
-                    Trip type
-                  </label>
-                 <div className="grid grid-cols-3 gap-3">
-                    {[
-                      { key: "hours", label: "Few hours" },
-                      { key: "day", label: "One day" },
-                      { key: "multi", label: "Multiple days" },
-                    ].map((t) => (
-                      <button
-                        key={t.key}
-                        type="button"
-                        onClick={() => setTripType(t.key)}
-                        className={`rounded-xl border p-4 text-sm transition text-center
-                          ${
-                            tripType === t.key
-                              ? "border-[#5b7c67] bg-[#5b7c67]/10 font-medium"
-                              : "hover:bg-gray-50"
-                          }`}
-                      >
-                        {t.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
+               {/* ===== TRIP TYPE (FLIGHT STYLE) ===== */}
+<div className="flex flex-wrap gap-6 items-center">
+
+  {[
+    { key: "hours", label: "Few Hours" },
+    { key: "day", label: "One Day" },
+    { key: "multi", label: "Multiple days" },
+  ].map((t) => (
+    <button
+      key={t.key}
+      type="button"
+      onClick={() => setTripType(t.key)}
+      className={`flex items-center gap-3 px-5 py-3 rounded-full border
+        transition-all duration-200 text-sm font-medium
+        ${
+          tripType === t.key
+            ? "border-blue-600 bg-blue-50 text-blue-700"
+            : "border-gray-300 text-gray-700 hover:border-blue-400"
+        }`}
+    >
+      {/* Radio circle */}
+      <span
+        className={`w-4 h-4 rounded-full border flex items-center justify-center
+          ${
+            tripType === t.key
+              ? "border-blue-600"
+              : "border-gray-400"
+          }`}
+      >
+        {tripType === t.key && (
+          <span className="w-2 h-2 rounded-full bg-blue-600" />
+        )}
+      </span>
+
+      {t.label}
+    </button>
+  ))}
+</div>
+
 
                 {/* ===== Conditional Fields ===== */}
                 {tripType === "hours" && (
@@ -395,119 +423,123 @@ function App() {
                   </div>
                 )}
 
-                {/* ===== Destination ===== */}
-                 <div className="space-y-2  pb-6">
-                    <label className="text-sm font-medium text-gray-700">
-                      What is destination of choice?
-                    </label>
-                    <input
-                      value={place}
-                      onChange={(e) => setPlace(e.target.value)}
-                      placeholder="Enter city or place"
-                      className="w-full rounded-xl border border-gray-300 px-4 py-3
-                                focus:outline-none focus:ring-2 focus:ring-[#5b7c67]/30"
-                    />
-                  </div>
+              <div className="grid grid-cols-1  gap-4 pb-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">
+                    Destination
+                  </label>
+                  <input
+                    value={place}
+                    onChange={(e) => setPlace(e.target.value)}
+                    placeholder="Enter city or place"
+                    className="w-full rounded-xl border px-4 py-3"
+                  />
+                </div>
 
+                {/* <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">
+                    Travel date
+                  </label>
+                  <input
+                    type="date"
+                    className="w-full rounded-xl border px-4 py-3"
+                  />
+                </div> */}
+              </div>
+              {/* ===== BUDGET + GROUP + TRANSPORT ===== */}
+              <div className="grid grid-cols-1  gap-4 pb-4">
 
-
-                   {/* ===== DATE ===== */}
-                          <div className="space-y-2  pb-6">
-                            <label className="text-sm font-medium text-gray-700">
-                              When are you planning to travel?
-                            </label>
-                            <input
-                              type="date"
-                              className="w-full rounded-xl border border-gray-300 px-4 py-3"
-                            />
-                          </div>
-
-                          {/* ===== BUDGET ===== */}
-                            {(tripType === "day" || tripType === "multi") && (
-                              <div className="space-y-3  pb-6">
-                                <label className="text-sm font-medium text-gray-700">
-                                  What is your budget?
-                                </label>
-
-                                <div className="grid grid-cols-3 gap-3">
-                                  {["Low", "Medium", "Luxury"].map((b) => (
-                                    <button
-                                      key={b}
-                                      type="button"
-                                      onClick={() => setBudget(b)}
-                                      className={`rounded-xl border p-4 text-sm text-center transition
-                                        ${
-                                          budget === b
-                                            ? "border-[#5b7c67] bg-[#5b7c67]/10"
-                                            : "hover:bg-gray-50"
-                                        }`}
-                                    >
-                                      <p className="font-medium">{b}</p>
-                                      <p className="text-xs text-gray-500 mt-1">
-                                        {b === "Low" && "Budget friendly"}
-                                        {b === "Medium" && "Balanced"}
-                                        {b === "Luxury" && "Premium"}
-                                      </p>
-                                    </button>
-                                  ))}
-                                </div>
-                              </div>
-                            )}
-
-                            {/* ===== TRAVEL GROUP ===== */}
-                            <div className="space-y-3  pb-6">
-                              <label className="text-sm font-medium text-gray-700">
-                                Who are you traveling with?
-                              </label>
-
-                              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                                {["Solo", "Couple", "Family", "Friends"].map((g) => (
-                                  <button
-                                    key={g}
-                                    type="button"
-                                    onClick={() => setGroup(g)}
-                                    className={`rounded-xl border p-4 text-sm transition
-                                      ${
-                                        group === g
-                                          ? "border-[#5b7c67] bg-[#5b7c67]/10"
-                                          : "hover:bg-gray-50"
-                                      }`}
-                                  >
-                                    {g}
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
+                {/* ===== BUDGET (only for day & multi) ===== */}
+                {/* {(tripType === "day" || tripType === "multi") && (
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Transport</label>
-                    <select
-                      value={Transport}
-                      onChange={(e) => setTransport(e.target.value)}
-                      className="w-full rounded-xl border px-4 py-3"
-                    >
-                      <option>Public transport</option>
-                      <option>Rented car</option>
-                      <option>Walking</option>
-                    </select>
-                  </div>
+                    <label className="text-sm font-medium text-gray-700">
+                      Budget
+                    </label>
 
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-gray-700">
-                        Any special preferences? (optional)
-                      </label>
-                      <input
-                        value={suggestions}
-                        onChange={(e) => setSuggestions(e.target.value)}
-                        placeholder="Avoid crowds, cafes, photography spots, local food..."
-                        className="w-full rounded-xl border border-gray-300 px-4 py-3"
-                      />
+                    <div className="grid grid-cols-3 gap-2">
+                      {["Low", "Medium", "Luxury"].map((b) => (
+                        <button
+                          key={b}
+                          type="button"
+                          onClick={() => setBudget(b)}
+                          className={`rounded-lg border px-3 py-2 text-sm transition
+                            ${
+                              budget === b
+                                ? "border-[#5b7c67] bg-[#5b7c67]/10 font-medium"
+                                : "hover:bg-gray-50"
+                            }`}
+                        >
+                          {b}
+                        </button>
+                      ))}
                     </div>
+                  </div>
+                )} */}
+
+  {/* ===== TRAVEL GROUP ===== */}
+  <div className="space-y-2">
+    <label className="text-sm font-medium text-gray-700">
+      Travel group
+    </label>
+
+    <div className="grid grid-cols-4 gap-2">
+      {["Solo", "Couple", "Family", "Friends"].map((g) => (
+        <button
+          key={g}
+          type="button"
+          onClick={() => setGroup(g)}
+          className={`rounded-lg border px-3 py-2 text-sm transition
+            ${
+              group === g
+                ? "border-[#5b7c67] bg-[#5b7c67]/10 font-medium"
+                : "hover:bg-gray-50"
+            }`}
+        >
+          {g}
+        </button>
+      ))}
+    </div>
+  </div>
+
+  {/* ===== TRANSPORT ===== */}
+  {/* <div className="space-y-2">
+    <label className="text-sm font-medium text-gray-700">
+      Transport
+    </label>
+    <select
+      value={Transport}
+      onChange={(e) => setTransport(e.target.value)}
+      className="w-full rounded-lg border px-3 py-2 text-sm"
+    >
+      <option>Public transport</option>
+      <option>Rented car</option>
+      <option>Walking</option>
+    </select>
+  </div> */}
+</div>
+
+{/* ===== PREFERENCES ===== */}
+<div className="space-y-2 pb-2">
+  <label className="text-sm font-medium text-gray-700">
+    Special preferences (optional)
+  </label>
+  <input
+    value={suggestions}
+    onChange={(e) => setSuggestions(e.target.value)}
+    placeholder="Avoid crowds, cafes, photography spots..."
+    className="w-full rounded-lg border px-3 py-2 text-sm"
+  />
+</div>
+
+                         
+
+                          
                 {/* ===== Grid Fields ===== */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               </div>
 
                 {/* ===== ACTION AREA ===== */}
-                <div className="pt-6 border-t border-gray-100 space-y-3">
+                <div className="pt-6 border-t border-gray-100 space-y-2">
                   <button
                     type="submit"
                     disabled={loading}
@@ -526,31 +558,16 @@ function App() {
                 </div>
               </form>
 
+              {/* <FeatureCards /> */}
+
              {/* <TravelQuotes /> */}
 
             </div>
+           
 
-            <TravelQuotes />
+            {/* <TravelQuotes /> */}
             {/* ===== FORM CARD 2 ===== */}
                   <div className="bg-white rounded-[40px] p-8 md:p-12 shadow-xl space-y-12">
-
-              {/* ===== CARD HEADER ===== */}
-              {/* <div className="text-center space-y-3">
-                <h2 className="text-3xl font-semibold text-gray-800">
-                  What is PROJECT X?
-                </h2>
-                <p className="text-gray-600 text-base leading-relaxed">
-                  Project X is an AI-powered travel planning platform designed to help
-                  travelers create realistic, well-paced itineraries based on their
-                  available time, travel style, budget, and destination.
-                  <br />
-                  <br />
-                  Whether you have just a few hours or multiple days, Project X analyzes
-                  travel flow and activities to help you plan smarter, stress-free journeys.
-                </p>
-              </div> */}
-
-              {/* ===== INNER INFO CARDS ===== */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
                 {/* CARD 1 */}
@@ -657,9 +674,16 @@ function App() {
 
                 {/* CARD 4 */}
                 
-
+                  
               </div>
-             
+             <FeatureCards  
+                onNavigate={(id) => {
+                  if (id === "distance") setActiveComponent("distance");
+                  if (id === "itineraries") setActiveComponent("itineraries");
+                  if (id === "packing") setActiveComponent("packing");
+                  if(id ==="cities") setActiveComponent("cities");
+                }}
+             />
             </div>
             <div className="text-center max-w-3xl mx-auto mb-12">
               <h2 className="text-4xl md:text-4xl font-semibold text-gray-800">
@@ -726,6 +750,25 @@ function App() {
             onBack={() => setActiveComponent("itineraries")}
           />
         )}
+
+        {activeComponent === "distance" && (
+          <div className="pt-28">
+          <DistanceCalculator
+            onBack={() => setActiveComponent("home")}
+          />
+          </div>
+        )}
+
+        {activeComponent === "cities" && (
+          <ExploreCities
+            onBack={() => setActiveComponent("home")}
+            onCityClick={(city) => {
+              console.log(city); // later → City Detail page
+            }}
+          />
+        )}
+
+
 
         {/* PROFILE */}
         {activeComponent === "profile" && (
