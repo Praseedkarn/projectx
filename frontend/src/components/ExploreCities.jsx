@@ -1,8 +1,11 @@
 import { useState } from "react";
 import { cities } from "../data/cities";
 
+const ITEMS_PER_PAGE = 9;
+
 export default function ExploreCities({ onBack, onCityClick }) {
   const [query, setQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const filteredCities = cities.filter(
     (c) =>
@@ -10,11 +13,23 @@ export default function ExploreCities({ onBack, onCityClick }) {
       c.country.toLowerCase().includes(query.toLowerCase())
   );
 
+  const totalPages = Math.ceil(filteredCities.length / ITEMS_PER_PAGE);
+
+  const paginatedCities = filteredCities.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  const handleSearch = (e) => {
+    setQuery(e.target.value);
+    setCurrentPage(1);
+  };
+
   return (
     <section className="bg-[#f6f8f5] px-4 pt-24 pb-24 overflow-hidden">
       <div className="max-w-5xl mx-auto space-y-10">
 
-        {/* ===== HEADER BAR ===== */}
+        {/* HEADER */}
         <div className="flex items-center justify-between">
           <button
             onClick={onBack}
@@ -24,61 +39,47 @@ export default function ExploreCities({ onBack, onCityClick }) {
           </button>
         </div>
 
-        {/* ===== HERO CARD ===== */}
-        <div className="bg-white rounded-[32px] p-8 md:p-10 shadow-[0_10px_40px_rgba(0,0,0,0.06)] text-center space-y-4">
+        {/* HERO */}
+        <div className="bg-white rounded-[32px] p-8 md:p-10 shadow text-center space-y-4">
           <h1 className="text-2xl md:text-3xl font-semibold text-gray-900">
             Explore Cities Around the World
           </h1>
 
           <p className="text-sm text-gray-500 max-w-xl mx-auto">
-            Discover destinations through culture, food, history, and local
-            experiences.
+            Discover destinations through culture, food, history, and local experiences.
           </p>
 
-          {/* SEARCH */}
           <div className="max-w-md mx-auto relative">
             <input
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              onChange={handleSearch}
               placeholder="Search city or country"
-              className="
-                w-full rounded-full border
-                px-5 py-3 text-sm
-                outline-none
-              "
+              className="w-full rounded-full border px-5 py-3 text-sm outline-none"
             />
             <span className="absolute right-4 top-3 text-gray-400">🔍</span>
           </div>
         </div>
 
-        {/* ===== CITY GRID ===== */}
+        {/* CITY GRID */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredCities.map((city) => (
+          {paginatedCities.map((city) => (
             <div
               key={city.id}
               onClick={() => onCityClick?.(city)}
-              className="
-                bg-white rounded-2xl overflow-hidden
-                shadow-md hover:shadow-xl
-                transition cursor-pointer
-              "
+              className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition cursor-pointer"
             >
-              {/* IMAGE */}
               <img
                 src={city.image}
                 alt={city.name}
                 className="h-40 w-full object-cover"
               />
 
-              {/* CONTENT */}
               <div className="p-4 space-y-2">
                 <h3 className="text-sm font-semibold text-gray-900">
                   Explore {city.name}
                 </h3>
 
-                <div className="flex items-center gap-1 text-xs text-gray-500">
-                  📍 {city.country}
-                </div>
+                <div className="text-xs text-gray-500">📍 {city.country}</div>
 
                 <p className="text-xs text-gray-600 line-clamp-2">
                   {city.desc}
@@ -92,12 +93,48 @@ export default function ExploreCities({ onBack, onCityClick }) {
           ))}
         </div>
 
-        {/* EMPTY STATE */}
+        {/* EMPTY */}
         {filteredCities.length === 0 && (
           <div className="text-center text-sm text-gray-500 pt-10">
             No cities found for “{query}”
           </div>
         )}
+
+        {/* PAGINATION */}
+        {totalPages > 1 && (
+          <div className="flex justify-center gap-2 pt-6">
+            <button
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage((p) => p - 1)}
+              className="px-4 py-2 rounded-full border text-sm disabled:opacity-40"
+            >
+              ← Prev
+            </button>
+
+            {[...Array(totalPages)].map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrentPage(i + 1)}
+                className={`w-9 h-9 rounded-full text-sm
+                  ${currentPage === i + 1
+                    ? "bg-[#5b7c67] text-white"
+                    : "border hover:bg-gray-100"}
+                `}
+              >
+                {i + 1}
+              </button>
+            ))}
+
+            <button
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage((p) => p + 1)}
+              className="px-4 py-2 rounded-full border text-sm disabled:opacity-40"
+            >
+              Next →
+            </button>
+          </div>
+        )}
+
       </div>
     </section>
   );
