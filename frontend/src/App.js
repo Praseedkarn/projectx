@@ -18,6 +18,7 @@ import AdminBlog from "./components/AdminBlog";
 import FeatureCards from "./components/FeatureCards";
 import DistanceCalculator from "./components/DistanceCalculator";
 import ExploreCities from "./components/ExploreCities";
+import CityPage from "./components/CityPage";
 
 function App() {
   const formCardRef = useRef(null);
@@ -43,6 +44,7 @@ function App() {
   const [selectedBlogSlug, setSelectedBlogSlug] = useState(null);
   const [suggestions, setSuggestions]=useState("");
   const [activeBlog, setActiveBlog] = useState(null);
+  const [selectedCity, setSelectedCity] = useState(null);
 
 
   /* ===== Load user ===== */
@@ -346,51 +348,47 @@ function App() {
                     </div>
                   )}
                 </div>
-
-
              <form onSubmit={handleSubmit} className="space-y-4">
 
                 {/* ===== Trip Type ===== */}
                {/* ===== TRIP TYPE (FLIGHT STYLE) ===== */}
-<div className="flex flex-wrap gap-6 items-center">
+              <div className="flex flex-wrap gap-6 items-center">
 
-  {[
-    { key: "hours", label: "Few Hours" },
-    { key: "day", label: "One Day" },
-    { key: "multi", label: "Multiple days" },
-  ].map((t) => (
-    <button
-      key={t.key}
-      type="button"
-      onClick={() => setTripType(t.key)}
-      className={`flex items-center gap-3 px-5 py-3 rounded-full border
-        transition-all duration-200 text-sm font-medium
-        ${
-          tripType === t.key
-            ? "border-blue-600 bg-blue-50 text-blue-700"
-            : "border-gray-300 text-gray-700 hover:border-blue-400"
-        }`}
-    >
-      {/* Radio circle */}
-      <span
-        className={`w-4 h-4 rounded-full border flex items-center justify-center
-          ${
-            tripType === t.key
-              ? "border-blue-600"
-              : "border-gray-400"
-          }`}
-      >
-        {tripType === t.key && (
-          <span className="w-2 h-2 rounded-full bg-blue-600" />
-        )}
-      </span>
+                {[
+                  { key: "hours", label: "Few Hours" },
+                  { key: "day", label: "One Day" },
+                  { key: "multi", label: "Multiple days" },
+                ].map((t) => (
+                  <button
+                    key={t.key}
+                    type="button"
+                    onClick={() => setTripType(t.key)}
+                    className={`flex items-center gap-3 px-5 py-3 rounded-full border
+                      transition-all duration-200 text-sm font-medium
+                      ${
+                        tripType === t.key
+                          ? "border-blue-600 bg-blue-50 text-blue-700"
+                          : "border-gray-300 text-gray-700 hover:border-blue-400"
+                      }`}
+                  >
+                    {/* Radio circle */}
+                    <span
+                      className={`w-4 h-4 rounded-full border flex items-center justify-center
+                        ${
+                          tripType === t.key
+                            ? "border-blue-600"
+                            : "border-gray-400"
+                        }`}
+                    >
+                      {tripType === t.key && (
+                        <span className="w-2 h-2 rounded-full bg-blue-600" />
+                      )}
+                    </span>
 
-      {t.label}
-    </button>
-  ))}
-</div>
-
-
+                    {t.label}
+                  </button>
+                ))}
+              </div>
                 {/* ===== Conditional Fields ===== */}
                 {tripType === "hours" && (
                    <div className="space-y-2  pb-6">
@@ -407,7 +405,6 @@ function App() {
                       />
                     </div>
                 )}
-
                 {tripType === "multi" && (
                 <div className="space-y-2  pb-6">
                     <label className="text-sm font-medium text-gray-700">
@@ -422,7 +419,6 @@ function App() {
                     />
                   </div>
                 )}
-
               <div className="grid grid-cols-1  gap-4 pb-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-700">
@@ -759,14 +755,27 @@ function App() {
           </div>
         )}
 
-        {activeComponent === "cities" && (
-          <ExploreCities
-            onBack={() => setActiveComponent("home")}
-            onCityClick={(city) => {
-              console.log(city); // later → City Detail page
-            }}
-          />
-        )}
+       {activeComponent === "cities" && (
+        <ExploreCities
+          onBack={() => setActiveComponent("home")}
+          onCityClick={(slug) => {
+            setSelectedCity(slug);        // ✅ save slug
+            setActiveComponent("city");  // ✅ switch page
+          }}
+        />
+      )}
+
+      {activeComponent === "city" && selectedCity && (
+  <CityPage
+    slug={selectedCity}
+    onBack={() => {
+      setSelectedCity(null);
+      setActiveComponent("cities");
+    }}
+  />
+)}
+       
+
 
 
 

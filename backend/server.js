@@ -6,7 +6,7 @@ import connectDB from "./config/db.js";
 import blogRoutes from "./routes/blog.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import itineraryRoutes from "./routes/itinerary.routes.js";
-
+import cityRoutes from "./routes/city.routes.js";
 
 dotenv.config();
 
@@ -23,6 +23,7 @@ app.use("/api/itineraries", itineraryRoutes);
 // API routes
 app.use("/api/ai", aiRoutes);
 app.use("/api/blogs",blogRoutes);
+app.use("/api/cities",cityRoutes);
 
 // Test route
 app.get("/", (req, res) => {

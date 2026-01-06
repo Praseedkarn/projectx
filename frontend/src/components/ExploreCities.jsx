@@ -64,8 +64,8 @@ export default function ExploreCities({ onBack, onCityClick }) {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {paginatedCities.map((city) => (
             <div
-              key={city.id}
-              onClick={() => onCityClick?.(city)}
+              key={city._id || city.id}
+              onClick={() => onCityClick(city.slug)}
               className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition cursor-pointer"
             >
               <img
