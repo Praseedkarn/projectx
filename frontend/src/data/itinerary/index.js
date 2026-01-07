@@ -1,4 +1,3 @@
-
 import bali from "./bali";
 import japan from "./japan";
 import europ from "./europ";
@@ -35,45 +34,50 @@ import ladakhItinerary from "./ladakh";
 import icelandRingRoadItinerary from "./iceland";
 import santoriniItinerary from "./santorini";
 
+/*
+  RULE:
+  - Keys MUST match `citySlug`
+  - Keys MUST be lowercase
+  - Keys MUST be stable (never change later)
+*/
+
 export const detailedItineraries = {
-  1: bali,
-  2: europ,
-  3: japan,
-  4: Australian,
-  5: peru,
-  6: thai,
-  7: safari,
-  8: california,
-  9: delhiHeritage,
-  10: goa,
-  11: kashmir,
-  12: Rajasthan,
-  13: kerala,
-  14: himachalItinerary,
-  15: goldenTriangleItinerary,
-  16: goaItinerary,
-  17: northEastItinerary,
-  18: varanasiItinerary,
-  19: kashmir,
-  20: andamanItinerary,
-  21: swissAlpsItinerary,
-  22: everest,
-  23:incaTrailItinerary,
-  24:patagoniaItinerary,
-  25:mountFujiItinerary,
-  26:dolomitesItinerary,
-  27:rockyMountainsItinerary,
-  28:kilimanjaroItinerary,
-  29:annapurnaCircuitItinerary,
-  30:mountCookItinerary,
-  31:goldenTriangleItinerary,
-  32:udaipurItinerary,
-  33:sikkimItinerary,
-  34:rishikeshItinerary,
-  35:ladakhItinerary,
-  36:icelandRingRoadItinerary,
-  37:santoriniItinerary,
+  // 🌍 International
+  bali,
+  europ,
+  japan,
+  australian: Australian,
+  peru,
+  thai,
+  safari,
+  california,
+  swissalps: swissAlpsItinerary,
+  everest,
+  incatrail: incaTrailItinerary,
+  patagonia: patagoniaItinerary,
+  mountfuji: mountFujiItinerary,
+  dolomites: dolomitesItinerary,
+  rockymountains: rockyMountainsItinerary,
+  kilimanjaro:kilimanjaroItinerary,
+  annapurna: annapurnaCircuitItinerary,
+  mountcook: mountCookItinerary,
+  iceland: icelandRingRoadItinerary,
+  santorini: santoriniItinerary,
 
-
-
+  // 🇮🇳 India
+  delhi: delhiHeritage,
+  goa,
+  kashmir,
+  rajasthan: Rajasthan,
+  kerala,
+  himachal: himachalItinerary,
+  goldentriangle: goldenTriangleItinerary,
+  goabeach: goaItinerary,
+  northeast: northEastItinerary,
+  varanasi: varanasiItinerary,
+  andaman: andamanItinerary,
+  udaipur: udaipurItinerary,
+  sikkim: sikkimItinerary,
+  rishikesh: rishikeshItinerary,
+  ladakh: ladakhItinerary,
 };

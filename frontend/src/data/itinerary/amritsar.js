@@ -1,5 +1,5 @@
 const amritsarItinerary = {
-  
+  slug:"amritsar",
   title: "Golden Temple & Amritsar Food Tour",
   duration: "3 days",
   location: "Amritsar, Punjab, India",

@@ -45,6 +45,7 @@ function App() {
   const [suggestions, setSuggestions]=useState("");
   const [activeBlog, setActiveBlog] = useState(null);
   const [selectedCity, setSelectedCity] = useState(null);
+  const [userPreferences, setUserPreferences] = useState("");
 
 
   /* ===== Load user ===== */
@@ -198,11 +199,8 @@ function App() {
       const aiResponse = await generateTravelItinerary(description, detailLevel);
 
       setTripSuggestions({
-        text:
-          aiResponse?.text ||
-          aiResponse?.result ||
-          aiResponse?.choices?.[0]?.message?.content ||
-          String(aiResponse),
+        text: aiResponse?.text || "",
+        itinerary: aiResponse?.itinerary || null
       });
 
       setApiStatus("available");
@@ -766,12 +764,16 @@ function App() {
       )}
 
       {activeComponent === "city" && selectedCity && (
-  <CityPage
-    slug={selectedCity}
-    onBack={() => {
-      setSelectedCity(null);
-      setActiveComponent("cities");
-    }}
+        <CityPage
+          slug={selectedCity}
+          onBack={() => {
+            setSelectedCity(null);
+            setActiveComponent("cities");
+          }}
+           onItineraryClick={(id) => {
+          setSelectedItineraryId(id);   // "bali"
+          setActiveComponent("itinerary-detail");
+  }}
   />
 )}
        

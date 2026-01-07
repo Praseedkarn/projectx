@@ -44,15 +44,18 @@ export const fetchAllItineraries = async () => {
  * Fetch itinerary by legacyId
  * 🔥 THIS IS WHAT YOUR UI NEEDS
  */
-export const fetchItineraryByLegacyId = async (legacyId) => {
-  const response = await fetch(`/api/itineraries/legacy/${legacyId}`);
+export const fetchItineraryBySlug = async (slug) => {
+  const res = await fetch(
+    `http://localhost:5001/api/itineraries/${slug}`
+  );
 
-  if (!response.ok) {
-    throw new Error("Failed to fetch itinerary");
+  if (!res.ok) {
+    throw new Error("Itinerary not found");
   }
 
-  return response.json();
+  return res.json();
 };
+
 
 /**
  * Fetch itinerary by MongoDB _id

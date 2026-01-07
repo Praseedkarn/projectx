@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { detailedItineraries } from "../data/itinerary";
-import { fetchItineraryByLegacyId } from "../services/api";
+import { fetchItineraryBySlug } from "../services/api";
 
 /* ===== 360 STREET VIEW (NO API KEY) ===== */
 const StreetView360 = ({ place }) => {
@@ -32,18 +32,18 @@ const ItineraryDetail = ({ itineraryId, onBack }) => {
 useEffect(() => {
   const loadItinerary = async () => {
     try {
-      // 1️⃣ Try static itinerary first
-      const staticData = detailedItineraries[itineraryId];
+      const staticData = Object.values(detailedItineraries).find(
+  (it) => it.citySlug === itineraryId
+);
 
       if (staticData) {
         setItineraryDetails(staticData);
       } else {
-        // 2️⃣ Fallback to DB
-        const dbData = await fetchItineraryByLegacyId(itineraryId);
+        const dbData = await fetchItineraryBySlug(itineraryId);
         setItineraryDetails(dbData);
       }
-    } catch (error) {
-      console.error("Failed to load itinerary:", error);
+    } catch (err) {
+      console.error("Failed to load itinerary:", err);
       setItineraryDetails(null);
     }
 

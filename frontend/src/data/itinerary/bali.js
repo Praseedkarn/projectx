@@ -1,5 +1,5 @@
 const baliItinerary= {
-      
+      citySlug :"bali",
       title: 'Bali Adventure',
       duration: '7 days',
       location: 'Bali, Indonesia',

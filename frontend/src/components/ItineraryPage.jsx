@@ -6,6 +6,7 @@ const ItineraryPage = ({ onBack, onItineraryClick, onViewSaved }) => {
   const [popularItineraries] = useState([
     {
       id: 1,
+      citySlug:"bali",
       title: 'Bali Adventure',
       duration: '7 days',
       description: 'Explore the best of Bali - beaches, temples, and rice terraces',
@@ -17,6 +18,7 @@ const ItineraryPage = ({ onBack, onItineraryClick, onViewSaved }) => {
     },
     {
       id: 2,
+      citySlug:"europ",
       title: 'European Capitals',
       duration: '10 days',
       description: 'Visit Paris, Rome, and Amsterdam in one unforgettable trip',
@@ -28,6 +30,7 @@ const ItineraryPage = ({ onBack, onItineraryClick, onViewSaved }) => {
     },
     {
       id: 3,
+      citySlug:"japan",
       title: 'Japanese Culture',
       duration: '14 days',
       description: 'Traditional temples, modern cities, and authentic cuisine',
@@ -39,6 +42,7 @@ const ItineraryPage = ({ onBack, onItineraryClick, onViewSaved }) => {
     },
     {
       id: 4,
+      citySlug:"australia",
       title: 'Australian Road Trip',
       duration: '12 days',
       description: 'Coastal drives from Sydney to Melbourne with wildlife encounters',
@@ -50,6 +54,7 @@ const ItineraryPage = ({ onBack, onItineraryClick, onViewSaved }) => {
     },
     {
       id: 5,
+      citySlug:"peru",
       title: 'Peru Discovery',
       duration: '9 days',
       description: 'Machu Picchu, Sacred Valley, and Peruvian cuisine',
@@ -61,6 +66,7 @@ const ItineraryPage = ({ onBack, onItineraryClick, onViewSaved }) => {
     },
     {
       id: 6,
+      citySlug:"thai",
       title: 'Thai Islands',
       duration: '8 days',
       description: 'Island hopping in Southern Thailand paradise',
@@ -72,6 +78,7 @@ const ItineraryPage = ({ onBack, onItineraryClick, onViewSaved }) => {
     },
     {
       id: 7,
+      citySlug:"safari",
       title: 'Safari Experience',
       duration: '6 days',
       description: 'Wildlife safari in the heart of Africa',
@@ -83,6 +90,7 @@ const ItineraryPage = ({ onBack, onItineraryClick, onViewSaved }) => {
     },
     {
       id: 8,
+      citySlug:"california",
       title: 'California Coast',
       duration: '10 days',
       description: 'Highway 1 road trip from San Francisco to Los Angeles',
@@ -94,6 +102,7 @@ const ItineraryPage = ({ onBack, onItineraryClick, onViewSaved }) => {
     },
     {
       id: 9,
+      citySlug:"delhi",
       title: 'Delhi Heritage Tour',
       duration: '3 days',
       description: 'Explore the rich history and culture of Delhi',
@@ -1062,10 +1071,13 @@ const ItineraryPage = ({ onBack, onItineraryClick, onViewSaved }) => {
 
   // Function to handle itinerary click
   const handleItineraryClick = (itinerary) => {
-    if (onItineraryClick) {
-      onItineraryClick(itinerary.id);
-    }
-  };
+  if (!itinerary.citySlug) {
+    console.error("Missing citySlug for:", itinerary.title);
+    return;
+  }
+  onItineraryClick(itinerary.citySlug);
+};
+
 
   // Toggle save itinerary
   const toggleSaveItinerary = (itinerary, e) => {
