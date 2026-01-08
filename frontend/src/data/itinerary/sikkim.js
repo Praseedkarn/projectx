@@ -1,4 +1,5 @@
 const sikkimItinerary = {
+  citySlug:"sikkim-gangtok",
   title: "Sikkim & Gangtok Explorer",
   duration: "6 days",
   location: "Gangtok → Tsomgo Lake → Lachung → Yumthang Valley, Sikkim",

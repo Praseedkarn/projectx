@@ -1,4 +1,5 @@
 const patagoniaItinerary = {
+  citySlug:"patagonia-wildness",
   title: "Patagonia Wilderness Trek",
   duration: "9 days",
   location: "Torres del Paine → El Chaltén → El Calafate, Patagonia",

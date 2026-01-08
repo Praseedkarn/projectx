@@ -1,4 +1,5 @@
 const rockyMountainsItinerary = {
+  citySlug:"rockey-mountains",
   title: "Rocky Mountains Road & Hike",
   duration: "5 days",
   location: "Denver → Rocky Mountain National Park → Aspen → Vail, Colorado",

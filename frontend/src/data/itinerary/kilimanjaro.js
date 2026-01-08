@@ -1,4 +1,5 @@
 const kilimanjaroItinerary = {
+  citySlug:"kilimanjaro",
   title: "Kilimanjaro Summit Trek",
   duration: "8 days",
   location: "Mount Kilimanjaro, Tanzania",

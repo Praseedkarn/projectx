@@ -1,5 +1,5 @@
 const Australia = {
-  
+  citySlug:"australia-roadtrip",
   title: 'Australian Road Trip',
   duration: '12 days',
   location: 'Sydney → Jervis Bay → Lakes Entrance → Melbourne → Great Ocean Road',

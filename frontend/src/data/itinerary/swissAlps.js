@@ -1,4 +1,5 @@
 const swissAlpsItinerary = {
+  citySlug:"swiss-alps",
   title: "Swiss Alps Scenic Escape",
   duration: "6 days",
   location: "Switzerland",

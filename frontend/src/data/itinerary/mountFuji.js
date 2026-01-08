@@ -1,4 +1,5 @@
 const mountFujiItinerary = {
+  citySlug:"mount-fiji",
   title: "Mount Fuji Climb",
   duration: "3 days",
   location: "Tokyo → Mount Fuji, Japan",

@@ -1,4 +1,5 @@
 const Kerala = {
+  citySlug:"kerala-backwater",
   title: 'Kerala Backwater Escape',
   duration: '5 days',
   location: 'Kochi → Alleppey → Kumarakom, Kerala',

@@ -19,6 +19,7 @@ import FeatureCards from "./components/FeatureCards";
 import DistanceCalculator from "./components/DistanceCalculator";
 import ExploreCities from "./components/ExploreCities";
 import CityPage from "./components/CityPage";
+import AiFeedbackBanner from "./components/AifeedbackBanner";
 
 function App() {
   const formCardRef = useRef(null);
@@ -554,9 +555,12 @@ function App() {
 
               {/* <FeatureCards /> */}
 
-             {/* <TravelQuotes /> */}
+             
 
             </div>
+            {/* ===== AI FEEDBACK GLASS SECTION ===== */}
+<AiFeedbackBanner source="AI Planner" />
+
            
 
             {/* <TravelQuotes /> */}

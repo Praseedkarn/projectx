@@ -1,4 +1,6 @@
 const varanasiItinerary = {
+  citySlug:"varanasi-spiritual",
+
   title: "Spiritual Varanasi Retreat",
   duration: "3 days",
   location: "Varanasi, India",

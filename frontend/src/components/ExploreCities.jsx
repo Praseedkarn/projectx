@@ -1,11 +1,14 @@
-import { useState } from "react";
+import { useState , useEffect } from "react";
 import { cities } from "../data/cities";
 
 const ITEMS_PER_PAGE = 9;
+const optimizeUnsplash = (url, width = 400) =>
+  `${url}&w=${width}&auto=format&fit=crop&q=60`;
 
 export default function ExploreCities({ onBack, onCityClick }) {
   const [query, setQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(true);
 
   const filteredCities = cities.filter(
     (c) =>
@@ -24,6 +27,26 @@ export default function ExploreCities({ onBack, onCityClick }) {
     setQuery(e.target.value);
     setCurrentPage(1);
   };
+
+  useEffect(() => {
+  const timer = setTimeout(() => {
+    setLoading(false);
+  }, 2000);
+
+  return () => clearTimeout(timer);
+}, []);
+
+if (loading) {
+  return (
+    <section className="h-screen flex items-center justify-center bg-[#f6f8f5]">
+      <div className="text-center space-y-3">
+        <div className="w-10 h-10 border-4 border-gray-300 border-t-[#5b7c67] rounded-full animate-spin mx-auto" />
+        <p className="text-sm text-gray-600">Loading cities…</p>
+      </div>
+    </section>
+  );
+}
+
 
   return (
     <section className="bg-[#f6f8f5] px-4 pt-24 pb-24 overflow-hidden">
@@ -68,11 +91,16 @@ export default function ExploreCities({ onBack, onCityClick }) {
               onClick={() => onCityClick(city.slug)}
               className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition cursor-pointer"
             >
+             <div className="h-40 w-full bg-gray-200 overflow-hidden">
               <img
-                src={city.image}
+                src={optimizeUnsplash(city.image, 400)}
                 alt={city.name}
-                className="h-40 w-full object-cover"
+                loading="lazy"
+                decoding="async"
+                className="h-40 w-full object-cover transition-opacity duration-300"
               />
+            </div>
+
 
               <div className="p-4 space-y-2">
                 <h3 className="text-sm font-semibold text-gray-900">

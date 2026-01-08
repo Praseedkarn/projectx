@@ -1,5 +1,5 @@
 const goaItinerary = {
-  
+  citySlug:"goa-quick-break",
   title: "Goa Beach Break",
   duration: "3 days",
   location: "Goa, India",

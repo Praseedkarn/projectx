@@ -1,5 +1,5 @@
 const incaTrailItinerary = {
-  
+  citySlug:"inca-trail",
   title: "Inca Trail to Machu Picchu",
   duration: "7 days",
   location: "Cusco → Inca Trail → Machu Picchu, Peru",

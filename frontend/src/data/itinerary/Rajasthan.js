@@ -1,4 +1,5 @@
 const Rajasthan = {
+  citySlug:"",
   title: 'Rajasthan Royal Tour',
   duration: '8 days',
   location: 'Jaipur → Jodhpur → Udaipur → Pushkar, Rajasthan',

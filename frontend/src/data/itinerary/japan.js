@@ -1,5 +1,6 @@
 const japan = {
   title: 'Japanese Culture',
+  citySlug:"japan-classic",
   duration: '14 days',
   location: 'Tokyo → Kyoto → Osaka → Hiroshima',
   difficulty: 'Moderate',

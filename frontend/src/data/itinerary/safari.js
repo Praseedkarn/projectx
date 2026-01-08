@@ -1,4 +1,5 @@
 const safari = {
+  citySlug:"kenya-safari",
   title: 'Safari Experience',
   duration: '6 days',
   location: 'Masai Mara National Reserve, Kenya',

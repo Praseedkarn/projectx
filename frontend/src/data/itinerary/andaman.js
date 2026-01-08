@@ -1,5 +1,5 @@
 const andamanItinerary = {
-  citySlug:"andaman",
+  citySlug:"andaman-island",
   title: "Andaman Island Getaway",
   duration: "5 days",
   location: "Andaman & Nicobar Islands, India",

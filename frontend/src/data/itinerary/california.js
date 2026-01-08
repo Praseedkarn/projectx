@@ -1,5 +1,5 @@
 const California = {
-
+citySlug:"california-coast",
   title: 'California Coast',
   duration: '10 days',
   location: 'San Francisco → Monterey → Big Sur → Santa Barbara → Los Angeles',

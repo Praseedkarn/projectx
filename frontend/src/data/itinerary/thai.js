@@ -1,4 +1,5 @@
 const thai = {
+  citySlug:"thai-island",
   title: 'Thai Islands',
   duration: '8 days',
   location: 'Phuket → Phi Phi Islands → Krabi',

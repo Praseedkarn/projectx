@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import { detailedItineraries } from "../data/itinerary";
 
 export default function CityPage({
   slug,
   onBack,
-  onItineraryClick, // 👈 IMPORTANT (passed from App.js)
+  onItineraryClick,
 }) {
   const [city, setCity] = useState(null);
+  const [cityItinerary, setCityItinerary] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
@@ -30,12 +30,22 @@ export default function CityPage({
       });
   }, [slug]);
 
-  /* ================= FIND ITINERARY ================= */
-  const cityItinerary = city
-    ? Object.values(detailedItineraries).find(
-        (it) => it.citySlug === city.slug
-      )
-    : null;
+  /* ================= FETCH ITINERARY (FROM MONGODB) ================= */
+  useEffect(() => {
+    if (!slug) return;
+
+    fetch(`http://localhost:5001/api/itineraries/${slug}`)
+      .then((res) => {
+        if (!res.ok) return null;
+        return res.json();
+      })
+      .then((data) => {
+        setCityItinerary(data);
+      })
+      .catch(() => {
+        setCityItinerary(null);
+      });
+  }, [slug]);
 
   /* ================= STATES ================= */
   if (loading) {
@@ -70,8 +80,10 @@ export default function CityPage({
             className="w-full h-[360px] object-cover rounded-[36px]"
           />
 
-          <div className="absolute bottom-6 left-6 bg-white/90 backdrop-blur
-                          rounded-2xl px-6 py-4 shadow-lg">
+          <div
+            className="absolute bottom-6 left-6 bg-white/90 backdrop-blur
+                       rounded-2xl px-6 py-4 shadow-lg"
+          >
             <h1 className="text-3xl font-semibold">{city.name}</h1>
             <p className="text-sm text-gray-600 mt-1">
               {city.tagline}
@@ -114,9 +126,9 @@ export default function CityPage({
           </div>
         </Card>
 
-        {/* ================= ITINERARY CONNECTOR ================= */}
-        {cityItinerary && (
-          <Card title="Recommended Itinerary">
+        {/* ================= RECOMMENDED ITINERARY ================= */}
+        <Card title="Recommended Itinerary">
+          {cityItinerary ? (
             <div
               onClick={() => onItineraryClick(city.slug)}
               className="cursor-pointer border rounded-2xl p-5
@@ -138,8 +150,12 @@ export default function CityPage({
                 View itinerary →
               </div>
             </div>
-          </Card>
-        )}
+          ) : (
+            <p className="text-sm text-gray-500">
+              No itinerary available for this city yet.
+            </p>
+          )}
+        </Card>
 
         {/* NEIGHBORHOODS */}
         <Card title="Neighborhoods to Explore">

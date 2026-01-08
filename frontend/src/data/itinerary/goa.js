@@ -1,5 +1,5 @@
 const goa = {
-  
+  citySlug:"goa",
   title: 'Goa Beach Holiday',
   duration: '5 days',
   location: 'North Goa and South Goa, India',
