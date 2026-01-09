@@ -20,8 +20,10 @@ import DistanceCalculator from "./components/DistanceCalculator";
 import ExploreCities from "./components/ExploreCities";
 import CityPage from "./components/CityPage";
 import AiFeedbackBanner from "./components/AifeedbackBanner";
+import FaqSection from "./components/FaqSections";
 
 function App() {
+  
   const formCardRef = useRef(null);
   const [showSignIn, setShowSignIn] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
@@ -49,6 +51,8 @@ function App() {
   const [userPreferences, setUserPreferences] = useState("");
 
 
+
+  
   /* ===== Load user ===== */
   useEffect(() => {
     const userData = localStorage.getItem("user");
@@ -798,7 +802,7 @@ function App() {
         {activeComponent === "saved" && <SavedItineraries />}
         {activeComponent === "packing" && <PackingList />}
       </main>
-
+        <FaqSection />
       <Footer />
     </div>
   );

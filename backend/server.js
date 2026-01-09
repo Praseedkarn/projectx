@@ -14,14 +14,15 @@ import authRoutes from "./routes/auth.routes.js";
 import itineraryRoutes from "./routes/itinerary.routes.js";
 import cityRoutes from "./routes/city.routes.js";
 import feedbackRoutes from "./routes/feedback.routes.js";
+import qrTripRoutes from "./routes/qrTrip.routes.js";
 
 // 🔎 DEBUG (SAFE TO KEEP)
-console.log("🔥 THIS IS THE ACTIVE SERVER.JS FILE");
-console.log("SMTP_HOST:", process.env.SMTP_HOST);
-console.log("SMTP_PORT:", process.env.SMTP_PORT);
-console.log("SMTP_USER:", process.env.SMTP_USER);
-console.log("SMTP_PASS:", process.env.SMTP_PASS ? "LOADED" : "MISSING");
-console.log("ADMIN_EMAIL:", process.env.ADMIN_EMAIL);
+// console.log("🔥 THIS IS THE ACTIVE SERVER.JS FILE");
+// console.log("SMTP_HOST:", process.env.SMTP_HOST);
+// console.log("SMTP_PORT:", process.env.SMTP_PORT);
+// console.log("SMTP_USER:", process.env.SMTP_USER);
+// console.log("SMTP_PASS:", process.env.SMTP_PASS ? "LOADED" : "MISSING");
+// console.log("ADMIN_EMAIL:", process.env.ADMIN_EMAIL);
 
 const app = express();
 
@@ -39,6 +40,7 @@ app.use("/api/ai", aiRoutes);
 app.use("/api/blogs", blogRoutes);
 app.use("/api/cities", cityRoutes);
 app.use("/api/feedback", feedbackRoutes);
+app.use("/api/qr-trips",qrTripRoutes);
 
 // ✅ HEALTH CHECK
 app.get("/", (req, res) => {

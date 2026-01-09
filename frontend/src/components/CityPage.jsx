@@ -1,14 +1,30 @@
 import { useEffect, useState } from "react";
 
-export default function CityPage({
-  slug,
-  onBack,
-  onItineraryClick,
-}) {
+/* ================= GOOGLE MAP EMBED (NO API KEY) ================= */
+const GoogleMapEmbed = ({ place }) => {
+  if (!place) return null;
+
+  return (
+    <div className="w-full h-[380px] rounded-3xl overflow-hidden border shadow-sm">
+      <iframe
+        title={`Map of ${place}`}
+        src={`https://www.google.com/maps?q=${encodeURIComponent(
+          place
+        )}&output=embed`}
+        className="w-full h-full"
+        loading="lazy"
+        referrerPolicy="no-referrer-when-downgrade"
+      />
+    </div>
+  );
+};
+
+export default function CityPage({ slug, onBack, onItineraryClick }) {
   const [city, setCity] = useState(null);
   const [cityItinerary, setCityItinerary] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [selectedMapPlace, setSelectedMapPlace] = useState("");
 
   /* ================= FETCH CITY ================= */
   useEffect(() => {
@@ -30,22 +46,72 @@ export default function CityPage({
       });
   }, [slug]);
 
-  /* ================= FETCH ITINERARY (FROM MONGODB) ================= */
+  /* ================= FETCH ITINERARY ================= */
   useEffect(() => {
     if (!slug) return;
 
     fetch(`http://localhost:5001/api/itineraries/${slug}`)
-      .then((res) => {
-        if (!res.ok) return null;
-        return res.json();
-      })
-      .then((data) => {
-        setCityItinerary(data);
-      })
-      .catch(() => {
-        setCityItinerary(null);
-      });
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => setCityItinerary(data))
+      .catch(() => setCityItinerary(null));
   }, [slug]);
+
+  /* ================= MAP HIGHLIGHTS (FAIL-SAFE LOGIC) ================= */
+  const mapHighlights = (() => {
+    // 1️⃣ Explicit city map highlights (if you add later)
+    if (city?.mapHighlights?.length) {
+      return city.mapHighlights;
+    }
+
+    // 2️⃣ Itinerary 360 highlights
+    if (cityItinerary?.highlight360Views?.length) {
+      return cityItinerary.highlight360Views;
+    }
+
+    // 3️⃣ Itinerary day places
+    const fromDays = {};
+    cityItinerary?.days?.forEach((day) => {
+      day.places?.forEach((p) => {
+        if (!fromDays[p]) {
+          fromDays[p] = {
+            label: p.split(",")[0],
+            place: p,
+          };
+        }
+      });
+    });
+
+    if (Object.keys(fromDays).length > 0) {
+      return Object.values(fromDays).slice(0, 6);
+    }
+
+    // 4️⃣ Neighborhoods fallback (IMPORTANT)
+    if (city?.neighborhoods?.length) {
+      return city.neighborhoods.slice(0, 6).map((n) => ({
+        label: n.name,
+        place: `${n.name}, ${city.name}`,
+      }));
+    }
+
+    // 5️⃣ FINAL fallback → city itself (NEVER FAILS)
+    if (city?.name) {
+      return [
+        {
+          label: city.name,
+          place: city.name,
+        },
+      ];
+    }
+
+    return [];
+  })();
+
+  /* ================= SET DEFAULT MAP PLACE ================= */
+  useEffect(() => {
+    if (mapHighlights.length > 0) {
+      setSelectedMapPlace(mapHighlights[0].place);
+    }
+  }, [slug, cityItinerary, city]);
 
   /* ================= STATES ================= */
   if (loading) {
@@ -80,10 +146,7 @@ export default function CityPage({
             className="w-full h-[360px] object-cover rounded-[36px]"
           />
 
-          <div
-            className="absolute bottom-6 left-6 bg-white/90 backdrop-blur
-                       rounded-2xl px-6 py-4 shadow-lg"
-          >
+          <div className="absolute bottom-6 left-6 bg-white/90 backdrop-blur rounded-2xl px-6 py-4 shadow-lg">
             <h1 className="text-3xl font-semibold">{city.name}</h1>
             <p className="text-sm text-gray-600 mt-1">
               {city.tagline}
@@ -109,6 +172,32 @@ export default function CityPage({
           </p>
         </Card>
 
+        {/* MAP EXPLORE (ALWAYS SHOWS) */}
+        <Card title="📍 Explore on Map">
+          <p className="text-sm text-gray-600 mb-4 max-w-2xl">
+            Explore important locations and areas around {city.name}.
+          </p>
+
+          <div className="flex flex-wrap gap-3 mb-5">
+            {mapHighlights.map(({ label, place }) => (
+              <button
+                key={place}
+                onClick={() => setSelectedMapPlace(place)}
+                className={`px-4 py-2 rounded-full text-xs font-medium transition
+                  ${
+                    selectedMapPlace === place
+                      ? "bg-[#5b7c67] text-white shadow-md scale-105"
+                      : "bg-white border hover:bg-gray-50 hover:scale-105"
+                  }`}
+              >
+                📍 {label}
+              </button>
+            ))}
+          </div>
+
+          <GoogleMapEmbed place={selectedMapPlace} />
+        </Card>
+
         {/* BEST TIME */}
         <Card title="Best Time to Visit">
           <div className="grid sm:grid-cols-2 gap-4">
@@ -126,26 +215,95 @@ export default function CityPage({
           </div>
         </Card>
 
-        {/* ================= RECOMMENDED ITINERARY ================= */}
+        <Card title="🌡️ Average Temperature">
+  <div className="grid grid-cols-2 gap-4">
+    <div className="bg-gray-50 rounded-xl p-4">
+      <div className="text-sm text-gray-500">Summer</div>
+      <div className="text-lg font-semibold">
+        {city.avgTemp?.summer || "—"}
+      </div>
+    </div>
+    <div className="bg-gray-50 rounded-xl p-4">
+      <div className="text-sm text-gray-500">Winter</div>
+      <div className="text-lg font-semibold">
+        {city.avgTemp?.winter || "—"}
+      </div>
+    </div>
+  </div>
+</Card>
+
+<Card title="👥 Best For">
+  <div className="space-y-3 text-sm text-gray-700">
+    <p><strong>Couples:</strong> {city.bestForPeople?.couples}</p>
+    <p><strong>Families:</strong> {city.bestForPeople?.families}</p>
+    <p><strong>Friends:</strong> {city.bestForPeople?.friends}</p>
+    <p><strong>Solo:</strong> {city.bestForPeople?.solo}</p>
+  </div>
+</Card>
+<Card title="🏙️ Neighborhoods">
+  <div className="grid sm:grid-cols-2 gap-4">
+    {city.neighborhoods?.map((n, i) => (
+      <div key={i} className="border rounded-2xl p-4">
+        <div className="font-medium">{n.name}</div>
+        <p className="text-sm text-gray-600 mt-1">{n.desc}</p>
+      </div>
+    ))}
+  </div>
+</Card>
+<Card title="🚇 Transport">
+  <div className="flex flex-wrap gap-2">
+    {city.transport?.map((t, i) => (
+      <span
+        key={i}
+        className="px-3 py-1 bg-gray-100 rounded-full text-sm"
+      >
+        {t}
+      </span>
+    ))}
+  </div>
+</Card>
+<Card title="🎯 Things To Do">
+  <ul className="list-disc pl-5 space-y-2 text-sm text-gray-700">
+    {city.thingsToDo?.map((item, i) => (
+      <li key={i}>{item}</li>
+    ))}
+  </ul>
+</Card>
+<Card title="🧭 Nearby Cities">
+  <div className="grid sm:grid-cols-2 gap-4">
+    {city.nearbyCities?.map((c, i) => (
+      <div key={i} className="border rounded-xl p-4">
+        <div className="font-medium">{c.name}</div>
+        <div className="text-sm text-gray-500">
+          {c.distance}
+        </div>
+      </div>
+    ))}
+  </div>
+</Card>
+
+
+
+
+
+
+
+        {/* RECOMMENDED ITINERARY */}
         <Card title="Recommended Itinerary">
           {cityItinerary ? (
             <div
               onClick={() => onItineraryClick(city.slug)}
-              className="cursor-pointer border rounded-2xl p-5
-                         hover:shadow-md transition"
+              className="cursor-pointer border rounded-2xl p-5 hover:shadow-md transition"
             >
               <h3 className="text-lg font-semibold">
                 {cityItinerary.title}
               </h3>
-
               <p className="text-sm text-gray-600 mt-1">
                 {cityItinerary.duration} · {cityItinerary.difficulty}
               </p>
-
               <p className="text-sm text-gray-700 mt-2 line-clamp-2">
                 {cityItinerary.description}
               </p>
-
               <div className="mt-3 text-sm text-[#5b7c67] font-medium">
                 View itinerary →
               </div>
@@ -157,52 +315,6 @@ export default function CityPage({
           )}
         </Card>
 
-        {/* NEIGHBORHOODS */}
-        <Card title="Neighborhoods to Explore">
-          <div className="grid sm:grid-cols-2 gap-4">
-            {city.neighborhoods?.map((n, i) => (
-              <div key={i} className="bg-gray-50 p-4 rounded-2xl">
-                <div className="font-medium">{n.name}</div>
-                <p className="text-sm text-gray-600 mt-1">
-                  {n.desc}
-                </p>
-              </div>
-            ))}
-          </div>
-        </Card>
-
-        {/* THINGS TO DO */}
-        <Card title="Things to Do">
-          <ul className="grid sm:grid-cols-2 gap-2 text-sm text-gray-700">
-            {city.thingsToDo?.map((t, i) => (
-              <li key={i} className="flex gap-2">
-                <span>•</span>
-                <span>{t}</span>
-              </li>
-            ))}
-          </ul>
-        </Card>
-
-        {/* TRANSPORT */}
-        <Card title="Getting Around">
-          <div className="flex flex-wrap gap-3">
-            {city.transport?.map((t, i) => (
-              <Tag key={i}>{t}</Tag>
-            ))}
-          </div>
-        </Card>
-
-        {/* NEARBY */}
-        <Card title="Nearby Cities">
-          <div className="flex flex-wrap gap-3">
-            {city.nearbyCities?.map((n, i) => (
-              <Tag key={i}>
-                {n.name} · {n.distance}
-              </Tag>
-            ))}
-          </div>
-        </Card>
-
       </div>
     </section>
   );
@@ -212,8 +324,7 @@ export default function CityPage({
 
 function Card({ title, children }) {
   return (
-    <section className="bg-white rounded-[32px] p-6 md:p-8
-                        shadow-[0_10px_40px_rgba(0,0,0,0.05)]">
+    <section className="bg-white rounded-[32px] p-6 md:p-8 shadow-[0_10px_40px_rgba(0,0,0,0.05)]">
       <h2 className="text-xl font-semibold mb-4">{title}</h2>
       {children}
     </section>
@@ -228,13 +339,5 @@ function Fact({ label, value }) {
         {value || "—"}
       </div>
     </div>
-  );
-}
-
-function Tag({ children }) {
-  return (
-    <span className="px-4 py-2 rounded-full border text-sm bg-white">
-      {children}
-    </span>
   );
 }

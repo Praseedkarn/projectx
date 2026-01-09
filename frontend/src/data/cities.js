@@ -174,7 +174,7 @@ export const cities = [
   {
     id: 21,
     name: "Marrakech",
-    slug:"",
+    slug:"marrakech",
     country: "Morocco",
     desc: "Colorful souks and ancient medinas.",
     image: "https://images.unsplash.com/photo-1587974928442-77dc3e0dba72?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8bWFycmFrZWNofGVufDB8fDB8fHww",
@@ -184,7 +184,7 @@ export const cities = [
   {
     id: 22,
     name: "Sydney",
-    slug:"",
+    slug:"sydney",
     country: "Australia",
     desc: "Iconic harbor, beaches, and vibrant lifestyle.",
     image: "https://images.unsplash.com/photo-1624138784614-87fd1b6528f8?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8c3lkbmV5fGVufDB8fDB8fHww",
@@ -192,7 +192,7 @@ export const cities = [
   {
     id: 23,
     name: "Melbourne",
-    slug:"",
+    slug:"melbourne",
     country: "Australia",
     desc: "Culture, coffee, art, and coastal beauty.",
     image: "https://images.unsplash.com/photo-1546868762-b61266729c8a?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fG1lbGJvdXJuZXxlbnwwfHwwfHx8MA%3D%3D",
@@ -200,7 +200,7 @@ export const cities = [
   {
     id: 24,
     name: "Auckland",
-    slug:"",
+    slug:"auckland",
     country: "New Zealand",
     desc: "Nature-rich city between two harbors.",
     image: "https://images.unsplash.com/photo-1507699622108-4be3abd695ad?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8YXVja2xhbmR8ZW58MHx8MHx8fDA%3D",
@@ -208,7 +208,7 @@ export const cities = [
   {
   id: 25,
   name: "Berlin",
-  slug:"",
+  slug:"berlin",
   country: "Germany",
   desc: "A creative capital shaped by history and modern culture.",
   image: "https://plus.unsplash.com/premium_photo-1694475085892-3bb718a2bc05?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8YmVybGlufGVufDB8fDB8fHww",
@@ -216,7 +216,7 @@ export const cities = [
 {
   id: 26,
   name: "Vienna",
-  slug:"",
+  slug:"vienna",
   country: "Austria",
   desc: "Classical music, imperial palaces, and timeless elegance.",
   image: "https://images.unsplash.com/photo-1573167443175-867d91708f97?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8dmllbm5hfGVufDB8fDB8fHww",
@@ -224,7 +224,7 @@ export const cities = [
 {
   id: 27,
   name: "Prague",
-  slug:"",
+  slug:"prague",
   country: "Czech Republic",
   desc: "A fairytale city of castles, bridges, and medieval streets.",
   image: "https://images.unsplash.com/photo-1600623471616-8c1966c91ff6?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8cHJhZ3VlfGVufDB8fDB8fHww",
@@ -232,7 +232,7 @@ export const cities = [
 {
   id: 28,
   name: "Budapest",
-  slug:"",
+  slug:"budapest",
   country: "Hungary",
   desc: "Thermal baths, grand architecture, and nightlife.",
   image: "https://images.unsplash.com/photo-1541343672885-9be56236302a?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8YnVkYXBlc3R8ZW58MHx8MHx8fDA%3D",
@@ -240,7 +240,7 @@ export const cities = [
 {
   id: 29,
   name: "Lisbon",
-  slug:"",
+  slug:"lisbon",
   country: "Portugal",
   desc: "Colorful streets, trams, and Atlantic charm.",
   image: "https://images.unsplash.com/photo-1585208798174-6cedd86e019a?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bGlzYm9ufGVufDB8fDB8fHww",
@@ -248,7 +248,7 @@ export const cities = [
 {
   id: 30,
   name: "Zurich",
-  slug:"",
+  slug:"zurich",
   country: "Switzerland",
   desc: "Lakeside beauty with alpine precision.",
   image: "https://images.unsplash.com/photo-1620563316910-f242d1bad656?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8enVyaWNofGVufDB8fDB8fHww",
@@ -256,7 +256,7 @@ export const cities = [
 {
   id: 31,
   name: "Athens",
-  slug:"",
+  slug:"athens",
   country: "Greece",
   desc: "Ancient ruins and Mediterranean life.",
   image: "https://images.unsplash.com/photo-1602769247692-126fdf1f1da6?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8YXRoZW5zfGVufDB8fDB8fHww",
@@ -264,7 +264,7 @@ export const cities = [
 {
   id: 32,
   name: "Copenhagen",
-  slug:"",
+  slug:"copenhagen",
   country: "Denmark",
   desc: "Design-forward living with cozy hygge vibes.",
   image: "https://images.unsplash.com/photo-1513622118278-bc041b3c13ed?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8Y29wZW5oYWdlbnxlbnwwfHwwfHx8MA%3D%3D",
@@ -272,7 +272,7 @@ export const cities = [
 {
   id: 33,
   name: "Stockholm",
-  slug:"",
+  slug:"stockholm",
   country: "Sweden",
   desc: "Scandinavian elegance across islands.",
   image: "https://images.unsplash.com/photo-1600290601473-3b73e4c531c9?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8c3RvY2tob2xtfGVufDB8fDB8fHww",
@@ -280,7 +280,7 @@ export const cities = [
 {
   id: 34,
   name: "Oslo",
-  slug:"",
+  slug:"oslo",
   country: "Norway",
   desc: "Nature meets modern Nordic architecture.",
   image: "https://images.unsplash.com/photo-1560525942-fca0ea0acade?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8b3Nsb3xlbnwwfHwwfHx8MA%3D%3D",
@@ -288,7 +288,7 @@ export const cities = [
 {
   id: 35,
   name: "Helsinki",
-  slug:"",
+  slug:"helsinki",
   country: "Finland",
   desc: "Minimal design, saunas, and coastal calm.",
   image: "https://images.unsplash.com/photo-1538332576228-eb5b4c4de6f5?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8aGVsc2lua2l8ZW58MHx8MHx8fDA%3D",
@@ -296,7 +296,7 @@ export const cities = [
 {
   id: 36,
   name: "Edinburgh",
-  slug:"",
+  slug:"edinburgh",
   country: "Scotland",
   desc: "Castles, cobbled streets, and literary soul.",
   image: "https://images.unsplash.com/photo-1506377585622-bedcbb027afc?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZWRpbmJ1cmdofGVufDB8fDB8fHww",
@@ -304,7 +304,7 @@ export const cities = [
 {
   id: 37,
   name: "Venice",
-  slug:"",
+  slug:"venice",
   country: "Italy",
   desc: "Canals, gondolas, and timeless romance.",
   image: "https://images.unsplash.com/photo-1519112232436-9923c6ba3d26?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8dmVuaWNlfGVufDB8fDB8fHww",
@@ -312,7 +312,7 @@ export const cities = [
 {
   id: 38,
   name: "Florence",
-  slug:"",
+  slug:"florence",
   country: "Italy",
   desc: "Renaissance art and Tuscan charm.",
   image: "https://images.unsplash.com/photo-1476362174823-3a23f4aa6d76?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZmxvcmVuY2V8ZW58MHx8MHx8fDA%3D",
@@ -320,7 +320,7 @@ export const cities = [
 {
   id: 39,
   name: "Madrid",
-  slug:"",
+  slug:"madrid",
   country: "Spain",
   desc: "Royal heritage, nightlife, and food culture.",
   image: "https://images.unsplash.com/photo-1574556462575-eb106a5865a0?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8bWFkcmlkfGVufDB8fDB8fHww",
@@ -328,7 +328,7 @@ export const cities = [
 {
   id: 40,
   name: "Seville",
-  slug:"",
+  slug:"seville",
   country: "Spain",
   desc: "Flamenco, Moorish architecture, and orange trees.",
   image: "https://plus.unsplash.com/premium_photo-1697729598906-fd57243037e3?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8c2V2aWxsZXxlbnwwfHwwfHx8MA%3D%3D",
@@ -336,7 +336,7 @@ export const cities = [
 {
   id: 41,
   name: "Warsaw",
-  slug:"",
+  slug:"warsaw",
   country: "Poland",
   desc: "Resilient history with modern energy.",
   image: "https://plus.unsplash.com/premium_photo-1688901653255-88753dbcb6ba?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fHdhcnNhd3xlbnwwfHwwfHx8MA%3D%3D",
@@ -344,7 +344,7 @@ export const cities = [
 {
   id: 42,
   name: "Krakow",
-  slug:"",
+  slug:"krakow",
   country: "Poland",
   desc: "Medieval squares and deep cultural roots.",
   image: "https://images.unsplash.com/photo-1519922639192-e73293ca430e?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTV8fGtyYWtvd3xlbnwwfHwwfHx8MA%3D%3D",
@@ -352,7 +352,7 @@ export const cities = [
 {
   id: 43,
   name: "Tallinn",
-  slug:"",
+  slug:"tallinn",
   country: "Estonia",
   desc: "One of Europe’s best-preserved old towns.",
   image: "https://images.unsplash.com/photo-1452868195396-89c1af3b1b2e?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8dGFsbGlubnxlbnwwfHwwfHx8MA%3D%3D",
@@ -360,7 +360,7 @@ export const cities = [
 {
   id: 44,
   name: "Riga",
-  slug:"",
+  slug:"riga",
   country: "Latvia",
   desc: "Art Nouveau architecture and Baltic charm.",
   image: "https://images.unsplash.com/photo-1614887259709-fe2c3aa56022?q=80&w=1074&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
@@ -368,7 +368,7 @@ export const cities = [
 {
   id: 45,
   name: "Vilnius",
-  slug:"",
+  slug:"vilnius",
   country: "Lithuania",
   desc: "Baroque beauty with creative spirit.",
   image: "https://images.unsplash.com/photo-1578845832207-b74a206ac25d?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8dmlsbml1c3xlbnwwfHwwfHx8MA%3D%3D",
@@ -376,7 +376,7 @@ export const cities = [
 {
   id: 46,
   name: "Reykjavik",
-  slug:"",
+  slug:"reykjavik",
   country: "Iceland",
   desc: "Gateway to volcanoes, glaciers, and auroras.",
   image: "https://images.unsplash.com/photo-1465353471565-b77e538f34c9?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8cmV5a2phdmlrfGVufDB8fDB8fHww",
@@ -384,7 +384,7 @@ export const cities = [
 {
   id: 47,
   name: "Moscow",
-  slug:"",
+  slug:"moscow",
   country: "Russia",
   desc: "Grand architecture and deep history.",
   image: "https://images.unsplash.com/photo-1513326738677-b964603b136d?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bW9zY293fGVufDB8fDB8fHww",
@@ -392,7 +392,7 @@ export const cities = [
 {
   id: 48,
   name: "St. Petersburg",
-  slug:"",
+  slug:"st-petersburg",
   country: "Russia",
   desc: "Imperial canals and artistic heritage.",
   image: "https://images.unsplash.com/photo-1556543697-b40fdaadca4d?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8c3QlMjBwZXRlcnNidXJnfGVufDB8fDB8fHww",
@@ -400,7 +400,7 @@ export const cities = [
 {
   id: 49,
   name: "Dublin",
-  slug:"",
+  slug:"dublin",
   country: "Ireland",
   desc: "Lively pubs, literature, and coastal charm.",
   image: "https://images.unsplash.com/photo-1549918864-48ac978761a4?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZHVibGlufGVufDB8fDB8fHww",
@@ -408,7 +408,7 @@ export const cities = [
 {
   id: 50,
   name: "Brussels",
-  slug:"",
+  slug:"brussels",
   country: "Belgium",
   desc: "Chocolate, waffles, and European culture.",
   image: "https://images.unsplash.com/photo-1548092304-e0205cb0031b?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8YnJ1c3NlbHN8ZW58MHx8MHx8fDA%3D",
@@ -416,7 +416,7 @@ export const cities = [
 {
   id: 51,
   name: "Nagoya",
-  slug:"",
+  slug:"nagoya",
   country: "Japan",
   desc: "A futuristic megacity rooted in tradition.",
   image: "https://images.unsplash.com/photo-1596628889205-f92ba59fd2ba?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8bmFnb3lhfGVufDB8fDB8fHww",
@@ -424,7 +424,7 @@ export const cities = [
 {
   id: 52,
   name: "Kyoto",
-  slug:"",
+  slug:"kyoto",
   country: "Japan",
   desc: "Ancient temples, geishas, and cherry blossoms.",
   image: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8a3lvdG98ZW58MHx8MHx8fDA%3D",
@@ -432,7 +432,7 @@ export const cities = [
 {
   id: 53,
   name: "Busan",
-  slug:"",
+  slug:"busan",
   country: "South Korea",
   desc: "K-pop culture meets historic palaces.",
   image: "https://images.unsplash.com/photo-1591520284162-8e64eceebacf?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8YnVzYW58ZW58MHx8MHx8fDA%3D",
@@ -440,7 +440,7 @@ export const cities = [
 {
   id: 54,
   name: "Pattaya",
-  slug:"",
+  slug:"pattaya",
   country: "Thailand",
   desc: "Street food, temples, and vibrant nightlife.",
   image: "https://images.unsplash.com/photo-1503788311183-fa3bf9c4bc32?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8cGF0dGF5YXxlbnwwfHwwfHx8MA%3D%3D",
@@ -448,7 +448,7 @@ export const cities = [
 {
   id: 55,
   name: "Singapore",
-  slug:"",
+  slug:"singapore",
   country: "Singapore",
   desc: "A clean, modern city with global flavors.",
   image: "https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8c2luZ2Fwb3JlfGVufDB8fDB8fHww",
@@ -456,7 +456,7 @@ export const cities = [
 {
   id: 56,
   name: "Kuala Lumpur",
-  slug:"",
+  slug:"kuala-lumpur",
   country: "Malaysia",
   desc: "Skyscrapers rising above cultural heritage.",
   image: "https://images.unsplash.com/photo-1596422846543-75c6fc197f07?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8a3VhbGElMjBsdW1wdXJ8ZW58MHx8MHx8fDA%3D",
@@ -464,7 +464,6 @@ export const cities = [
 {
   id: 57,
   name: "Bali",
-  slug:"",
   slug :"bali",
   country: "Indonesia",
   desc: "Tropical paradise of temples and beaches.",
@@ -473,7 +472,7 @@ export const cities = [
 {
   id: 58,
   name: "Jakarta",
-  slug:"",
+  slug:"jakarta",
   country: "Indonesia",
   desc: "A fast-paced capital with diverse cultures.",
   image: "https://images.unsplash.com/photo-1567756396406-f529ebb5583d?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8amFrYXJ0YXxlbnwwfHwwfHx8MA%3D%3D",
@@ -481,7 +480,7 @@ export const cities = [
 {
   id: 59,
   name: "Hanoi",
-  slug:"",
+  slug:"hanoi",
   country: "Vietnam",
   desc: "Historic streets and rich street-food culture.",
   image: "https://images.unsplash.com/photo-1555921015-5532091f6026?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8aGFub2l8ZW58MHx8MHx8fDA%3D",
@@ -489,7 +488,7 @@ export const cities = [
 {
   id: 60,
   name: "Ho Chi Minh City",
-  slug:"",
+  slug:"ho-chi-minh",
   country: "Vietnam",
   desc: "Dynamic city blending past and present.",
   image: "https://images.unsplash.com/photo-1580835267732-2d232d3d2655?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fGhvJTIwY2hpJTIwbWluaCUyMGNpdHl8ZW58MHx8MHx8fDA%3D",
@@ -497,7 +496,7 @@ export const cities = [
 {
   id: 61,
   name: "Beijing",
-  slug:"",
+  slug:"beijing",
   country: "China",
   desc: "Imperial history and modern transformation.",
   image: "https://images.unsplash.com/photo-1584872589930-e99fe5bf4408?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8YmVpamluZ3xlbnwwfHwwfHx8MA%3D%3D",
@@ -505,7 +504,7 @@ export const cities = [
 {
   id: 62,
   name: "Shanghai",
-  slug:"",
+  slug:"shanghai",
   country: "China",
   desc: "China’s global financial and cultural hub.",
   image: "https://images.unsplash.com/photo-1627484986972-e544190b8abb?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8c2hhbmdoYWl8ZW58MHx8MHx8fDA%3D",
@@ -513,7 +512,7 @@ export const cities = [
 {
   id: 63,
   name: "Taipei",
-  slug:"",
+  slug:"taipei",
   country: "Taiwan",
   desc: "Night markets, mountains, and modern life.",
   image: "https://images.unsplash.com/photo-1572715381359-002b1eabd56b?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8dGFpcGVpfGVufDB8fDB8fHww",
@@ -521,7 +520,7 @@ export const cities = [
 {
   id: 64,
   name: "Manila",
-  slug:"",
+  slug:"manila",
   country: "Philippines",
   desc: "Historic districts and island energy.",
   image: "https://images.unsplash.com/photo-1655016268120-383558788b37?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8bWFuaWxhfGVufDB8fDB8fHww",
@@ -529,7 +528,7 @@ export const cities = [
 {
   id: 65,
   name: "Colombo",
-  slug:"",
+  slug:"colombo",
   country: "Sri Lanka",
   desc: "Coastal capital with colonial influences.",
   image: "https://images.unsplash.com/photo-1704797390767-de3e63fa939f?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8Y29sb21ib3xlbnwwfHwwfHx8MA%3D%3D",
@@ -537,7 +536,7 @@ export const cities = [
 {
   id: 66,
   name: "Kathmandu",
-  slug:"",
+  slug:"kathmandu",
   country: "Nepal",
   desc: "Gateway to the Himalayas and spiritual heritage.",
   image: "https://images.unsplash.com/photo-1605640840605-14ac1855827b?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8a2F0aG1hbmR1fGVufDB8fDB8fHww",
@@ -545,7 +544,7 @@ export const cities = [
 {
   id: 67,
   name: "Thimphu",
-  slug:"",
+  slug:"thimphu",
   country: "Bhutan",
   desc: "Peaceful capital rooted in tradition.",
   image: "https://images.unsplash.com/photo-1665479003896-6d1c61af635c?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8dGhpbXBodXxlbnwwfHwwfHx8MA%3D%3D",
@@ -553,7 +552,7 @@ export const cities = [
 {
   id: 68,
   name: "Ulaanbaatar",
-  slug:"",
+  slug:"ulaanbaatar",
   country: "Mongolia",
   desc: "Nomadic culture meets urban life.",
   image: "https://images.unsplash.com/photo-1708873395735-dcad0140e3a2?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8dWxhYW5iYWF0YXJ8ZW58MHx8MHx8fDA%3D",
@@ -561,7 +560,7 @@ export const cities = [
 {
   id: 69,
   name: "Tashkent",
-  slug:"",
+  slug:"tashkent",
   country: "Uzbekistan",
   desc: "Silk Road history with Soviet-era charm.",
   image: "https://images.unsplash.com/photo-1622021109028-8ba1d5374161?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8dGFzaGtlbnR8ZW58MHx8MHx8fDA%3D",
@@ -569,7 +568,7 @@ export const cities = [
 {
   id: 70,
   name: "Baku",
-  slug:"",
+  slug:"baku",
   country: "Azerbaijan",
   desc: "Modern flames rising from ancient roots.",
   image: "https://plus.unsplash.com/premium_photo-1731443614667-e924b1d926fe?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8YmFrdXxlbnwwfHwwfHx8MA%3D%3D",
@@ -577,7 +576,7 @@ export const cities = [
 {
   id: 71,
   name: "Doha",
-  slug:"",
+  slug:"doha",
   country: "Qatar",
   desc: "A fast-rising Gulf city blending tradition and modernity.",
   image: "https://images.unsplash.com/photo-1669300884869-e6e11c67c031?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8ZG9oYXxlbnwwfHwwfHx8MA%3D%3D",
@@ -585,7 +584,7 @@ export const cities = [
 {
   id: 72,
   name: "Riyadh",
-  slug:"",
+  slug:"riyadh",
   country: "Saudi Arabia",
   desc: "The heart of Saudi Arabia’s cultural and economic transformation.",
   image: "https://images.unsplash.com/photo-1605237165959-dcc784975d51?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fHJpeWFkaHxlbnwwfHwwfHx8MA%3D%3D",
@@ -593,7 +592,7 @@ export const cities = [
 {
   id: 73,
   name: "Jerusalem",
-  slug:"",
+  slug:"jerusalem",
   country: "Israel",
   desc: "One of the world’s oldest and most spiritual cities.",
   image: "https://plus.unsplash.com/premium_photo-1675369532333-a32de6c1e55e?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8amVydXNhbGVtfGVufDB8fDB8fHww",
@@ -601,7 +600,7 @@ export const cities = [
 {
   id: 74,
   name: "Tehran",
-  slug:"",
+  slug:"tehran",
   country: "Iran",
   desc: "A historic metropolis framed by the Alborz mountains.",
   image: "https://images.unsplash.com/photo-1615373615964-389b41cda0a7?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjB8fHRlaHJhbnxlbnwwfHwwfHx8MA%3D%3D",
@@ -609,7 +608,7 @@ export const cities = [
 {
   id: 75,
   name: "Almaty",
-  slug:"",
+  slug:"almaty",
   country: "Kazakhstan",
   desc: "A leafy city surrounded by dramatic mountain scenery.",
   image: "https://images.unsplash.com/photo-1600255531849-9edcc7c3d115?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8YWxtYXR5fGVufDB8fDB8fHww",
@@ -617,7 +616,7 @@ export const cities = [
 {
   id: 76,
   name: "Yerevan",
-  slug:"",
+  slug:"yerevan",
   country: "Armenia",
   desc: "Ancient culture with views of Mount Ararat.",
   image: "https://plus.unsplash.com/premium_photo-1661934402599-7cb20c105a7b?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8eWVyZXZhbnxlbnwwfHwwfHx8MA%3D%3D",
@@ -625,7 +624,7 @@ export const cities = [
 {
   id: 77,
   name: "Tbilisi",
-  slug:"",
+  slug:"tbilisi",
   country: "Georgia",
   desc: "Colorful balconies, sulfur baths, and wine culture.",
   image: "https://plus.unsplash.com/premium_photo-1677344088109-8122ab4e2a5b?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8dGJpbGlzaXxlbnwwfHwwfHx8MA%3D%3D",
@@ -633,7 +632,7 @@ export const cities = [
 {
   id: 78,
   name: "Sarajevo",
-  slug:"",
+  slug:"sarajevo",
   country: "Bosnia and Herzegovina",
   desc: "A city where East and West deeply intertwine.",
   image: "https://images.unsplash.com/photo-1570831709673-03320e9d734f?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8c2FyYWpldm98ZW58MHx8MHx8fDA%3D",
@@ -641,7 +640,7 @@ export const cities = [
 {
   id: 79,
   name: "Belgrade",
-  slug:"",
+  slug:"belgrade",
   country: "Serbia",
   desc: "A lively Balkan capital at the confluence of two rivers.",
   image: "https://images.unsplash.com/photo-1727105538592-3074729d8abc?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8YmVsZ3JhZGV8ZW58MHx8MHx8fDA%3D",
@@ -649,7 +648,7 @@ export const cities = [
 {
   id: 80,
   name: "Sofia",
-  slug:"",
+  slug:"sofia",
   country: "Bulgaria",
   desc: "Ancient ruins beneath a modern European city.",
   image: "https://images.unsplash.com/photo-1695798598638-e8305f0ffac2?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8c29maWF8ZW58MHx8MHx8fDA%3D",
@@ -657,7 +656,7 @@ export const cities = [
 {
   id: 81,
   name: "Bucharest",
-  slug:"",
+  slug:"bucharest",
   country: "Romania",
   desc: "A mix of grand boulevards and old-world charm.",
   image: "https://images.unsplash.com/photo-1574616979112-f9f52d3747f8?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8YnVjaGFyZXN0fGVufDB8fDB8fHww",
@@ -665,7 +664,7 @@ export const cities = [
 {
   id: 82,
   name: "Skopje",
-  slug:"",
+  slug:"skopje",
   country: "North Macedonia",
   desc: "Statues, bridges, and Balkan heritage.",
   image: "https://images.unsplash.com/photo-1624895060572-a5fc35b5db2f?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8c2tvcGplfGVufDB8fDB8fHww",
@@ -673,7 +672,7 @@ export const cities = [
 {
   id: 83,
   name: "Ljubljana",
-  slug:"",
+  slug:"ljubljana",
   country: "Slovenia",
   desc: "A green, charming capital with a fairytale old town.",
   image: "https://images.unsplash.com/photo-1611576191056-3e6696029388?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bGp1YmxqYW5hfGVufDB8fDB8fHww",
@@ -681,7 +680,7 @@ export const cities = [
 {
   id: 84,
   name: "Monaco",
-  slug:"",
+  slug:"monaco",
   country: "Monaco",
   desc: "Luxury, yachts, and Mediterranean glamour.",
   image: "https://images.unsplash.com/photo-1595138320174-a64d168e9970?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bW9uYWNvfGVufDB8fDB8fHww",
@@ -689,7 +688,7 @@ export const cities = [
 {
   id: 85,
   name: "Nice",
-  slug:"",
+  slug:"nice",
   country: "France",
   desc: "Azure coastlines and relaxed Riviera vibes.",
   image: "https://images.unsplash.com/photo-1604440401661-8f6f07c285a2?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8bmljZXxlbnwwfHwwfHx8MA%3D%3D",
@@ -697,7 +696,7 @@ export const cities = [
 {
   id: 86,
   name: "Naples",
-  slug:"",
+  slug:"naples",
   country: "Italy",
   desc: "Historic streets beneath Mount Vesuvius.",
   image: "https://images.unsplash.com/photo-1527208043690-e3db1cc93456?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8bmFwbGVzfGVufDB8fDB8fHww",
@@ -705,7 +704,7 @@ export const cities = [
 {
   id: 87,
   name: "Palermo",
-  slug:"",
+  slug:"palermo",
   country: "Italy",
   desc: "A crossroads of Mediterranean civilizations.",
   image: "https://images.unsplash.com/photo-1586729223498-2cc4a05d3858?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cGFsZXJtb3xlbnwwfHwwfHx8MA%3D%3D",
@@ -713,7 +712,7 @@ export const cities = [
 {
   id: 88,
   name: "Valletta",
-  slug:"",
+  slug:"valletta",
   country: "Malta",
   desc: "A fortified city rich in maritime history.",
   image: "https://plus.unsplash.com/premium_photo-1673561231809-17f6f9ef09b7?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8dmFsbGV0dGF8ZW58MHx8MHx8fDA%3D",
@@ -721,227 +720,260 @@ export const cities = [
 {
   id: 89,
   name: "Lima",
+  slug: "lima",
   country: "Peru",
   desc: "Clifftop views and world-famous cuisine.",
-  image: "https://images.unsplash.com/photo-1580530719837-952e0515b69a?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8bGltYXxlbnwwfHwwfHx8MA%3D%3D",
+  image: "https://images.unsplash.com/photo-1580530719837-952e0515b69a?w=1000&auto=format&fit=crop&q=60"
 },
 {
   id: 90,
   name: "Bogotá",
+  slug: "bogota",
   country: "Colombia",
   desc: "A high-altitude capital full of culture and art.",
-  image: "https://plus.unsplash.com/premium_photo-1697730030651-3a7aa391b9d6?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8Ym9nb3RhfGVufDB8fDB8fHww",
+  image: "https://plus.unsplash.com/premium_photo-1697730030651-3a7aa391b9d6?w=1000&auto=format&fit=crop&q=60"
 },
 {
   id: 91,
   name: "Quito",
+  slug: "quito",
   country: "Ecuador",
   desc: "A beautifully preserved old town near the equator.",
-  image: "https://images.unsplash.com/photo-1610226977124-9fd2755d09f2?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cXVpdG98ZW58MHx8MHx8fDA%3D",
+  image: "https://images.unsplash.com/photo-1610226977124-9fd2755d09f2?w=1000&auto=format&fit=crop&q=60"
 },
 {
   id: 92,
   name: "La Paz",
+  slug: "la-paz",
   country: "Bolivia",
   desc: "The world’s highest capital city.",
-  image: "https://images.unsplash.com/photo-1650700311346-dd9ad9e77114?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bGElMjBwYXp8ZW58MHx8MHx8fDA%3D",
+  image: "https://images.unsplash.com/photo-1650700311346-dd9ad9e77114?w=1000&auto=format&fit=crop&q=60"
 },
 {
   id: 93,
   name: "Casablanca",
+  slug: "casablanca",
   country: "Morocco",
   desc: "Modern energy mixed with Atlantic heritage.",
-  image: "https://images.unsplash.com/photo-1528657249085-c569d3c869e4?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8Y2FzYWJsYW5jYXxlbnwwfHwwfHx8MA%3D%3D",
+  image: "https://images.unsplash.com/photo-1528657249085-c569d3c869e4?w=1000&auto=format&fit=crop&q=60"
 },
 {
   id: 94,
   name: "Addis Ababa",
+  slug: "addis-ababa",
   country: "Ethiopia",
   desc: "Political heart of Africa with ancient roots.",
-  image: "https://images.unsplash.com/photo-1664022379391-8b52fd2653f0?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8YWRkaXMlMjBhYmFiYXxlbnwwfHwwfHx8MA%3D%3D",
+  image: "https://images.unsplash.com/photo-1664022379391-8b52fd2653f0?w=1000&auto=format&fit=crop&q=60"
 },
 {
   id: 95,
   name: "Nairobi",
+  slug: "nairobi",
   country: "Kenya",
   desc: "A safari city where wildlife meets skyscrapers.",
-  image: "https://images.unsplash.com/photo-1635595358293-03620e36be48?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8bmFpcm9iaXxlbnwwfHwwfHx8MA%3D%3D",
+  image: "https://images.unsplash.com/photo-1635595358293-03620e36be48?w=1000&auto=format&fit=crop&q=60"
 },
 {
   id: 96,
   name: "Matera",
+  slug: "matera",
   country: "Italy",
   desc: "Ancient cave dwellings carved into limestone cliffs.",
-  image: "https://images.unsplash.com/photo-1596319682968-c8d4875a6f17?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8bWF0ZXJhfGVufDB8fDB8fHww",
+  image: "https://images.unsplash.com/photo-1596319682968-c8d4875a6f17?w=1000&auto=format&fit=crop&q=60"
 },
 {
   id: 97,
   name: "Kotor",
+  slug: "kotor",
   country: "Montenegro",
   desc: "A medieval town tucked deep inside a dramatic bay.",
-  image: "https://images.unsplash.com/photo-1544329095-a7c19df83018?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bW9zdGFyfGVufDB8fDB8fHww",
+  image: "https://images.unsplash.com/photo-1544329095-a7c19df83018?w=1000&auto=format&fit=crop&q=60"
 },
 {
   id: 98,
   name: "Mostar",
+  slug: "mostar",
   country: "Bosnia and Herzegovina",
   desc: "Iconic bridge, Ottoman heritage, and river views.",
-  image: "",
+  image: ""
 },
 {
   id: 99,
   name: "Ohrid",
+  slug: "ohrid",
   country: "North Macedonia",
   desc: "Lakeside churches and quiet old-town charm.",
-  image: "https://images.unsplash.com/photo-1618735751653-d221b2436b0e?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8b2hyaWR8ZW58MHx8MHx8fDA%3D",
+  image: "https://images.unsplash.com/photo-1618735751653-d221b2436b0e?w=1000&auto=format&fit=crop&q=60"
 },
 {
   id: 100,
   name: "Gjirokastër",
+  slug: "gjirokaster",
   country: "Albania",
   desc: "Stone houses and hilltop castle views.",
-  image: "https://plus.unsplash.com/premium_photo-1736063854328-48347237635a?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8Z2ppcm9rYXN0JUMzJUFCcnxlbnwwfHwwfHx8MA%3D%3D",
+  image: "https://plus.unsplash.com/premium_photo-1736063854328-48347237635a?w=1000&auto=format&fit=crop&q=60"
 },
 {
   id: 101,
   name: "Plovdiv",
+  slug: "plovdiv",
   country: "Bulgaria",
   desc: "One of Europe’s oldest cities with Roman ruins.",
-  image: "https://images.unsplash.com/photo-1672691993652-c0dc435011cc?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8cGxvdmRpdnxlbnwwfHwwfHx8MA%3D%3D",
+  image: "https://images.unsplash.com/photo-1672691993652-c0dc435011cc?w=1000&auto=format&fit=crop&q=60"
 },
 {
   id: 102,
   name: "Brasov",
+  slug: "brasov",
   country: "Romania",
   desc: "A Transylvanian town surrounded by the Carpathians.",
-  image: "https://images.unsplash.com/photo-1558253347-fb1128610003?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8YnJhc292fGVufDB8fDB8fHww",
+  image: "https://images.unsplash.com/photo-1558253347-fb1128610003?w=1000&auto=format&fit=crop&q=60"
 },
 {
   id: 103,
   name: "Český Krumlov",
+  slug: "cesky-krumlov",
   country: "Czech Republic",
   desc: "A fairytale town frozen in medieval time.",
-  image: "https://plus.unsplash.com/premium_photo-1661963139522-22525f644234?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8Y3plY2glMjByZXB1YmxpY3xlbnwwfHwwfHx8MA%3D%3D",
+  image: "https://plus.unsplash.com/premium_photo-1661963139522-22525f644234?w=1000&auto=format&fit=crop&q=60"
 },
 {
   id: 104,
   name: "Lviv",
+  slug: "lviv",
   country: "Ukraine",
   desc: "Coffee culture, cobbled streets, and Austro-Hungarian vibes.",
-  image: "https://images.unsplash.com/photo-1572940252238-edf9d51925ba?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8bHZpdnxlbnwwfHwwfHx8MA%3D%3D",
+  image: "https://images.unsplash.com/photo-1572940252238-edf9d51925ba?w=1000&auto=format&fit=crop&q=60"
 },
 {
   id: 105,
   name: "Salzburg",
+  slug: "salzburg",
   country: "Austria",
   desc: "Baroque beauty and alpine surroundings.",
-  image: "https://plus.unsplash.com/premium_photo-1661962627529-73e5d332d04a?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+  image: "https://plus.unsplash.com/premium_photo-1661962627529-73e5d332d04a?q=80&w=1170&auto=format&fit=crop"
 },
 {
   id: 106,
   name: "Hallstatt",
+  slug: "hallstatt",
   country: "Austria",
   desc: "A postcard village by a serene alpine lake.",
-  image: "https://images.unsplash.com/photo-1601801017546-1dd109433165?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8aGFsbHN0YXR0fGVufDB8fDB8fHww",
+  image: "https://images.unsplash.com/photo-1601801017546-1dd109433165?w=1000&auto=format&fit=crop&q=60"
 },
 {
   id: 107,
   name: "Tromsø",
+  slug: "tromso",
   country: "Norway",
   desc: "Arctic city famous for northern lights.",
-  image: "https://images.unsplash.com/photo-1560185678-759b5712a60e?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8dHJvbXNvfGVufDB8fDB8fHww",
+  image: "https://images.unsplash.com/photo-1560185678-759b5712a60e?w=1000&auto=format&fit=crop&q=60"
 },
 {
   id: 108,
   name: "Faroe Islands",
+  slug: "faroe-islands",
   country: "Denmark",
   desc: "Remote cliffs, waterfalls, and dramatic landscapes.",
-  image: "https://images.unsplash.com/photo-1561810051-09dd8d26010c?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8ZmFyb2UlMjBpc2xhbmRzfGVufDB8fDB8fHww",
+  image: "https://images.unsplash.com/photo-1561810051-09dd8d26010c?w=1000&auto=format&fit=crop&q=60"
 },
 {
   id: 109,
   name: "Svaneti",
+  slug: "svaneti",
   country: "Georgia",
   desc: "Ancient stone towers in the Caucasus mountains.",
-  image: "https://images.unsplash.com/photo-1569498283068-140e58143192?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8c3ZhbmV0aXxlbnwwfHwwfHx8MA%3D%3D",
+  image: "https://images.unsplash.com/photo-1569498283068-140e58143192?w=1000&auto=format&fit=crop&q=60"
 },
 {
   id: 110,
   name: "Luang Prabang",
+  slug: "luang-prabang",
   country: "Laos",
   desc: "Monks, waterfalls, and slow riverside life.",
-  image: "https://plus.unsplash.com/premium_photo-1661882477461-20d16af70819?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8bHVhbmclMjBwcmFiYW5nfGVufDB8fDB8fHww",
+  image: "https://plus.unsplash.com/premium_photo-1661882477461-20d16af70819?w=1000&auto=format&fit=crop&q=60"
 },
 {
   id: 111,
   name: "Hpa-An",
+  slug: "hpa-an",
   country: "Myanmar",
   desc: "Limestone caves and quiet countryside.",
-  image: "https://images.unsplash.com/photo-1583844497208-780ced06a8c2?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8aHBhLWFufGVufDB8fDB8fHww",
+  image: "https://images.unsplash.com/photo-1583844497208-780ced06a8c2?w=1000&auto=format&fit=crop&q=60"
 },
 {
   id: 112,
   name: "Sapa",
+  slug: "sapa",
   country: "Vietnam",
   desc: "Terraced rice fields and misty mountains.",
-  image: "https://images.unsplash.com/photo-1694152363060-cc26bde73872?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8c2FwYXxlbnwwfHwwfHx8MA%3D%3D",
+  image: "https://images.unsplash.com/photo-1694152363060-cc26bde73872?w=1000&auto=format&fit=crop&q=60"
 },
 {
   id: 113,
   name: "Ninh Binh",
+  slug: "ninh-binh",
   country: "Vietnam",
   desc: "River landscapes known as “Halong Bay on land”.",
-  image: "https://images.unsplash.com/photo-1560550356-3cdd74bca5e8?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fG5pbmglMjBiJUMzJUFDbmh8ZW58MHx8MHx8fDA%3D",
+  image: "https://images.unsplash.com/photo-1560550356-3cdd74bca5e8?w=1000&auto=format&fit=crop&q=60"
 },
 {
   id: 114,
   name: "Siwa Oasis",
+  slug: "siwa-oasis",
   country: "Egypt",
   desc: "Remote desert oasis with Berber culture.",
-  image: "https://images.unsplash.com/photo-1527736848781-72dc3b2ee00f?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8c2l3YSUyMG9hc2lzfGVufDB8fDB8fHww",
+  image: "https://images.unsplash.com/photo-1527736848781-72dc3b2ee00f?w=1000&auto=format&fit=crop&q=60"
 },
 {
   id: 115,
   name: "Chefchaouen",
+  slug: "chefchaouen",
   country: "Morocco",
   desc: "A tranquil blue-painted mountain town.",
-  image: "https://images.unsplash.com/photo-1569383746724-6f1b882b8f46?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Y2hlZmNoYW91ZW58ZW58MHx8MHx8fDA%3D",
+  image: "https://images.unsplash.com/photo-1569383746724-6f1b882b8f46?w=1000&auto=format&fit=crop&q=60"
 },
 {
   id: 116,
   name: "Lalibela",
+  slug: "lalibela",
   country: "Ethiopia",
   desc: "Rock-hewn churches carved from solid stone.",
-  image: "https://images.unsplash.com/photo-1572888195250-3037a59d3578?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8bGFsaWJlbGF8ZW58MHx8MHx8fDA%3D",
+  image: "https://images.unsplash.com/photo-1572888195250-3037a59d3578?w=1000&auto=format&fit=crop&q=60"
 },
 {
   id: 117,
   name: "San Pedro de Atacama",
+  slug: "san-pedro-de-atacama",
   country: "Chile",
   desc: "Mars-like desert landscapes and starry skies.",
-  image: "https://images.unsplash.com/photo-1556741495-4a9f3c6935e8?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8c2FuJTIwcGVkcm8lMjBkZSUyMGF0YWNhbWF8ZW58MHx8MHx8fDA%3D",
+  image: "https://images.unsplash.com/photo-1556741495-4a9f3c6935e8?w=1000&auto=format&fit=crop&q=60"
 },
 {
   id: 118,
   name: "Uyuni",
+  slug: "uyuni",
   country: "Bolivia",
   desc: "Gateway to the world’s largest salt flats.",
-  image: "https://images.unsplash.com/photo-1517706598116-51e85d33db24?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8dXl1bml8ZW58MHx8MHx8fDA%3D",
+  image: "https://images.unsplash.com/photo-1517706598116-51e85d33db24?w=1000&auto=format&fit=crop&q=60"
 },
 {
   id: 119,
   name: "Pucón",
+  slug: "pucon",
   country: "Chile",
   desc: "Adventure town beneath an active volcano.",
-  image: "https://images.unsplash.com/photo-1665107277506-5f272d52ddb1?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8cHVjb258ZW58MHx8MHx8fDA%3D",
+  image: "https://images.unsplash.com/photo-1665107277506-5f272d52ddb1?w=1000&auto=format&fit=crop&q=60"
 },
 {
   id: 120,
   name: "Tasmania",
+  slug: "tasmania",
   country: "Australia",
   desc: "Wild coastlines, forests, and untouched nature.",
-  image: "https://images.unsplash.com/photo-1617766643842-bb3fc12dffc8?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8dGFzbWFuaWF8ZW58MHx8MHx8fDA%3D",
+  image: "https://images.unsplash.com/photo-1617766643842-bb3fc12dffc8?w=1000&auto=format&fit=crop&q=60"
 }
+
 
 
 ];

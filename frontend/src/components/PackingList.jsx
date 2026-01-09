@@ -335,6 +335,23 @@ const PackingList = ({ onBack, user, tripDetails }) => {
                 Create New List
               </button>
             </div>
+            {/* BOTTOM ACTION BUTTONS */}
+<div className="mt-8 bg-white rounded-2xl shadow p-5 flex flex-col sm:flex-row gap-3 justify-between">
+  <button
+    onClick={printList}
+    className="w-full sm:w-auto bg-black text-white px-6 py-3 rounded-xl hover:bg-gray-900"
+  >
+    🖨️ Print Packing List
+  </button>
+
+  <button
+    onClick={exportList}
+    className="w-full sm:w-auto border border-black px-6 py-3 rounded-xl hover:bg-gray-100"
+  >
+    📄 Download as Text File
+  </button>
+</div>
+
           </div>
         )}
       </div>

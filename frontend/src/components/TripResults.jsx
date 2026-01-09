@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { QRCodeCanvas } from "qrcode.react";
 
 const TripResults = ({ suggestions, loading, onClose }) => {
   const messages = [
@@ -10,8 +11,15 @@ const TripResults = ({ suggestions, loading, onClose }) => {
   ];
 
   const [step, setStep] = useState(0);
-  const [showTyping, setShowTyping] = useState(false);
-  const [typedText, setTypedText] = useState("");
+
+  // typing + content states
+  const [isTyping, setIsTyping] = useState(false);
+  const [displayText, setDisplayText] = useState("");
+  const [finalText, setFinalText] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
+  const [qrTripId, setQrTripId] = useState(null);
+  const [qrLoading, setQrLoading] = useState(false);
+  const [qrError, setQrError] = useState("");
 
   /* ================= LOADING TEXT ROTATION ================= */
   useEffect(() => {
@@ -24,47 +32,70 @@ const TripResults = ({ suggestions, loading, onClose }) => {
 
   /* ================= START TYPING AFTER LOADING ================= */
   useEffect(() => {
-    if (loading) {
-      setShowTyping(false);
-      setTypedText("");
-      return;
-    }
+    if (loading) return;
 
     if (!suggestions?.text) return;
 
-    // small delay so transition feels smooth
-    const delay = setTimeout(() => {
-      setShowTyping(true);
-    }, 500);
+    setIsTyping(true);
+    setDisplayText("");
+    setFinalText("");
+    setIsEditing(false);
 
-    return () => clearTimeout(delay);
-  }, [loading, suggestions]);
-
-  /* ================= TYPING EFFECT ================= */
-  useEffect(() => {
-    if (!showTyping) return;
-
+    const lines = suggestions.text.split("\n");
     let index = 0;
-    const fullText = suggestions.text;
 
     const typingInterval = setInterval(() => {
       index++;
-      setTypedText(fullText.slice(0, index));
+      const current = lines.slice(0, index).join("\n");
+      setDisplayText(current);
 
-      if (index >= fullText.length) {
+      if (index >= lines.length) {
         clearInterval(typingInterval);
+        setFinalText(suggestions.text);
+        setDisplayText("");
+        setIsTyping(false);
       }
-    }, 25); // typing speed
+    }, 80); // FAST: line-by-line typing
 
     return () => clearInterval(typingInterval);
-  }, [showTyping, suggestions]);
+  }, [loading, suggestions]);
 
-  /* ================= LOADING ================= */
+  const handleGenerateQR = async () => {
+  if (!finalText || qrLoading) return;
+
+  setQrLoading(true);
+  setQrError("");
+
+  try {
+    const res = await fetch("http://localhost:5001/api/qr-trips", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ text: finalText }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.message || "Failed to generate QR");
+    }
+
+    setQrTripId(data.qrTripId);
+  } catch (err) {
+    setQrError("Failed to generate QR. Try again.");
+  } finally {
+    setQrLoading(false);
+  }
+};
+
+
+
+  /* ================= LOADING SCREEN ================= */
   if (loading) {
     return (
       <div className="min-h-screen pt-24 flex items-center justify-center px-4">
         <div className="bg-white rounded-3xl shadow-xl p-8 text-center space-y-6 max-w-md w-full">
-
           <div className="w-14 h-14 border-4 border-[#5b7c67]/30
                           border-t-[#5b7c67]
                           rounded-full animate-spin mx-auto" />
@@ -80,7 +111,6 @@ const TripResults = ({ suggestions, loading, onClose }) => {
           <p className="text-xs text-gray-400">
             This may take a few seconds…
           </p>
-
         </div>
       </div>
     );
@@ -95,7 +125,7 @@ const TripResults = ({ suggestions, loading, onClose }) => {
     );
   }
 
-  /* ================= RESULT (TEXT ONLY) ================= */
+  /* ================= MAIN RESULT ================= */
   return (
     <div className="min-h-screen pt-24">
       <div className="max-w-4xl mx-auto px-4 space-y-6">
@@ -113,17 +143,109 @@ const TripResults = ({ suggestions, loading, onClose }) => {
           </button>
         </div>
 
-        {/* Typed Text */}
-        <div className="bg-white rounded-3xl shadow-lg p-6">
-          <pre className="bg-slate-50 border border-slate-200 rounded-xl
-                          p-5 text-slate-700 text-[15px]
-                          leading-[1.7] font-serif
-                          whitespace-pre-wrap break-words
-                          min-h-[300px]">
-            {typedText}
-            <span className="animate-pulse">▍</span>
-          </pre>
+        {/* Content Card */}
+        <div className="bg-white rounded-3xl shadow-lg p-6 space-y-4">
+
+          {/* Action Buttons */}
+          <div className="flex justify-end gap-3">
+            {!isEditing ? (
+              <button
+                disabled={isTyping || !finalText}
+                onClick={() => setIsEditing(true)}
+                className={`px-4 py-2 text-sm rounded-lg transition
+                  ${isTyping || !finalText
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-slate-800 text-white hover:bg-slate-700"
+                  }`}
+              >
+                ✏️ Edit
+              </button>
+            ) : (
+              <button
+                onClick={() => setIsEditing(false)}
+                className="px-4 py-2 text-sm rounded-lg
+                           bg-emerald-600 text-white
+                           hover:bg-emerald-500 transition"
+              >
+                ✅ Save
+              </button>
+
+              
+            )}
+            
+          </div>
+
+          {/* Typing View */}
+          {isTyping && (
+            <pre
+              className="bg-slate-50 border border-slate-200 rounded-xl
+                         p-5 text-slate-700 text-[15px]
+                         leading-[1.7] font-serif
+                         whitespace-pre-wrap break-words
+                         min-h-[300px]"
+            >
+              {displayText}
+              <span className="animate-pulse">▍</span>
+            </pre>
+          )}
+
+          {/* View Mode */}
+          {!isTyping && !isEditing && (
+            <pre
+              className="bg-slate-50 border border-slate-200 rounded-xl
+                         p-5 text-slate-700 text-[15px]
+                         leading-[1.7] font-serif
+                         whitespace-pre-wrap break-words
+                         min-h-[300px]"
+            >
+              {finalText}
+            </pre>
+          )}
+
+          {/* Edit Mode */}
+          {!isTyping && isEditing && (
+            <textarea
+              value={finalText}
+              onChange={(e) => setFinalText(e.target.value)}
+              className="w-full min-h-[300px]
+                         bg-white border border-slate-300
+                         rounded-xl p-4 text-[15px]
+                         leading-[1.7] font-serif
+                         focus:outline-none focus:ring-2
+                         focus:ring-slate-400"
+            />
+          )}
+
         </div>
+        <button
+  onClick={handleGenerateQR}
+  disabled={!finalText || isEditing || qrLoading}
+  className={`px-4 py-2 text-sm rounded-lg transition
+    ${(!finalText || isEditing || qrLoading)
+      ? "bg-gray-400 cursor-not-allowed"
+      : "bg-indigo-600 text-white hover:bg-indigo-500"
+    }`}
+>
+  {qrLoading ? "Generating QR..." : "📱 Generate QR"}
+</button>
+
+{qrTripId && (
+  <div className="mt-6 flex flex-col items-center gap-3">
+    <QRCodeCanvas
+      value={`http://localhost:3000/qr-trip/${qrTripId}`}
+      size={220}
+    />
+
+    <p className="text-sm text-gray-600">
+      Scan to view itinerary anytime
+    </p>
+
+    <p className="text-xs text-gray-400 break-all">
+      http://localhost:3000/qr-trip/{qrTripId}
+    </p>
+  </div>
+)}
+
 
         <div className="text-center text-xs text-gray-500">
           ✨ Generated by AI. Content may vary.
@@ -133,5 +255,7 @@ const TripResults = ({ suggestions, loading, onClose }) => {
     </div>
   );
 };
+
+
 
 export default TripResults;

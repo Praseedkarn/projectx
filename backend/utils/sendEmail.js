@@ -12,7 +12,7 @@ const transporter = nodemailer.createTransport({
 
 export const sendFeedbackEmail = async ({ message, email, source }) => {
   await transporter.sendMail({
-    from: `"AI Travel App" <${process.env.ADMIN_EMAIL}>`,
+    from: `"PROJEXT X" <${process.env.ADMIN_EMAIL}>`,
     to: process.env.ADMIN_EMAIL,
     subject: "📩 New Feedback Received",
     html: `

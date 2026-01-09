@@ -6,7 +6,7 @@ const callOpenRouter = async (model, prompt, apiKey) => {
     {
       model,
       messages: [{ role: "user", content: prompt }],
-      temperature: 0.7,
+      temperature: 0.6,
     },
     {
       headers: {
@@ -27,21 +27,19 @@ export const generateItinerary = async (description, detailLevel) => {
 Create a travel itinerary in clear, readable text.
 
 Trip details:
-- Description: ${description}
-- Detail level: ${detailLevel || "morning"}
+${description}
 
-Guidelines:
-- Write in plain English
+Writing rules:
+- Use plain English
 - Use headings like "Day 1 Morning", "Afternoon", etc.
 - Mention places, transport, and approximate costs naturally
-- DO NOT use JSON
-- DO NOT use markdown
+- Do NOT use JSON
+- Do NOT use markdown
 `;
 
-  // ✅ ORDER MATTERS
   const models = [
-    "deepseek/deepseek-r1-0528:free",   // PRIMARY
-    "arcee/trinity-mini:free",          // FALLBACK
+    "deepseek/deepseek-r1-0528:free",
+    "arcee/trinity-mini:free",
   ];
 
   const apiKeys = [
@@ -53,11 +51,26 @@ Guidelines:
     for (const model of models) {
       try {
         console.log(`⚡ Trying ${model}`);
-        const text = await callOpenRouter(model, prompt, key);
+
+        const result = await callOpenRouter(model, prompt, key);
+
+        // 🚨 LENGTH LIMIT DETECTION
+        if (result.finishReason === "length") {
+          console.warn("⚠️ AI RESPONSE CUT DUE TO TOKEN LIMIT");
+          console.warn("⚠️ Model:", model);
+          console.warn("⚠️ Suggestion: Reduce days or detail level");
+        }
+
+        // 🚨 TOO SHORT (fallback safety)
+        if (result.text.length < 300) {
+          console.warn("⚠️ AI RESPONSE SUSPICIOUSLY SHORT");
+          console.warn("⚠️ Characters:", result.text.length);
+        }
 
         return {
           provider: model,
-          text: text.replace(/```/g, "").trim(),
+          text: result.text.replace(/```/g, "").trim(),
+          finishReason: result.finishReason,
         };
       } catch (err) {
         console.warn(`❌ Failed: ${model}`);
