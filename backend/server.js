@@ -41,6 +41,9 @@ app.use("/api/blogs", blogRoutes);
 app.use("/api/cities", cityRoutes);
 app.use("/api/feedback", feedbackRoutes);
 app.use("/api/qr-trips",qrTripRoutes);
+app.get("/api/health", (req, res) => {
+  res.json({ status: "ok" });
+});
 
 // ✅ HEALTH CHECK
 app.get("/", (req, res) => {

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 
 /* ================= GOOGLE MAP EMBED (NO API KEY) ================= */
 const GoogleMapEmbed = ({ place }) => {
@@ -19,7 +20,9 @@ const GoogleMapEmbed = ({ place }) => {
   );
 };
 
-export default function CityPage({ slug, onBack, onItineraryClick }) {
+export default function CityPage() {
+ const { slug } = useParams();          // ✅ FROM URL
+  const navigate = useNavigate();
   const [city, setCity] = useState(null);
   const [cityItinerary, setCityItinerary] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -132,7 +135,7 @@ export default function CityPage({ slug, onBack, onItineraryClick }) {
 
         {/* BACK */}
         <button
-          onClick={onBack}
+          onClick={()=>navigate("/cities")}
           className="text-sm text-gray-600 hover:underline"
         >
           ← Back to Cities
@@ -292,7 +295,7 @@ export default function CityPage({ slug, onBack, onItineraryClick }) {
         <Card title="Recommended Itinerary">
           {cityItinerary ? (
             <div
-              onClick={() => onItineraryClick(city.slug)}
+              onClick={() => navigate(`/itineraries/${slug}`)}
               className="cursor-pointer border rounded-2xl p-5 hover:shadow-md transition"
             >
               <h3 className="text-lg font-semibold">

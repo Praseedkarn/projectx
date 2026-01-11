@@ -1,12 +1,26 @@
 import axios from "axios";
 
+/* =========================
+   Utility: Sleep (rate limit safe)
+========================= */
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/* =========================
+   OpenRouter Call
+========================= */
 const callOpenRouter = async (model, prompt, apiKey) => {
   const response = await axios.post(
     "https://openrouter.ai/api/v1/chat/completions",
     {
       model,
-      messages: [{ role: "user", content: prompt }],
+      messages: [
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
       temperature: 0.6,
+      max_tokens: 900, // keep free models safe
     },
     {
       headers: {
@@ -15,26 +29,31 @@ const callOpenRouter = async (model, prompt, apiKey) => {
         "HTTP-Referer": "http://localhost:3000",
         "X-Title": "AI Travel Planner",
       },
-      timeout: 25000, // free models are slow
+      timeout: 30000, // free models are slow
     }
   );
 
-  return response.data.choices[0].message.content;
+  return response.data.choices[0]; // ✅ correct structure
 };
 
-export const generateItinerary = async (description, detailLevel) => {
+/* =========================
+   Main Itinerary Generator
+========================= */
+export const generateItinerary = async (description, detailLevel = "medium") => {
   const prompt = `
-Create a travel itinerary in clear, readable text.
+Create a SIMPLE and CLEAR travel itinerary.
 
-Trip details:
+Trip description:
 ${description}
 
-Writing rules:
+Rules:
+- Limit itinerary to 3–5 days maximum
 - Use plain English
-- Use headings like "Day 1 Morning", "Afternoon", etc.
-- Mention places, transport, and approximate costs naturally
-- Do NOT use JSON
-- Do NOT use markdown
+- Use headings like "Day 1 Morning", "Afternoon"
+- Mention places, transport, and approximate costs
+- Keep explanations short
+- DO NOT use markdown
+- DO NOT use JSON
 `;
 
   const models = [
@@ -47,36 +66,47 @@ Writing rules:
     process.env.AI_API_KEY_SECONDARY,
   ];
 
+  let lastError = null;
+
   for (const key of apiKeys) {
+    if (!key) continue;
+
     for (const model of models) {
       try {
         console.log(`⚡ Trying ${model}`);
 
-        const result = await callOpenRouter(model, prompt, key);
+        const choice = await callOpenRouter(model, prompt, key);
 
-        // 🚨 LENGTH LIMIT DETECTION
-        if (result.finishReason === "length") {
-          console.warn("⚠️ AI RESPONSE CUT DUE TO TOKEN LIMIT");
-          console.warn("⚠️ Model:", model);
-          console.warn("⚠️ Suggestion: Reduce days or detail level");
-        }
+        const text = choice.message?.content;
 
-        // 🚨 TOO SHORT (fallback safety)
-        if (result.text.length < 300) {
-          console.warn("⚠️ AI RESPONSE SUSPICIOUSLY SHORT");
-          console.warn("⚠️ Characters:", result.text.length);
+        if (!text || text.length < 200) {
+          console.warn("⚠️ Response too short, skipping");
+          await sleep(3000);
+          continue;
         }
 
         return {
           provider: model,
-          text: result.text.replace(/```/g, "").trim(),
-          finishReason: result.finishReason,
+          text: text.replace(/```/g, "").trim(),
+          finishReason: choice.finish_reason || "stop",
         };
       } catch (err) {
+        lastError = err;
+
+        const status = err.response?.status;
+        const msg = err.response?.data?.error?.message || err.message;
+
         console.warn(`❌ Failed: ${model}`);
+        console.warn(`   Status: ${status || "unknown"}`);
+        console.warn(`   Message: ${msg}`);
+
+        // ⏳ Avoid rate-limit bans
+        await sleep(3000);
       }
     }
   }
 
-  throw new Error("All AI providers failed");
+  throw new Error(
+    "All AI providers failed. Free models may be rate-limited or offline."
+  );
 };

@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import "./App.css";
+
+/* ===== COMPONENT IMPORTS ===== */
 import Header from "./components/Header";
-import Footer from "./components/footer";
 import SignIn from "./components/SignIn";
 import TripResults from "./components/TripResults";
 import ProfilePage from "./components/ProfilePage";
@@ -12,228 +14,219 @@ import PackingList from "./components/PackingList";
 import ItinerarySlider from "./components/ItinerarySlider";
 import BlogDetail from "./components/BlogDetail";
 import Blogs from "./components/Blogs";
-import TravelQuotes from "./components/TravelQuotes";
-import { generateTravelItinerary } from "./services/api";
 import AdminBlog from "./components/AdminBlog";
 import FeatureCards from "./components/FeatureCards";
 import DistanceCalculator from "./components/DistanceCalculator";
 import ExploreCities from "./components/ExploreCities";
 import CityPage from "./components/CityPage";
 import AiFeedbackBanner from "./components/AifeedbackBanner";
-import FaqSection from "./components/FaqSections";
+import FaqFooterSection from "./components/FaqFooterSection";
+
+import { generateTravelItinerary } from "./services/api";
 
 function App() {
-  
-  const formCardRef = useRef(null);
-  const [showSignIn, setShowSignIn] = useState(false);
-  const [currentUser, setCurrentUser] = useState(null);
-  const [tripSuggestions, setTripSuggestions] = useState(null);
-  const [loading, setLoading] = useState(false);
+  /* ================= ROUTER ================= */
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  /* ================= STATE ================= */
   const [activeComponent, setActiveComponent] = useState("home");
+  const [showSignIn, setShowSignIn] = useState(false);
+  const [loading, setLoading] = useState(false);
+
   const [selectedItineraryId, setSelectedItineraryId] = useState(null);
-  const [apiStatus, setApiStatus] = useState("checking");
+  const [selectedBlogSlug, setSelectedBlogSlug] = useState(null);
+  const [selectedCity, setSelectedCity] = useState(null);
+
+  /* ================= REFS ================= */
+  const formCardRef = useRef(null);
   const headerRef = useRef(null);
-  const [headerHeight, setHeaderHeight] = useState(0);
+
+  /* ================= USER ================= */
+  const [currentUser, setCurrentUser] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("user"));
+    } catch {
+      return null;
+    }
+  });
+
+  useEffect(() => {
+  let isMounted = true;
+
+  const checkApiStatus = async () => {
+    try {
+      const res = await fetch("http://localhost:5001/api/health");
+
+      if (!res.ok) throw new Error("API down");
+
+      if (isMounted) setApiStatus("available");
+    } catch (err) {
+      if (isMounted) setApiStatus("offline");
+    }
+  };
+
+  checkApiStatus();
+
+  return () => {
+    isMounted = false;
+  };
+}, []);
+
+
+  /* ================= FORM ================= */
   const [tripType, setTripType] = useState("multi");
   const [days, setDays] = useState(3);
   const [hours, setHours] = useState(4);
   const [place, setPlace] = useState("");
   const [group, setGroup] = useState("Family");
   const [budget, setBudget] = useState("Medium");
-  const [pace, setPace] = useState("Balanced");
-  const [detailLevel, setDetailLevel] = useState("morning");
-  const [Month, setMonth] = useState("");
   const [Transport, setTransport] = useState("");
-  const [selectedBlogSlug, setSelectedBlogSlug] = useState(null);
-  const [suggestions, setSuggestions]=useState("");
-  const [activeBlog, setActiveBlog] = useState(null);
-  const [selectedCity, setSelectedCity] = useState(null);
-  const [userPreferences, setUserPreferences] = useState("");
+  const [detailLevel, setDetailLevel] = useState("morning");
+  const [suggestions, setSuggestions] = useState("");
 
+  /* ================= AI ================= */
+  const [apiStatus, setApiStatus] = useState("checking");
 
-
-  
-  /* ===== Load user ===== */
+  /* ================= URL → STATE SYNC ================= */
   useEffect(() => {
-    const userData = localStorage.getItem("user");
-    if (userData) setCurrentUser(JSON.parse(userData));
-  }, []);
+  const path = location.pathname;
 
-  useEffect(() => {
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-  }, [activeComponent]);
-
-  /* ===== Check AI status ===== */
-  useEffect(() => {
-    const checkAPI = async () => {
-      if (!currentUser) return;
-      try {
-        const test = await generateTravelItinerary("test", "morning");
-        setApiStatus(test?.text ? "available" : "unavailable");
-      } catch {
-        setApiStatus("unavailable");
-      }
-    };
-    checkAPI();
-  }, [currentUser]);
-
-  useEffect(() => {
-  if (!headerRef.current) return;
-
-  const updateHeight = () => {
-    setHeaderHeight(headerRef.current.offsetHeight);
-  };
+  if (path === "/") setActiveComponent("home");
+  else if (path === "/cities") setActiveComponent("cities");
+  else if (path.startsWith("/cities/")) {
+    setSelectedCity(path.split("/")[2]);
+    setActiveComponent("city");
+  }
+  else if (path === "/itineraries") setActiveComponent("itineraries");
+  else if (path.startsWith("/itineraries/")) {
+    setSelectedItineraryId(path.split("/")[2]);
+    setActiveComponent("itinerary-detail");
+  }
+  else if (path === "/packing") setActiveComponent("packing"); // ✅ FIX
+  else if (path === "/results") setActiveComponent("results");
+}, [location.pathname]);
 
 
-
-
-  updateHeight(); // initial
-  window.addEventListener("resize", updateHeight);
-
-  return () => window.removeEventListener("resize", updateHeight);
-}, [activeComponent]);
-
-
-  /* ===== Auth ===== */
+  /* ================= AUTH ================= */
   const handleLoginSuccess = (user) => {
     localStorage.setItem("user", JSON.stringify(user));
-    setCurrentUser(user);
-    setShowSignIn(false);
+    window.location.reload();
   };
 
   const handleLogout = () => {
     localStorage.removeItem("user");
-    setCurrentUser(null);
-    setTripSuggestions(null);
-    setActiveComponent("home");
+    window.location.reload();
   };
 
-  /* ===== Submit Trip ===== */
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  /* ================= NAV ================= */
+  const go = (path, component) => {
+    navigate(path);
+    setActiveComponent(component);
+  };
 
-    if (!currentUser) {
-      setShowSignIn(true);
-      return;
-    }
+  /* ================= SUBMIT ================= */
+ const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    if (!place.trim()) {
-      alert("Please enter a destination");
-      return;
-    }
+  if (!currentUser) {
+    setShowSignIn(true);
+    return;
+  }
 
-    let description = "";
+  if (!place.trim()) {
+    alert("Please enter a destination");
+    return;
+  }
 
-    if (tripType === "hours") {
-      description = `
-        Create a realistic ${hours}-hour itinerary in ${place}.
-        Traveler type: ${group}
-        Transport: ${Transport}
-        Rules:
-        - Use HOUR-WISE format (Hour 1, Hour 2, etc.) and keep it relaxed.
-        - Max 3–4 nearby places only
-        - Keep travel time minimal
-        - Focus on cafes, parks, markets, viewpoints
-        - Include short food/snack suggestions
-        - No hotels or long-distance travel
-        - Simple bullet points
-        - Practical and relaxed flow
-        User Preferences / special Request:
-         ${suggestions||"None"}
-        Budget:
-        - Mention estimated cost per activity
-        - End with TOTAL ESTIMATED COST for ${hours} hours
-        
+  setLoading(true);
 
-      `;
-    } else if (tripType === "day") {
-        description = `
-        Create a realistic 1-day itinerary for ${place}.
-        Traveler type: ${group}
-        Budget: ${budget}
-        Transport: ${Transport}
-        Rules:
-          - Morning / Afternoon / Evening
-          - Max 2–3 main attractions
-          - Include breakfast, lunch, and evening food spots
-          - Keep travel distances short
-          - Mention local specialties
-          - Avoid rushing and overcrowding
-          - Add practical tips (best time, ticket tips)
-          - Easy-to-follow formatting
-          User Preferences / special Request:
-      ${suggestions||"None"}
-            Budget:
-          - Show cost for food, transport, attractions
-          - End with TOTAL DAY BUDGET (one clear number)
-        `;
-    } else {
-      description = `
-        Create a realistic ${days}-day itinerary for ${place}.
-        Traveler type: ${group}
-        Budget: ${budget}
-       
-        Transport: ${Transport}
-         Rules:
-          - Day-wise structured plan (Day 1, Day 2, etc.)
-          - Max 3–4 activities per day
-          - First day should be light, last day relaxed
-          - Include local food recommendations daily
-          - Suggest transport options between places
-          - Mention approximate daily cost (rough estimate)
-          - Consider weather and season
-          - Avoid unrealistic travel distances
-          - Clear headings and bullet points
+  // 👉 start AI request (do NOT await yet)
+  const aiPromise = generateTravelItinerary(place, detailLevel);
 
-        User Preferences / special Request:
-      ${suggestions || "None"}
-        Budget:
-          - Show DAILY estimated cost breakdown
-          - Include food, transport, attractions
-          - End with TOTAL TRIP COST (sum of all days)
-        `;
-    }
-
-    setLoading(true);
-    setTripSuggestions(null);
-    setActiveComponent("results");
+  // 👉 navigate AFTER 3 seconds
+  setTimeout(async () => {
     try {
-      const aiResponse = await generateTravelItinerary(description, detailLevel);
+      const aiResponse = await aiPromise;
 
-      setTripSuggestions({
+      const result = {
         text: aiResponse?.text || "",
-        itinerary: aiResponse?.itinerary || null
-      });
+      };
 
-      setApiStatus("available");
-      
+      // save fallback
+      localStorage.setItem("lastTripResult", JSON.stringify(result));
 
-      const saved = JSON.parse(localStorage.getItem("userTrips") || "[]");
-      saved.push({
-        id: Date.now(),
-        date: new Date().toISOString(),
-        description,
-        text: aiResponse.text,
+      navigate("/results", {
+        state: {
+          suggestions: result,
+          fromHome: true,   // optional flag
+        },
       });
-      localStorage.setItem("userTrips", JSON.stringify(saved));
     } catch {
-      setApiStatus("unavailable");
       alert("AI service unavailable");
+      navigate("/", { replace: true });
     } finally {
       setLoading(false);
     }
-  };
- const handleBlogClick = (slug) => {
-  if (slug === "admin") {
-    setActiveComponent("admin-blog");
-  } else {
-    setSelectedBlogSlug(slug);
-    setActiveComponent("blog-detail");
-  }
+  }, 3000);
 };
+
+
+
+  /* ================= RENDER PAGE ================= */
+  const renderPage = () => {
+    switch (activeComponent) {
+      case "distance":
+        return <DistanceCalculator onBack={() => setActiveComponent("home")} />;
+
+      case "itineraries":
+        return (
+          <ItineraryPage
+            onItineraryClick={(id) => {
+              setSelectedItineraryId(id);
+              setActiveComponent("itinerary-detail");
+            }}
+          />
+        );
+
+      case "itinerary-detail":
+        return <ItineraryDetail itineraryId={selectedItineraryId} />;
+
+      case "cities":
+        return (
+          <ExploreCities
+            onCityClick={(slug) => {
+              setSelectedCity(slug);
+              go(`/cities/${slug}`, "city");
+            }}
+          />
+        );
+
+      case "city":
+        return <CityPage slug={selectedCity} />;
+
+      case "packing":
+        return <PackingList />;
+
+      case "profile":
+        return <ProfilePage user={currentUser} onLogout={handleLogout} />;
+
+      case "saved":
+        return <SavedItineraries />;
+
+      case "blogs":
+        return <Blogs onBlogClick={(slug) => setSelectedBlogSlug(slug)} />;
+
+      case "blog-detail":
+        return <BlogDetail slug={selectedBlogSlug} />;
+
+      case "admin-blog":
+        return <AdminBlog />;
+
+      default:
+        return null;
+    }
+  };
 
 
 
@@ -241,29 +234,19 @@ function App() {
     <div className="App">
       <Header
       ref={headerRef}
-        variant={activeComponent === "home" ? "home" : "compact"}
+        variant={location.pathname === "/" ? "home" : "compact"}
         user={currentUser}
         onSignInClick={() => setShowSignIn(true)}
         onLogoutClick={handleLogout}
-        onHomeClick={() => setActiveComponent("home")}
-        onItinerariesClick={() => setActiveComponent("itineraries")}
-        onSavedClick={() => setActiveComponent("saved")}
-        onPackingListClick={() => setActiveComponent("packing")}
-        onProfileClick={() => setActiveComponent("profile")}
-        onBlogsClick={()=>setActiveComponent("blogs")}
+        onHomeClick={() => go("/", "home")}
+        onItinerariesClick={() => go("/itineraries", "itineraries")}
+        onSavedClick={() => go("/saved", "saved")}
+        onPackingListClick={() => go("/packing", "packing")}
+        onProfileClick={() => go("/profile", "profile")}
+        onBlogsClick={() => go("/blogs", "blogs")}
+
       />
-
-      <div
-        style={{
-          height:
-            activeComponent === "home"
-              ? headerHeight + 480   // 👈 extra space for hero
-              : headerHeight,
-        }}
-        className="transition-[height] duration-500"
-      />
-
-
+      
       {showSignIn && (
         <SignIn
           onClose={() => setShowSignIn(false)}
@@ -273,7 +256,7 @@ function App() {
 
       <main
               className={`px-2 lg:px- pb-24 overflow-hidden
-                ${activeComponent === "home" ? "bg-[#d7f26e]/80" : "bg-white"}
+                ${activeComponent === "home" ? "bg-[#d7f26e]" : "bg-white"}
               `}
             >
 
@@ -314,11 +297,11 @@ function App() {
         )}
         {/* HOME */}
         {activeComponent === "home" && (
-          <div className="max-w-[1400px] mx-auto space-y-24">
-            <div ref = {formCardRef} className=" bg-white
-              rounded-3xl
-              shadow-[0_10px_30px_rgba(0,0,0,0.12)]
-              px-8 py-6">
+          <>
+          <div className="w-full bg-white rounded-[80px] shadow-[0_10px_30px_rgba(0,0,0,0.12)]">
+            <div ref = {formCardRef} className="
+             max-w-[1400px] mx-auto px-8 md:px-20 py-10
+              ">
 
               {/* card header */}
                 <div className="text-center space-y-2 mb-10">
@@ -475,64 +458,60 @@ function App() {
                   </div>
                 )} */}
 
-  {/* ===== TRAVEL GROUP ===== */}
-  <div className="space-y-2">
-    <label className="text-sm font-medium text-gray-700">
-      Travel group
-    </label>
+              {/* ===== TRAVEL GROUP ===== */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">
+                  Travel group
+                </label>
 
-    <div className="grid grid-cols-4 gap-2">
-      {["Solo", "Couple", "Family", "Friends"].map((g) => (
-        <button
-          key={g}
-          type="button"
-          onClick={() => setGroup(g)}
-          className={`rounded-lg border px-3 py-2 text-sm transition
-            ${
-              group === g
-                ? "border-[#5b7c67] bg-[#5b7c67]/10 font-medium"
-                : "hover:bg-gray-50"
-            }`}
-        >
-          {g}
-        </button>
-      ))}
-    </div>
-  </div>
+                <div className="grid grid-cols-4 gap-2">
+                  {["Solo", "Couple", "Family", "Friends"].map((g) => (
+                    <button
+                      key={g}
+                      type="button"
+                      onClick={() => setGroup(g)}
+                      className={`rounded-lg border px-3 py-2 text-sm transition
+                        ${
+                          group === g
+                            ? "border-[#5b7c67] bg-[#5b7c67]/10 font-medium"
+                            : "hover:bg-gray-50"
+                        }`}
+                    >
+                      {g}
+                    </button>
+                  ))}
+                </div>
+              </div>
 
-  {/* ===== TRANSPORT ===== */}
-  {/* <div className="space-y-2">
-    <label className="text-sm font-medium text-gray-700">
-      Transport
-    </label>
-    <select
-      value={Transport}
-      onChange={(e) => setTransport(e.target.value)}
-      className="w-full rounded-lg border px-3 py-2 text-sm"
-    >
-      <option>Public transport</option>
-      <option>Rented car</option>
-      <option>Walking</option>
-    </select>
-  </div> */}
-</div>
+              {/* ===== TRANSPORT ===== */}
+              {/* <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">
+                  Transport
+                </label>
+                <select
+                  value={Transport}
+                  onChange={(e) => setTransport(e.target.value)}
+                  className="w-full rounded-lg border px-3 py-2 text-sm"
+                >
+                  <option>Public transport</option>
+                  <option>Rented car</option>
+                  <option>Walking</option>
+                </select>
+              </div> */}
+            </div>
 
-{/* ===== PREFERENCES ===== */}
-<div className="space-y-2 pb-2">
-  <label className="text-sm font-medium text-gray-700">
-    Special preferences (optional)
-  </label>
-  <input
-    value={suggestions}
-    onChange={(e) => setSuggestions(e.target.value)}
-    placeholder="Avoid crowds, cafes, photography spots..."
-    className="w-full rounded-lg border px-3 py-2 text-sm"
-  />
-</div>
-
-                         
-
-                          
+            {/* ===== PREFERENCES ===== */}
+            <div className="space-y-2 pb-2">
+              <label className="text-sm font-medium text-gray-700">
+                Special preferences (optional)
+              </label>
+              <input
+                value={suggestions}
+                onChange={(e) => setSuggestions(e.target.value)}
+                placeholder="Avoid crowds, cafes, photography spots..."
+                className="w-full rounded-lg border px-3 py-2 text-sm"
+              />
+            </div>           
                 {/* ===== Grid Fields ===== */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               </div>
@@ -556,256 +535,23 @@ function App() {
                   )}
                 </div>
               </form>
-
-              {/* <FeatureCards /> */}
-
-             
-
             </div>
-            {/* ===== AI FEEDBACK GLASS SECTION ===== */}
-<AiFeedbackBanner source="AI Planner" />
-
-           
-
-            {/* <TravelQuotes /> */}
-            {/* ===== FORM CARD 2 ===== */}
-                  <div className="bg-white rounded-[40px] p-8 md:p-12 shadow-xl space-y-12">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-                {/* CARD 1 */}
-               <div className="bg-[#6b8e23] text-white rounded-3xl p-6 flex items-center gap-6">
-
-                {/* LEFT — TEXT */}
-                <div className="w-1/2 space-y-2">
-                  <h4 className="text-xl font-semibold">
-                    AI-Generated Itineraries
-                  </h4>
-                  <p className="text-sm opacity-90">
-                    Instantly generate realistic, well-paced travel plans using AI.
-                    From a few hours to multi-day trips — customized by budget, pace,
-                    travel group, and season.
-                  </p>
-                </div>
-
-                {/* RIGHT — IMAGE */}
-                <div className="w-1/2 flex justify-center">
-                  <img
-                    src="/point.png"
-                    alt="AI Generated"
-                    className="w-28 md:w-32 opacity-90"
-                  />
-                </div>
-
-              </div>
-
-                {/* CARD 2 */}
-              
-            <div className="bg-[#6b8e23] text-white rounded-3xl p-6 flex items-center gap-6">
-
-                {/* LEFT — TEXT */}
-                <div className="w-1/2 space-y-2">
-                  <h4 className="text-xl font-semibold">
-                    Save Your Itineraries
-                  </h4>
-                  <p className="text-sm opacity-90">
-                    Save your favorite trips and access them anytime. Revisit past plans, compare journeys, and continue planning without starting from scratch.
-                  </p>
-                </div>
-
-                {/* RIGHT — IMAGE */}
-                <div className="w-1/2 flex justify-center">
-                  <img
-                    src="/map-location.png"
-                    alt="AI Generated"
-                    className="w-28 md:w-32 opacity-90"
-                  />
-                </div>
-
-              </div>
-                {/* CARD 3 */}
-               
-
-
-                <div className="bg-[#6b8e23] text-white rounded-3xl p-6 flex items-center gap-6">
-
-                {/* LEFT — TEXT */}
-                <div className="w-1/2 space-y-2">
-                  <h4 className="text-xl font-semibold">
-                    Explore with Maps & 360° Views
-                  </h4>
-                  <p className="text-sm opacity-90">
-                   Visualize your journey using interactive maps and Google 360° views. Explore locations before you travel and understand routes day-by-day.
-                  </p>
-                </div>
-
-                {/* RIGHT — IMAGE */}
-                <div className="w-1/2 flex justify-center">
-                  <img
-                    src="\360-camera.png"
-                    alt="AI Generated"
-                    className="w-28 md:w-32 opacity-90"
-                  />
-                </div>
-
-              </div>
-
-
-              <div className="bg-[#6b8e23] text-white rounded-3xl p-6 flex items-center gap-6">
-
-                {/* LEFT — TEXT */}
-                <div className="w-1/2 space-y-2">
-                  <h4 className="text-xl font-semibold">
-                    Smart Packing & Planning
-                  </h4>
-                  <p className="text-sm opacity-90">
-                                            Use built-in packing lists and day-wise plans to stay organized.
-                        Designed for real travel — not rushed, not generic.
-                  </p>
-                </div>
-
-                {/* RIGHT — IMAGE */}
-                <div className="w-1/2 flex justify-center">
-                  <img
-                    src="/passport.png"
-                    alt="AI Generated"
-                    className="w-28 md:w-32 opacity-90"
-                  />
-                </div>
-
-              </div>
-
-                {/* CARD 4 */}
-                
-                  
-              </div>
-             <FeatureCards  
-                onNavigate={(id) => {
-                  if (id === "distance") setActiveComponent("distance");
-                  if (id === "itineraries") setActiveComponent("itineraries");
-                  if (id === "packing") setActiveComponent("packing");
-                  if(id ==="cities") setActiveComponent("cities");
-                }}
-             />
-            </div>
-            <div className="text-center max-w-3xl mx-auto mb-12">
-              <h2 className="text-4xl md:text-4xl font-semibold text-gray-800">
-                Explore ready-made itineraries
-              </h2>
-
-              <p className="mt-3 text-gray-500 text-sm md:text-base">
-                Hand-crafted travel plans you can explore, customize, or use instantly.
-                Click any card to see the full day-by-day itinerary.
-              </p>
-            </div>
-              <ItinerarySlider
-              onItineraryClick={(id) => {
-                setSelectedItineraryId(id);
-                setActiveComponent("itinerary-detail");
-              }}
-              />
           </div>
-        )}
-
-          {activeComponent === "blogs" && (
-              <Blogs onBlogClick={handleBlogClick} />
-            )}
-
-
-
-          {activeComponent === "blog-detail" && (
-            <BlogDetail
-              slug={selectedBlogSlug}
-              onBack={() => setActiveComponent("blogs")}
+        
+            <AiFeedbackBanner source="AI Planner" />
+            <FeatureCards onNavigate={(id) => navigate(id)} />
+            <ItinerarySlider onItineraryClick={(id) => { setSelectedItineraryId(id); setActiveComponent("itinerary-detail");
+             }} 
             />
-          )}
-
-
-        {/* RESULTS */}
-        {activeComponent === "results" && (
-          <TripResults
-            suggestions={tripSuggestions}
-            loading={loading}
-            onClose={() => setActiveComponent("home")}
-          />
+          </>
         )}
 
-        {activeComponent === "admin-blog" && (
-          <AdminBlog onBack={() => setActiveComponent("blogs")} />
-        )}
-
-
-        {/* ITINERARIES */}
-        {activeComponent === "itineraries" && (
-          <ItineraryPage
-            onBack={() => setActiveComponent("home")}
-            onItineraryClick={(id) => {
-              setSelectedItineraryId(id);
-              setActiveComponent("itinerary-detail");
-            }}
-          />
-        )}
-
-        {/* ITINERARY DETAIL */}
-        {activeComponent === "itinerary-detail" && (
-          <ItineraryDetail
-            itineraryId={selectedItineraryId}
-            onBack={() => setActiveComponent("itineraries")}
-          />
-        )}
-
-        {activeComponent === "distance" && (
-          <div className="pt-28">
-          <DistanceCalculator
-            onBack={() => setActiveComponent("home")}
-          />
-          </div>
-        )}
-
-       {activeComponent === "cities" && (
-        <ExploreCities
-          onBack={() => setActiveComponent("home")}
-          onCityClick={(slug) => {
-            setSelectedCity(slug);        // ✅ save slug
-            setActiveComponent("city");  // ✅ switch page
-          }}
-        />
-      )}
-
-      {activeComponent === "city" && selectedCity && (
-        <CityPage
-          slug={selectedCity}
-          onBack={() => {
-            setSelectedCity(null);
-            setActiveComponent("cities");
-          }}
-           onItineraryClick={(id) => {
-          setSelectedItineraryId(id);   // "bali"
-          setActiveComponent("itinerary-detail");
-  }}
-  />
-)}
-       
-
-
-
-
-        {/* PROFILE */}
-        {activeComponent === "profile" && (
-          <ProfilePage
-            user={currentUser}
-            onBack={() => setActiveComponent("home")}
-            onLogout={handleLogout}
-            onPackingListClick={() => setActiveComponent("packing")}
-          />
-        )}
-
-        {activeComponent === "saved" && <SavedItineraries />}
-        {activeComponent === "packing" && <PackingList />}
+        {activeComponent !== "home" && activeComponent !== "results" &&  renderPage()}
       </main>
-        <FaqSection />
-      <Footer />
+        
+      {activeComponent==="home" && <FaqFooterSection />}
     </div>
   );
 }
 
-export default App;
+export default App;   

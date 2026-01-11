@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 // import '../styles/ItineraryPage.css';
+import { useNavigate } from  "react-router-dom";
 
 const getImageUrl = (url, width = 400) => {
   if (!url) {
@@ -18,8 +19,8 @@ const getImageUrl = (url, width = 400) => {
 
 
 
-const ItineraryPage = ({ onBack, onItineraryClick, onViewSaved }) => {
-  // Sample popular itineraries data
+const ItineraryPage = () => {
+  const navigate=useNavigate();
   const [popularItineraries] = useState([
   {
     id: 1,
@@ -1170,13 +1171,14 @@ const ItineraryPage = ({ onBack, onItineraryClick, onViewSaved }) => {
   }, []);
 
   // Function to handle itinerary click
-  const handleItineraryClick = (itinerary) => {
+ const handleItineraryClick = (itinerary) => {
   if (!itinerary.citySlug) {
     console.error("Missing citySlug for:", itinerary.title);
     return;
   }
-  onItineraryClick(itinerary.citySlug);
+  navigate(`/itineraries/${itinerary.citySlug}`);
 };
+
 
 
   // Toggle save itinerary
@@ -1243,33 +1245,28 @@ if (loading) {
 
 
  return (
-    <section className="bg-[#f6f8f5] px-4 pt-24 pb-24 overflow-hidden">
-      {/* <span className="absolute top-20 right-20 text-6xl opacity-30 rotate-12 z-0">
-    ✈️
-  </span> */}
-
-      {/* <div className="absolute bottom-32 right-16 w-56 h-56
-                bg-[#5b7c67]/80 rounded-full blur-3xl" /> */}
+    <section className="bg-[#f6f8f5] px-4 pt-4 pb-20 overflow-hidden ">
       <div className=" relative x-10 max-w-5xl mx-auto space-y-10">
 
         {/* ===== HEADER BAR ===== */}
         <div className="flex items-center justify-between">
           <button
-            onClick={onBack}
+            onClick={() =>navigate("/")}
             className="text-sm font-medium text-black hover:underline"
           >
             ← Back to Home
           </button>
 
-          {savedCount > 0 && onViewSaved && (
+         {savedCount > 0 && (
             <button
-              onClick={onViewSaved}
+              onClick={() => navigate("/saved")}
               className="rounded-full bg-[#5b7c67] px-4 py-2
-                         text-white text-sm font-medium"
+                        text-white text-sm font-medium"
             >
               ⭐ View Saved ({savedCount})
             </button>
           )}
+
         </div>
 
         {/* ===== HERO CARD ===== */}
@@ -1389,15 +1386,16 @@ if (loading) {
             later quickly.
           </p>
 
-          {savedCount > 0 && onViewSaved && (
+          {savedCount > 0 && (
             <button
-              onClick={onViewSaved}
+              onClick={() => navigate("/saved")}
               className="mt-4 rounded-full border px-6 py-3
-                         text-sm font-medium hover:bg-gray-50"
+                        text-sm font-medium hover:bg-gray-50"
             >
               ⭐ View All Saved Itineraries ({savedCount})
             </button>
           )}
+
         </div>
 
       </div>

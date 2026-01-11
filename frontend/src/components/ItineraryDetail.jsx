@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { detailedItineraries } from "../data/itinerary";
 import { fetchItineraryBySlug } from "../services/api";
+
 
 /* ===== 360 STREET VIEW (NO API KEY) ===== */
 const StreetView360 = ({ place }) => {
@@ -21,7 +23,9 @@ const StreetView360 = ({ place }) => {
   );
 };
 
-const ItineraryDetail = ({ itineraryId, onBack }) => {
+const ItineraryDetail = () => {
+  const { slug } = useParams();
+  const navigate=useNavigate();
   /* ===== STATE ===== */
   const [itineraryDetails, setItineraryDetails] = useState(null);
   const [activeTab, setActiveTab] = useState("overview");
@@ -33,13 +37,14 @@ useEffect(() => {
   const loadItinerary = async () => {
     try {
       const staticData = Object.values(detailedItineraries).find(
-  (it) => it.citySlug === itineraryId
-);
+        (it) => it.citySlug === slug
+      );
+
 
       if (staticData) {
         setItineraryDetails(staticData);
       } else {
-        const dbData = await fetchItineraryBySlug(itineraryId);
+        const dbData = await fetchItineraryBySlug(slug);
         setItineraryDetails(dbData);
       }
     } catch (err) {
@@ -53,7 +58,7 @@ useEffect(() => {
   };
 
   loadItinerary();
-}, [itineraryId]);
+}, [slug]);
 
 
   /* ===== 360 PLACES ===== */
@@ -105,25 +110,30 @@ useEffect(() => {
   if (!itineraryDetails) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
-        <button onClick={onBack} className="rounded-full border px-6 py-2">
+        <button
+          onClick={() => navigate(-1)}
+          className="rounded-full border px-6 py-2"
+        >
           ← Back
         </button>
+
       </div>
     );
   }
 
   return (
-    <section className="bg-[#fdfcf7] px-4 pt-24 pb-24">
+    <section className="bg-[#fdfcf7] px-4 pb-24">
       <div className="max-w-5xl mx-auto space-y-12">
 
         {/* ===== HERO / GUIDE HEADER ===== */}
         <div className="bg-white rounded-[32px] shadow-lg p-8 space-y-6 relative">
-          <button
-            onClick={onBack}
-            className="absolute top-6 left-6 text-sm text-gray-600 hover:underline"
-          >
-            ← Back
-          </button>
+         <button
+          onClick={() => navigate(-1)}
+          className="absolute top-6 left-6 text-sm text-gray-600 hover:underline"
+        >
+          ← Back
+        </button>
+
 
           <p className="text-xs uppercase tracking-widest text-gray-500 pt-6">
             Your Complete Travel Guide

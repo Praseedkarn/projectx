@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-
-const Blogs = ({ onBlogClick }) => {
+import { useNavigate } from "react-router-dom";
+const Blogs = () => {
+  const navigate=useNavigate();
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const isAdmin = localStorage.getItem("isAdmin") === "true";
@@ -43,7 +44,7 @@ const Blogs = ({ onBlogClick }) => {
         {isAdmin && (
           <div className="flex justify-end">
             <button
-              onClick={() => onBlogClick("admin")}
+              onClick={() => navigate("/blogs/admin")}
               className="rounded-full bg-[#5b7c67]
                         px-5 py-2 text-white text-sm
                         font-medium shadow-md
@@ -65,7 +66,7 @@ const Blogs = ({ onBlogClick }) => {
             {blogs.map((blog) => (
               <button
                 key={blog._id}
-                onClick={() => onBlogClick(blog.slug)}
+                onClick={() => navigate(`blogs/${blog.slug}`)}
                 className="text-left group bg-white rounded-[28px] shadow-lg
                            overflow-hidden hover:-translate-y-1 transition"
               >

@@ -10,7 +10,7 @@ const highlights = [
     image: "https://plus.unsplash.com/premium_vector-1711987817831-55bfbf7200a6?w=352&dpr=2&h=367&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
   },
   {
-    id:"distance",
+    id: "distance",
     icon: "📏",
     title: "Distance & Transport Aware",
     desc: "Smart travel flow with realistic distances, routes, and transport suggestions that actually make sense.",
@@ -18,7 +18,7 @@ const highlights = [
     image: "https://images.unsplash.com/photo-1535745122259-f1e187953c4c?w=1000&auto=format&fit=crop&q=60",
   },
   {
-    id:"packing",
+    id: "packing",
     icon: "🎒",
     title: "Smart Packing Lists",
     desc: "Never forget essentials. Packing lists auto-adjust based on destination, duration, and travel style.",
@@ -37,8 +37,8 @@ const highlights = [
 
 export default function FeatureCards({ onNavigate }) {
   return (
-    <section className="bg-transparent py-28">
-      <div className="max-w-6xl  mx-auto px-6 space-y-32">
+    <section className="bg-white py-32">
+      <div className="max-w-6xl mx-auto px-6 space-y-32">
 
         {/* Section header */}
         <motion.div
@@ -53,61 +53,52 @@ export default function FeatureCards({ onNavigate }) {
           </h2>
         </motion.div>
 
-        {/* Highlight rows */}
+        {/* Feature rows */}
         {highlights.map((h, i) => (
           <motion.div
-            key={i}
+            key={h.id}
             initial={{ opacity: 0, y: 60 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: i * 0.15 }}
+            transition={{ duration: 0.8, delay: i * 0.12 }}
             viewport={{ once: true }}
-            className={`flex flex-col md:flex-row items-center gap-20
-              ${i % 2 !== 0 ? "md:flex-row-reverse" : ""}
-            `}
+            className="flex flex-col md:flex-row items-center gap-20"
           >
             {/* TEXT */}
-            <motion.div
-              initial={{ opacity: 0, x: i % 2 === 0 ? -50 : 50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-              viewport={{ once: true }}
-              className="md:w-1/2 space-y-5"
-            >
-              <h3 className="text-lg font-semibold text-[#6b8e23]">
+            <div className="md:w-1/2 max-w-md space-y-4">
+              <h3 className="text-[15px] font-semibold tracking-wide text-[#6b8e23]">
                 {h.icon} {h.title}
               </h3>
 
-              <p className="text-sm md:text-base text-gray-600 leading-relaxed max-w-md">
+              <p className="text-[14px] text-gray-600 leading-relaxed">
                 {h.desc}
               </p>
 
-             <button
-                    onClick={() => {
-                       onNavigate(h.id)
-                    }}
-                    className="text-sm font-medium text-[#5b7c67] hover:text-[#4a6a58] flex items-center gap-2"
-                    >
-                    {h.action} <span>→</span>
-                    </button>
+              <button
+                onClick={() => onNavigate(`/${h.id}`)}
+                className="text-sm font-medium text-[#5b7c67] hover:text-[#4a6a58] flex items-center gap-2"
+              >
+                {h.action} <span>→</span>
+              </button>
+            </div>
 
-            </motion.div>
-
-            {/* IMAGE */}
-            <motion.div
-              initial={{ opacity: 0, x: i % 2 === 0 ? 50 : -50, scale: 0.95 }}
-              whileInView={{ opacity: 1, x: 0, scale: 1 }}
-              transition={{ duration: 0.8 }}
-              viewport={{ once: true }}
-              className="md:w-1/2 flex justify-center"
-            >
-              <div className="w-[340px] h-[240px] rounded-2xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.12)]">
+            {/* IMAGE CARD — CLASSIC STYLE */}
+            <div className="md:w-1/2 flex justify-center">
+              <div
+                className="
+                  w-[360px] h-[240px]
+                  rounded-xl
+                  overflow-hidden
+                  bg-[#faf8f3]
+                  border border-[#e6e2d9]
+                "
+              >
                 <img
                   src={h.image}
                   alt={h.title}
                   className="w-full h-full object-cover"
                 />
               </div>
-            </motion.div>
+            </div>
           </motion.div>
         ))}
       </div>

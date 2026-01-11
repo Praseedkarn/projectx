@@ -1,11 +1,12 @@
 import { useState , useEffect } from "react";
 import { cities } from "../data/cities";
-
+import { useNavigate } from "react-router-dom";
 const ITEMS_PER_PAGE = 9;
 const optimizeUnsplash = (url, width = 400) =>
   `${url}&w=${width}&auto=format&fit=crop&q=60`;
 
-export default function ExploreCities({ onBack, onCityClick }) {
+export default function ExploreCities() {
+  const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -55,7 +56,7 @@ if (loading) {
         {/* HEADER */}
         <div className="flex items-center justify-between">
           <button
-            onClick={onBack}
+            onClick={()=> navigate("/")}
             className="text-sm font-medium text-black hover:underline"
           >
             ← Back to Home
@@ -88,7 +89,7 @@ if (loading) {
           {paginatedCities.map((city) => (
             <div
               key={city._id || city.id}
-              onClick={() => onCityClick(city.slug)}
+              onClick={() => navigate(`/cities/${city.slug}`)}
               className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition cursor-pointer"
             >
              <div className="h-40 w-full bg-gray-200 overflow-hidden">

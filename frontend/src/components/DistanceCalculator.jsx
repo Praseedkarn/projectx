@@ -1,25 +1,27 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-export default function DistanceCalculator({ onBack }) {
+export default function DistanceCalculator() {
+  const navigate = useNavigate();
+
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
   const [mode, setMode] = useState("driving");
 
-const openGoogleMaps = () => {
-  if (!from || !to) {
-    alert("Please enter both locations");
-    return;
-  }
+  const openGoogleMaps = () => {
+    if (!from || !to) {
+      alert("Please enter both locations");
+      return;
+    }
 
-  const url =
-    `https://www.google.com/maps/dir/?api=1` +
-    `&origin=${encodeURIComponent(from)}` +
-    `&destination=${encodeURIComponent(to)}` +
-    `&travelmode=${mode}`;
+    const url =
+      `https://www.google.com/maps/dir/?api=1` +
+      `&origin=${encodeURIComponent(from)}` +
+      `&destination=${encodeURIComponent(to)}` +
+      `&travelmode=${mode}`;
 
-  window.open(url, "_blank");
-};
-
+    window.open(url, "_blank");
+  };
 
   return (
     <div className="max-w-xl mx-auto bg-white rounded-3xl p-8 shadow-xl space-y-6">
@@ -29,7 +31,7 @@ const openGoogleMaps = () => {
           Distance Calculator
         </h2>
         <button
-          onClick={onBack}
+          onClick={() => navigate(-1)}
           className="text-sm text-gray-500 hover:text-gray-700"
         >
           ← Back

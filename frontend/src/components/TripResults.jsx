@@ -1,7 +1,16 @@
 import React, { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { QRCodeCanvas } from "qrcode.react";
 
-const TripResults = ({ suggestions, loading, onClose }) => {
+const TripResults = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  /* ================= GET DATA SAFELY ================= */
+  const suggestions =
+    location.state?.suggestions ||
+    JSON.parse(localStorage.getItem("lastTripResult"));
+
   const messages = [
     "Understanding your preferences…",
     "Analyzing routes & distances…",
@@ -11,34 +20,43 @@ const TripResults = ({ suggestions, loading, onClose }) => {
   ];
 
   const [step, setStep] = useState(0);
+  const [loading, setLoading] = useState(!suggestions);
 
-  // typing + content states
   const [isTyping, setIsTyping] = useState(false);
   const [displayText, setDisplayText] = useState("");
   const [finalText, setFinalText] = useState("");
   const [isEditing, setIsEditing] = useState(false);
+
   const [qrTripId, setQrTripId] = useState(null);
   const [qrLoading, setQrLoading] = useState(false);
   const [qrError, setQrError] = useState("");
 
-  /* ================= LOADING TEXT ROTATION ================= */
+  /* ================= HARD REDIRECT IF NOTHING ================= */
+  useEffect(() => {
+    if (!suggestions) {
+      navigate("/", { replace: true });
+    }
+  }, [suggestions, navigate]);
+
+  /* ================= LOADING TEXT ================= */
   useEffect(() => {
     if (!loading) return;
+
     const interval = setInterval(() => {
       setStep((prev) => (prev + 1) % messages.length);
-    }, 3000);
+    }, 2500);
+
     return () => clearInterval(interval);
   }, [loading]);
 
-  /* ================= START TYPING AFTER LOADING ================= */
+  /* ================= TYPE EFFECT ================= */
   useEffect(() => {
-    if (loading) return;
-
     if (!suggestions?.text) return;
 
+    setLoading(false);
     setIsTyping(true);
-    setDisplayText("");
     setFinalText("");
+    setDisplayText("");
     setIsEditing(false);
 
     const lines = suggestions.text.split("\n");
@@ -46,8 +64,7 @@ const TripResults = ({ suggestions, loading, onClose }) => {
 
     const typingInterval = setInterval(() => {
       index++;
-      const current = lines.slice(0, index).join("\n");
-      setDisplayText(current);
+      setDisplayText(lines.slice(0, index).join("\n"));
 
       if (index >= lines.length) {
         clearInterval(typingInterval);
@@ -55,207 +72,125 @@ const TripResults = ({ suggestions, loading, onClose }) => {
         setDisplayText("");
         setIsTyping(false);
       }
-    }, 80); // FAST: line-by-line typing
+    }, 80);
 
     return () => clearInterval(typingInterval);
-  }, [loading, suggestions]);
+  }, [suggestions]);
 
+  /* ================= QR ================= */
   const handleGenerateQR = async () => {
-  if (!finalText || qrLoading) return;
+    if (!finalText || qrLoading) return;
 
-  setQrLoading(true);
-  setQrError("");
+    setQrLoading(true);
+    setQrError("");
 
-  try {
-    const res = await fetch("http://localhost:5001/api/qr-trips", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ text: finalText }),
-    });
+    try {
+      const res = await fetch("http://localhost:5001/api/qr-trips", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: finalText }),
+      });
 
-    const data = await res.json();
+      const data = await res.json();
+      if (!res.ok) throw new Error();
 
-    if (!res.ok) {
-      throw new Error(data.message || "Failed to generate QR");
+      setQrTripId(data.qrTripId);
+    } catch {
+      setQrError("Failed to generate QR. Try again.");
+    } finally {
+      setQrLoading(false);
     }
-
-    setQrTripId(data.qrTripId);
-  } catch (err) {
-    setQrError("Failed to generate QR. Try again.");
-  } finally {
-    setQrLoading(false);
-  }
-};
-
-
+  };
 
   /* ================= LOADING SCREEN ================= */
   if (loading) {
     return (
-      <div className="min-h-screen pt-24 flex items-center justify-center px-4">
-        <div className="bg-white rounded-3xl shadow-xl p-8 text-center space-y-6 max-w-md w-full">
+      <div className="min-h-screen pt-24 flex items-center justify-center">
+        <div className="bg-white p-8 rounded-3xl shadow-xl text-center space-y-4">
           <div className="w-14 h-14 border-4 border-[#5b7c67]/30
                           border-t-[#5b7c67]
                           rounded-full animate-spin mx-auto" />
-
-          <p className="text-lg font-semibold text-gray-800">
-            ✨ Planning your trip
-          </p>
-
-          <p className="text-sm text-gray-600">
-            {messages[step]}
-          </p>
-
-          <p className="text-xs text-gray-400">
-            This may take a few seconds…
-          </p>
+          <p className="font-semibold">✨ Planning your trip</p>
+          <p className="text-sm text-gray-500">{messages[step]}</p>
         </div>
       </div>
     );
   }
 
-  /* ================= NO DATA ================= */
-  if (!suggestions?.text) {
-    return (
-      <div className="pt-24 text-center text-gray-600">
-        No itinerary generated.
-      </div>
-    );
-  }
-
-  /* ================= MAIN RESULT ================= */
+  /* ================= RESULT ================= */
   return (
-    <div className="min-h-screen pt-24">
-      <div className="max-w-4xl mx-auto px-4 space-y-6">
+    <div className="min-h-screen pt-24 px-4">
+      <div className="max-w-4xl mx-auto space-y-6">
 
-        {/* Header */}
-        <div className="bg-white rounded-3xl shadow-lg p-6 flex justify-between items-center">
-          <h2 className="text-xl md:text-2xl font-semibold text-gray-800">
-            Your AI Travel Plan
-          </h2>
-          <button
-            onClick={onClose}
-            className="text-2xl text-gray-400 hover:text-gray-700"
-          >
-            ×
-          </button>
+        {/* HEADER */}
+        <div className="bg-white p-6 rounded-3xl shadow flex justify-between">
+          <h2 className="text-xl font-semibold">Your AI Travel Plan</h2>
+          <button onClick={() => navigate("/")}>✕</button>
         </div>
 
-        {/* Content Card */}
-        <div className="bg-white rounded-3xl shadow-lg p-6 space-y-4">
-
-          {/* Action Buttons */}
-          <div className="flex justify-end gap-3">
+        {/* CONTENT */}
+        <div className="bg-white p-6 rounded-3xl shadow space-y-4">
+          <div className="flex justify-end">
             {!isEditing ? (
               <button
-                disabled={isTyping || !finalText}
+                disabled={isTyping}
                 onClick={() => setIsEditing(true)}
-                className={`px-4 py-2 text-sm rounded-lg transition
-                  ${isTyping || !finalText
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-slate-800 text-white hover:bg-slate-700"
-                  }`}
+                className="bg-slate-800 text-white px-4 py-2 rounded"
               >
                 ✏️ Edit
               </button>
             ) : (
               <button
                 onClick={() => setIsEditing(false)}
-                className="px-4 py-2 text-sm rounded-lg
-                           bg-emerald-600 text-white
-                           hover:bg-emerald-500 transition"
+                className="bg-emerald-600 text-white px-4 py-2 rounded"
               >
                 ✅ Save
               </button>
-
-              
             )}
-            
           </div>
 
-          {/* Typing View */}
           {isTyping && (
-            <pre
-              className="bg-slate-50 border border-slate-200 rounded-xl
-                         p-5 text-slate-700 text-[15px]
-                         leading-[1.7] font-serif
-                         whitespace-pre-wrap break-words
-                         min-h-[300px]"
-            >
+            <pre className="bg-slate-50 p-5 rounded-xl whitespace-pre-wrap">
               {displayText}
               <span className="animate-pulse">▍</span>
             </pre>
           )}
 
-          {/* View Mode */}
           {!isTyping && !isEditing && (
-            <pre
-              className="bg-slate-50 border border-slate-200 rounded-xl
-                         p-5 text-slate-700 text-[15px]
-                         leading-[1.7] font-serif
-                         whitespace-pre-wrap break-words
-                         min-h-[300px]"
-            >
+            <pre className="bg-slate-50 p-5 rounded-xl whitespace-pre-wrap">
               {finalText}
             </pre>
           )}
 
-          {/* Edit Mode */}
-          {!isTyping && isEditing && (
+          {isEditing && (
             <textarea
               value={finalText}
               onChange={(e) => setFinalText(e.target.value)}
-              className="w-full min-h-[300px]
-                         bg-white border border-slate-300
-                         rounded-xl p-4 text-[15px]
-                         leading-[1.7] font-serif
-                         focus:outline-none focus:ring-2
-                         focus:ring-slate-400"
+              className="w-full min-h-[300px] border rounded-xl p-4"
             />
           )}
-
         </div>
+
+        {/* QR */}
         <button
-  onClick={handleGenerateQR}
-  disabled={!finalText || isEditing || qrLoading}
-  className={`px-4 py-2 text-sm rounded-lg transition
-    ${(!finalText || isEditing || qrLoading)
-      ? "bg-gray-400 cursor-not-allowed"
-      : "bg-indigo-600 text-white hover:bg-indigo-500"
-    }`}
->
-  {qrLoading ? "Generating QR..." : "📱 Generate QR"}
-</button>
+          onClick={handleGenerateQR}
+          disabled={!finalText || isEditing || qrLoading}
+          className="bg-indigo-600 text-white px-4 py-2 rounded"
+        >
+          {qrLoading ? "Generating QR..." : "📱 Generate QR"}
+        </button>
 
-{qrTripId && (
-  <div className="mt-6 flex flex-col items-center gap-3">
-    <QRCodeCanvas
-      value={`http://localhost:3000/qr-trip/${qrTripId}`}
-      size={220}
-    />
-
-    <p className="text-sm text-gray-600">
-      Scan to view itinerary anytime
-    </p>
-
-    <p className="text-xs text-gray-400 break-all">
-      http://localhost:3000/qr-trip/{qrTripId}
-    </p>
-  </div>
-)}
-
-
-        <div className="text-center text-xs text-gray-500">
-          ✨ Generated by AI. Content may vary.
-        </div>
-
+        {qrTripId && (
+          <div className="flex flex-col items-center">
+            <QRCodeCanvas
+              value={`${window.location.origin}/qr-trip/${qrTripId}`}
+              size={220}
+            />
+          </div>
+        )}
       </div>
     </div>
   );
 };
-
-
 
 export default TripResults;

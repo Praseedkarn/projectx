@@ -1,124 +1,92 @@
-import React, { useState ,useEffect , forwardRef } from "react";
+import React, { useState, useEffect, forwardRef } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 
-const Header = ({
-  user,
-  variant = "home", // "home" | "compact"
-  onSignInClick,
-  onLogoutClick,
-  onProfileClick,
-  onHomeClick,
-  onItinerariesClick,
-  onSavedClick,
-  onPackingListClick,
-  onBlogsClick,
-},ref) => {
-  
+const Header = forwardRef(({ user, variant = "home", onSignInClick, onLogoutClick }, ref) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
-  const [hideHeader , setHideHeader ]=useState(false);
-  const [lastScrollY ,setLastScrollY ]=useState(0);
-  const [lastRevealY , setLastRevealY]=useState(0);
-  const [showHero , setShowHero]=useState(true);
+  const [hideHeader, setHideHeader] = useState(false);
+  const [lastScrollY, setLastScrollY] = useState(0);
+  const [showHero, setShowHero] = useState(true);
 
   const closeAllMenus = () => {
     setIsMenuOpen(false);
     setShowProfileMenu(false);
   };
 
-  /* ===== SAFE NAVIGATION HANDLERS ===== */
-  const go = (fn) => {
-    closeAllMenus();
-    fn && fn();
-  };
+  /* ===== SCROLL BEHAVIOUR ===== */
+  useEffect(() => {
+    let ticking = false;
 
-useEffect(() => {
-  let ticking = false;
+    const handleScroll = () => {
+      if (ticking) return;
 
-  const handleScroll = () => {
-    if (ticking) return;
+      window.requestAnimationFrame(() => {
+        const currentY = window.scrollY;
 
-    window.requestAnimationFrame(() => {
-      const currentY = window.scrollY;
+        if (currentY > lastScrollY && currentY > 80) {
+          setHideHeader(true);
+        } else {
+          setHideHeader(false);
+        }
 
-      // HEADER HIDE / SHOW
-      if (currentY > lastScrollY && currentY > 80) {
-        setHideHeader(true);
-      } else {
-        setHideHeader(false);
-      }
+        if (currentY < 100) setShowHero(true);
+        else if (currentY > 160) setShowHero(false);
 
-      // HERO VISIBILITY (with buffer)
-      if (currentY < 100) {
-        setShowHero(true);
-      } else if (currentY > 160) {
-        setShowHero(false);
-      }
+        setLastScrollY(currentY);
+        ticking = false;
+      });
 
-      setLastScrollY(currentY);
-      ticking = false;
-    });
+      ticking = true;
+    };
 
-    ticking = true;
-  };
-
-  window.addEventListener("scroll", handleScroll, { passive: true });
-  return () => window.removeEventListener("scroll", handleScroll);
-}, [lastScrollY]);
-
-  
-
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [lastScrollY]);
 
   return (
-    <header 
-    ref={ref}
-    className={` fixed top-0 left-0 w-full z-50
-  transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]
-  ${hideHeader ? "-translate-y-full" : "translate-y-0"}`}>
+    <header
+      ref={ref}
+      className={`fixed top-0 left-0 w-full z-50 transition-transform duration-500
+        ${hideHeader ? "-translate-y-full" : "translate-y-0"}`}
+    >
       <div
-  className={`relative bg-[#fdfcf7] px-6 pt-5 
-  transition-[max-height,padding] duration-500
-  ease-[cubic-bezier(0.22,1,0.36,1)]
-  ${
-    variant === "home" && showHero
-      ? "rounded-b-[72px] pb-24 max-h-[520px]"
-      : "pb-6 max-h-[88px]"
-  }`}
->
-
+        className={`relative bg-[#fdfcf7] px-6 pt-5 transition-all duration-500
+          ${
+            variant === "home" && showHero
+              ? "rounded-b-[72px] pb-24 max-h-[520px]"
+              : "pb-9 max-h-[95px]"
+          }`}
+      >
         {/* ===== TOP BAR ===== */}
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           {/* LOGO */}
           <button
-            onClick={() => go(onHomeClick)}
+            onClick={() => {
+              closeAllMenus();
+              navigate("/");
+            }}
             className="flex items-center gap-3"
           >
-            {/* TEXT FIRST */}
-            <span className="font-heading italic text-3xl md:text-4xl
-               text-[#5b6f00] tracking-wide">
+            <span className="italic text-3xl md:text-4xl text-[#5b6f00]">
               PROJECT
             </span>
-
-            {/* LOGO IMAGE */}
-            <img
-              src="/logo.png"
-              alt="Project X logo"
-              className="w-8 h-8 md:w-9 md:h-9
-               transition-transform duration-300
-               group-hover:scale-110"
-            />
+            <img src="/logo.png" alt="logo" className="w-8 h-8" />
           </button>
 
-
           {/* DESKTOP NAV */}
-          <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-[#5b6f00]">
-            <button onClick={() => go(onHomeClick)}>Home</button>
-            <button onClick={() => go(onBlogsClick)}>Blogs</button>
+          <nav className="hidden md:flex gap-6 text-sm font-medium text-[#5b6f00]">
+            <button onClick={() => navigate("/")}>Home</button>
+            <button onClick={() => navigate("/blogs")}>Blogs</button>
+
             {user && (
               <>
-                <button onClick={() => go(onItinerariesClick)}>
+                <button onClick={() => navigate("/itineraries")}>
                   Itineraries
                 </button>
-                <button onClick={() => go(onSavedClick)}>Saved</button>
+                <button onClick={() => navigate("/saved")}>Saved</button>
               </>
             )}
 
@@ -134,12 +102,12 @@ useEffect(() => {
                   e.stopPropagation();
                   setShowProfileMenu((p) => !p);
                 }}
-                className="flex items-center gap-2 px-3 py-1.5 border border-[#5b6f00]/30 rounded-full"
+                className="flex items-center gap-2 px-3 py-1.5 border rounded-full"
               >
-                <span className="w-7 h-7 rounded-full bg-[#5b6f00]/10 flex items-center justify-center font-semibold">
+                <span className="w-7 h-7 rounded-full bg-[#5b6f00]/10 flex items-center justify-center">
                   {user.name?.[0]?.toUpperCase() || "U"}
                 </span>
-                <span className="hidden sm:block text-sm">{user.name}</span>
+                <span className="hidden sm:block">{user.name}</span>
               </button>
             ) : (
               <button
@@ -152,29 +120,20 @@ useEffect(() => {
 
             {/* PROFILE MENU */}
             {showProfileMenu && user && (
-              <div className="absolute right-0 top-12 z-[9999]
-                w-56 rounded-xl border
-                bg-white/95 backdrop-blur-md
-                shadow-2xl
-                max-h-[70vh]
-                 overflow-y-auto
-                ">
+              <div className="absolute right-0 top-12 w-56 rounded-xl border bg-white shadow-xl">
                 <div className="px-4 py-3">
                   <p className="font-semibold">{user.name}</p>
                   <p className="text-xs text-gray-500">{user.email}</p>
                 </div>
                 <div className="border-t">
-                  <button onClick={() => go(onProfileClick)} className="menu-item">
+                  <button onClick={() => navigate("/profile")} className="menu-item">
                     My profile
                   </button>
-                  <button
-                    onClick={() => go(onPackingListClick)}
-                    className="menu-item"
-                  >
+                  <button onClick={() => navigate("/packing")} className="menu-item">
                     Packing list
                   </button>
                   <button
-                    onClick={() => go(onLogoutClick)}
+                    onClick={onLogoutClick}
                     className="menu-item text-red-600"
                   >
                     Logout
@@ -183,56 +142,50 @@ useEffect(() => {
               </div>
             )}
 
-            {/* MOBILE BUTTON */}
+            {/* MOBILE MENU BUTTON */}
             <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsMenuOpen((p) => !p);
-              }}
-              className="md:hidden w-9 h-9 rounded-full border flex items-center justify-center"
+              onClick={() => setIsMenuOpen((p) => !p)}
+              className="md:hidden w-9 h-9 rounded-full border"
             >
               ☰
             </button>
 
             {/* MOBILE MENU */}
             {isMenuOpen && (
-              <div className="absolute right-0 top-12 z-[9999]
-                  w-60 rounded-xl border
-                  bg-white/95 backdrop-blur-md
-                  shadow-2xl
-                  p-3
-                  max-h-[75vh]
-                  overflow-y-auto
-                  overscroll-contain
-                  ">
-                <button onClick={() => go(onHomeClick)} className="menu-item">
+              <div className="absolute right-0 top-12 w-60 rounded-xl border bg-white p-3 shadow-xl">
+                <button onClick={() => navigate("/")} className="menu-item">
                   Home
                 </button>
+                <button onClick={() => navigate("/blogs")} className="menu-item">
+                  Blogs
+                </button>
+
                 {user && (
                   <>
                     <button
-                      onClick={() => go(onItinerariesClick)}
+                      onClick={() => navigate("/itineraries")}
                       className="menu-item"
                     >
                       Itineraries
                     </button>
                     <button
-                      onClick={() => go(onSavedClick)}
+                      onClick={() => navigate("/saved")}
                       className="menu-item"
                     >
                       Saved
                     </button>
                     <button
-                      onClick={() => go(onPackingListClick)}
+                      onClick={() => navigate("/packing")}
                       className="menu-item"
                     >
                       Packing list
                     </button>
                   </>
                 )}
+
                 {user && (
                   <button
-                    onClick={() => go(onLogoutClick)}
+                    onClick={onLogoutClick}
                     className="menu-item text-red-600"
                   >
                     Logout
@@ -242,8 +195,7 @@ useEffect(() => {
             )}
           </div>
         </div>
-        {/* ✈️ DECORATIVE IMAGE */}
-{variant === "home" && (
+        {variant === "home" && (
   <img
     src="/airplane.png"
     alt="Travel path"
@@ -260,8 +212,6 @@ useEffect(() => {
     "
   />
 )}
-
-{/* ✈️ RIGHT DECORATIVE IMAGE */}
 {variant === "home" && (
   <img
     src="/t.png"
@@ -281,35 +231,25 @@ useEffect(() => {
 )}
 
 
-
-
         {/* ===== HERO (HOME ONLY) ===== */}
-       {variant === "home" && (
-
-        
-        <div
-          className={`mt-28 text-center max-w-3xl mx-auto
-            transition-all duration-500
-            ease-[cubic-bezier(0.22,1,0.36,1)]
-            ${
-              showHero
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 -translate-y-6 pointer-events-none"
-            }`}
-        >
-
-          <h1 className="text-4xl md:text-6xl font-semibold italic text-[#5b6f00]">
-            Off the beaten path
-          </h1>
-          <p className="mt-4 text-lg italic text-gray-500">
-            thoughtful trips built around how you travel
-          </p>
-          
-        </div>
-
-
-      )}
-        </div>
+        {variant === "home" && (
+          <div
+            className={`mt-28 text-center max-w-3xl mx-auto transition-all duration-500
+              ${
+                showHero
+                  ? "opacity-100 translate-y-0"
+                  : "opacity-0 -translate-y-6 pointer-events-none"
+              }`}
+          >
+            <h1 className="text-4xl md:text-6xl italic text-[#5b6f00]">
+              Off the beaten path
+            </h1>
+            <p className="mt-4 text-lg italic text-gray-500">
+              thoughtful trips built around how you travel
+            </p>
+          </div>
+        )}
+      </div>
 
       <style>{`
         .menu-item {
@@ -325,6 +265,6 @@ useEffect(() => {
       `}</style>
     </header>
   );
-};
+});
 
 export default Header;

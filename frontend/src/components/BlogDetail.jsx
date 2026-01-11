@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 
-const BlogDetail = ({ slug, onBack }) => {
+const BlogDetail = () => {
+  const { slug } = useParams();      // ✅ from URL
+  const navigate = useNavigate();    // ✅ router back
+
   const [blog, setBlog] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -8,12 +12,18 @@ const BlogDetail = ({ slug, onBack }) => {
     if (!slug) return;
 
     fetch(`http://localhost:5001/api/blogs/${slug}`)
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error("Not found");
+        return res.json();
+      })
       .then((data) => {
         setBlog(data);
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch(() => {
+        setBlog(null);
+        setLoading(false);
+      });
   }, [slug]);
 
   if (loading) {
@@ -26,8 +36,14 @@ const BlogDetail = ({ slug, onBack }) => {
 
   if (!blog) {
     return (
-      <div className="min-h-[50vh] flex items-center justify-center">
-        Blog not found
+      <div className="min-h-[50vh] flex flex-col items-center justify-center gap-4">
+        <p>Blog not found</p>
+        <button
+          onClick={() => navigate("/blogs")}
+          className="text-sm text-[#5b7c67]"
+        >
+          ← Back to blogs
+        </button>
       </div>
     );
   }
@@ -38,7 +54,7 @@ const BlogDetail = ({ slug, onBack }) => {
 
         {/* BACK */}
         <button
-          onClick={onBack}
+          onClick={() => navigate("/blogs")}
           className="text-sm text-gray-500 hover:underline"
         >
           ← Back to blogs
@@ -66,9 +82,7 @@ const BlogDetail = ({ slug, onBack }) => {
 
         {/* CONTENT */}
         <div className="space-y-8 text-[17px] leading-relaxed text-gray-800">
-
           {blog.content.split("\n\n").map((block, i) => {
-            // IMAGE BLOCK
             if (block.startsWith("img:")) {
               return (
                 <img
@@ -80,7 +94,6 @@ const BlogDetail = ({ slug, onBack }) => {
               );
             }
 
-            // HEADING BLOCK
             if (block.startsWith("##")) {
               return (
                 <h2
@@ -92,10 +105,8 @@ const BlogDetail = ({ slug, onBack }) => {
               );
             }
 
-            // NORMAL PARAGRAPH
             return <p key={i}>{block}</p>;
           })}
-
         </div>
       </article>
     </section>
