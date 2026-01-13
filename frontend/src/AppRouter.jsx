@@ -14,6 +14,7 @@ import PackingList from "./components/PackingList";
 import Blogs from "./components/Blogs";
 import BlogDetail from "./components/BlogDetail";
 import ProfilePage from "./components/ProfilePage";
+import BecomeGuide from "./components/BecomeGuide";
 
 const AppRouter = () => {
   const [user, setUser] = useState(null);
@@ -36,8 +37,6 @@ const AppRouter = () => {
       {/* ===== ROUTES WITH HEADER ===== */}
       <Route element={<MainLayout user={user} onLogoutClick={handleLogout} />}>
         <Route path="/" element={<App />} />
-
-        {/* 🌍 Cities */}
         <Route path="/cities" element={<ExploreCities />} />
         <Route path="/cities/:slug" element={<CityPage />} />
         <Route path="/distance" element={<DistanceCalculator />} />
@@ -48,6 +47,7 @@ const AppRouter = () => {
         <Route path="/itineraries" element={<ItineraryPage />} />
         <Route path="/itineraries/:slug" element={<ItineraryDetail />} />
         <Route path="/results" element={<TripResults />} />
+        <Route path="/become-guide" element={<BecomeGuide/>}/>
       </Route>
 
       {/* ===== ROUTES WITHOUT HEADER ===== */}

@@ -21,8 +21,10 @@ import ExploreCities from "./components/ExploreCities";
 import CityPage from "./components/CityPage";
 import AiFeedbackBanner from "./components/AifeedbackBanner";
 import FaqFooterSection from "./components/FaqFooterSection";
-
+import BecomeGuide from "./components/BecomeGuide";
+import { demoItinerary } from "./data/demoItineraries";
 import { generateTravelItinerary } from "./services/api";
+import AiFailPage from "./components/AiFaliPage";
 
 function App() {
   /* ================= ROUTER ================= */
@@ -37,6 +39,8 @@ function App() {
   const [selectedItineraryId, setSelectedItineraryId] = useState(null);
   const [selectedBlogSlug, setSelectedBlogSlug] = useState(null);
   const [selectedCity, setSelectedCity] = useState(null);
+  const [showBecomeGuide, setShowBecomeGuide] = useState(false);
+
 
   /* ================= REFS ================= */
   const formCardRef = useRef(null);
@@ -89,7 +93,7 @@ function App() {
   const [apiStatus, setApiStatus] = useState("checking");
 
   /* ================= URL → STATE SYNC ================= */
-  useEffect(() => {
+ useEffect(() => {
   const path = location.pathname;
 
   if (path === "/") setActiveComponent("home");
@@ -103,9 +107,12 @@ function App() {
     setSelectedItineraryId(path.split("/")[2]);
     setActiveComponent("itinerary-detail");
   }
-  else if (path === "/packing") setActiveComponent("packing"); // ✅ FIX
-  else if (path === "/results") setActiveComponent("results");
+  else if (path === "/packing") setActiveComponent("packing");
+  else if (path === "/become-guide") setActiveComponent("become-guide");
+  else if (path === "/ai-failed") setActiveComponent("ai-failed");
+
 }, [location.pathname]);
+
 
 
   /* ================= AUTH ================= */
@@ -141,35 +148,60 @@ function App() {
 
   setLoading(true);
 
-  // 👉 start AI request (do NOT await yet)
-  const aiPromise = generateTravelItinerary(place, detailLevel);
+  const cleanedPlace = place.trim();
+  const isDemoRequest = cleanedPlace.toLowerCase() === "demo";
 
-  // 👉 navigate AFTER 3 seconds
-  setTimeout(async () => {
-    try {
-      const aiResponse = await aiPromise;
+  try {
+    let result;
 
-      const result = {
-        text: aiResponse?.text || "",
-      };
+    /* ===== DEMO MODE ===== */
+    if (isDemoRequest) {
+      result = { text: demoItinerary.text };
+    } else {
+      /* ===== REAL AI CALL ===== */
+      const aiResponse = await generateTravelItinerary(
+        cleanedPlace,
+        detailLevel
+      );
 
-      // save fallback
-      localStorage.setItem("lastTripResult", JSON.stringify(result));
+      if (!aiResponse?.text) {
+        throw new Error("AI_EMPTY");
+      }
 
+      result = { text: aiResponse.text };
+    }
+
+    // Save for refresh safety
+    localStorage.setItem("lastTripResult", JSON.stringify(result));
+
+    /* ===== DELAY BEFORE REDIRECT ===== */
+    setTimeout(() => {
       navigate("/results", {
         state: {
           suggestions: result,
-          fromHome: true,   // optional flag
+          city: isDemoRequest ? "Demo City" : cleanedPlace,
+          isDemo: isDemoRequest,
+          reason: isDemoRequest ? "You requested demo mode" : undefined,
         },
       });
-    } catch {
-      alert("AI service unavailable");
-      navigate("/", { replace: true });
-    } finally {
       setLoading(false);
-    }
-  }, 3000);
+    }, 3000);
+
+  } catch (err) {
+    console.error(err);
+
+    navigate("/ai-failed", {
+      state: {
+        reason: "AI service temporarily unavailable",
+      },
+    });
+
+    setLoading(false);
+  }
 };
+
+
+
 
 
 
@@ -188,6 +220,16 @@ function App() {
             }}
           />
         );
+        case "become-guide":
+          return <BecomeGuide />;
+
+
+        case "results":
+          return <TripResults />;
+
+        case "ai-failed":
+         return <AiFailPage />;
+
 
       case "itinerary-detail":
         return <ItineraryDetail itineraryId={selectedItineraryId} />;
@@ -543,10 +585,39 @@ function App() {
             <ItinerarySlider onItineraryClick={(id) => { setSelectedItineraryId(id); setActiveComponent("itinerary-detail");
              }} 
             />
+
+            {/* ===== BECOME A GUIDE CTA ===== */}
+            <div className="mt-20">
+               <div
+                className=" bg-[#d7f26e]
+                          py-16 px-6 text-center
+                          "
+              >
+                <div className="max-w-3xl mx-auto space-y-6">
+                  <div className="w-16 h-1 bg-black/30 mx-auto rounded-full" />
+
+                  <h2 className="text-3xl md:text-4xl font-semibold text-black">
+                    You too can earn while on the move
+                  </h2>
+
+                  <button
+                    onClick={() => navigate("/become-guide")}
+                    className="inline-flex items-center justify-center
+                              rounded-full bg-[#556b00]
+                              px-8 py-4 text-white
+                              text-lg font-medium
+                              hover:scale-105 transition"
+                  >
+                    Become a local guide
+                  </button>
+                </div>
+              </div>
+            </div>
+
           </>
         )}
 
-        {activeComponent !== "home" && activeComponent !== "results" &&  renderPage()}
+        {activeComponent !== "home" &&  renderPage()}
       </main>
         
       {activeComponent==="home" && <FaqFooterSection />}

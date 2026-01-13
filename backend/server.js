@@ -15,6 +15,8 @@ import itineraryRoutes from "./routes/itinerary.routes.js";
 import cityRoutes from "./routes/city.routes.js";
 import feedbackRoutes from "./routes/feedback.routes.js";
 import qrTripRoutes from "./routes/qrTrip.routes.js";
+import guideRoutes from "./routes/guide.routes.js"
+import wikiRoutes from "./routes/wiki.routes.js";
 
 // 🔎 DEBUG (SAFE TO KEEP)
 // console.log("🔥 THIS IS THE ACTIVE SERVER.JS FILE");
@@ -41,6 +43,8 @@ app.use("/api/blogs", blogRoutes);
 app.use("/api/cities", cityRoutes);
 app.use("/api/feedback", feedbackRoutes);
 app.use("/api/qr-trips",qrTripRoutes);
+app.use("/api/guides",guideRoutes);
+app.use("/api/wiki",wikiRoutes);
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok" });
 });

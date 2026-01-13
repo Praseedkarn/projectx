@@ -37,7 +37,7 @@ const highlights = [
 
 export default function FeatureCards({ onNavigate }) {
   return (
-    <section className="bg-white py-32">
+    <section className="bg-white py-32 rounded-[40px]  shadow-sm">
       <div className="max-w-6xl mx-auto px-6 space-y-32">
 
         {/* Section header */}

@@ -1,17 +1,23 @@
 import mongoose from "mongoose";
 
-const daySchema = new mongoose.Schema({
-  day: Number,
-  title: String,
-  places:[String],
-  activities: [String],
-  accommodation: String,
-  meals: String,
-});
+/* ================= DAY SCHEMA ================= */
+const daySchema = new mongoose.Schema(
+  {
+    day: Number,
+    title: String,
+    places: { type: [String], default: [] },
+    activities: { type: [String], default: [] },
+    accommodation: String,
+    meals: String,
+  },
+  { _id: false }
+);
 
+/* ================= ITINERARY SCHEMA ================= */
 const itinerarySchema = new mongoose.Schema(
   {
-    legacyId:Number,
+    legacyId: Number,
+
     title: { type: String, required: true },
     location: String,
     duration: String,
@@ -19,22 +25,26 @@ const itinerarySchema = new mongoose.Schema(
     priceRange: String,
     bestTime: String,
     description: String,
-
     image: String,
 
-    highlights: [String],
-    highlight360Views: [
-      {
-        label: String,
-        place: String,
-      },
-    ],
+    highlights: { type: [String], default: [] },
 
-    days: [daySchema],
+    highlight360Views: {
+      type: [
+        {
+          label: String,
+          place: String,
+        },
+      ],
+      default: [],
+    },
 
-    inclusions: [String],
-    exclusions: [String],
-    tips: [String],
+    // ✅ FIXED HERE
+    days: { type: [daySchema], default: [] },
+
+    inclusions: { type: [String], default: [] },
+    exclusions: { type: [String], default: [] },
+    tips: { type: [String], default: [] },
 
     budget: {
       flights: String,
