@@ -17,6 +17,12 @@ const daySchema = new mongoose.Schema(
 const itinerarySchema = new mongoose.Schema(
   {
     legacyId: Number,
+    slug: {
+      type: String,
+      required: true,
+      unique: true,
+      index: true,
+    },
 
     title: { type: String, required: true },
     location: String,

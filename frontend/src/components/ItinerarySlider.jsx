@@ -48,8 +48,8 @@ const ItinerarySlider = ({ onItineraryClick = () => {} }) => {
 
     {/* ===== HEADING ===== */}
     <div className="mb-6 mt-6 text-center">
-      <h2 className="text-3xl font-bold text-gray-900">
-        Popular Travel Itineraries
+      <h2 className="text-4xl font-serif  text-gray-900">
+        Explore ready-made itineraries
       </h2>
       <p className="mt-2 text-gray-500 text-sm">
         Hand-picked trips crafted by travelers like you

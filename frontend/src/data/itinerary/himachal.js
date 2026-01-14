@@ -1,5 +1,5 @@
 const himachalItinerary = {
-  citySlug:"himachal-adventure",
+  slug:"himachal-adventure",
   title: "Himachal Adventure Trail",
   duration: "6 days",
   location: "Himachal Pradesh, India",

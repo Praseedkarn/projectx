@@ -28,10 +28,10 @@ router.get("/mongo/:id", getItineraryById);
    GET BY legacyId (IMPORTANT)
    THIS FIXES YOUR FRONTEND CLICK
 ================================ */
-router.get("/:citySlug", async (req, res) => {
+router.get("/:slug", async (req, res) => {
   try {
     const itinerary = await Itinerary.findOne({
-      citySlug: req.params.citySlug,
+      slug: req.params.slug,
     });
 
     if (!itinerary) {
@@ -44,6 +44,7 @@ router.get("/:citySlug", async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
+
 
 
 

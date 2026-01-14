@@ -1,5 +1,5 @@
 const mountCookItinerary = {
-  citySlug:"mount-cook",
+  slug:"mount-cook",
   title: "Mount Cook Alpine Adventure",
   duration: "4 days",
   location: "Aoraki / Mount Cook National Park, New Zealand",

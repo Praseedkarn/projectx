@@ -36,26 +36,7 @@ const callOpenRouter = async (model, prompt, apiKey) => {
   return response.data.choices[0]; // ✅ correct structure
 };
 
-/* =========================
-   Main Itinerary Generator
-========================= */
-export const generateItinerary = async (description, detailLevel = "medium") => {
-  const prompt = `
-Create a SIMPLE and CLEAR travel itinerary.
-
-Trip description:
-${description}
-
-Rules:
-- Limit itinerary to 3–5 days maximum
-- Use plain English
-- Use headings like "Day 1 Morning", "Afternoon"
-- Mention places, transport, and approximate costs
-- Keep explanations short
-- DO NOT use markdown
-- DO NOT use JSON
-`;
-
+export const generateItinerary = async (prompt) => {
   const models = [
     "deepseek/deepseek-r1-0528:free",
     "arcee/trinity-mini:free",
@@ -66,47 +47,27 @@ Rules:
     process.env.AI_API_KEY_SECONDARY,
   ];
 
-  let lastError = null;
-
   for (const key of apiKeys) {
     if (!key) continue;
 
     for (const model of models) {
       try {
-        console.log(`⚡ Trying ${model}`);
-
         const choice = await callOpenRouter(model, prompt, key);
 
         const text = choice.message?.content;
 
-        if (!text || text.length < 200) {
-          console.warn("⚠️ Response too short, skipping");
-          await sleep(3000);
-          continue;
-        }
+        if (!text || text.length < 200) continue;
 
         return {
           provider: model,
           text: text.replace(/```/g, "").trim(),
-          finishReason: choice.finish_reason || "stop",
         };
-      } catch (err) {
-        lastError = err;
-
-        const status = err.response?.status;
-        const msg = err.response?.data?.error?.message || err.message;
-
-        console.warn(`❌ Failed: ${model}`);
-        console.warn(`   Status: ${status || "unknown"}`);
-        console.warn(`   Message: ${msg}`);
-
-        // ⏳ Avoid rate-limit bans
+      } catch {
         await sleep(3000);
       }
     }
   }
 
-  throw new Error(
-    "All AI providers failed. Free models may be rate-limited or offline."
-  );
+  throw new Error("AI providers failed");
 };
+

@@ -1,57 +1,66 @@
+import React from "react";
 import { Routes, Route } from "react-router-dom";
-import { useEffect, useState } from "react";
 
-import MainLayout from "./layouts/MainLayout";
-import App from "./App";
+/* ===== COMPONENT IMPORTS ===== */
+import TripResults from "./components/TripResults";
+import ProfilePage from "./components/ProfilePage";
 import ItineraryPage from "./components/ItineraryPage";
 import ItineraryDetail from "./components/ItineraryDetail";
-import TripResults from "./components/TripResults";
-import QrTripPage from "./components/QrTripPage";
-import DistanceCalculator from "./components/DistanceCalculator";
+import SavedItineraries from "./components/SavedItineraries";
+import PackingList from "./components/PackingList";
 import ExploreCities from "./components/ExploreCities";
 import CityPage from "./components/CityPage";
-import PackingList from "./components/PackingList";
-import Blogs from "./components/Blogs";
-import BlogDetail from "./components/BlogDetail";
-import ProfilePage from "./components/ProfilePage";
 import BecomeGuide from "./components/BecomeGuide";
+import AiFailPage from "./components/AiFaliPage";
+import Blogs from "./components/Blogs";
+import DistanceCalculator from "./components/DistanceCalculator";
+import QrTripPage from "./components/QrTripPage";
 
-const AppRouter = () => {
-  const [user, setUser] = useState(null);
-
-  /* ===== LOAD USER ONCE ===== */
-  useEffect(() => {
-    const savedUser = localStorage.getItem("user");
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
-    }
-  }, []);
-
-  const handleLogout = () => {
-    localStorage.removeItem("user");
-    setUser(null);
-  };
-
+const AppRouter = ({
+  currentUser,
+  handleLogout,
+  navigate,
+  homeContent
+}) => {
   return (
     <Routes>
-      {/* ===== ROUTES WITH HEADER ===== */}
-      <Route element={<MainLayout user={user} onLogoutClick={handleLogout} />}>
-        <Route path="/" element={<App />} />
-        <Route path="/cities" element={<ExploreCities />} />
-        <Route path="/cities/:slug" element={<CityPage />} />
-        <Route path="/distance" element={<DistanceCalculator />} />
-        <Route path ="/packing" element ={<PackingList/>}/>
-        <Route path="/blogs" element={<Blogs />} />
-        <Route path="/blogs/:slug" element={<BlogDetail />} />
-        <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/itineraries" element={<ItineraryPage />} />
-        <Route path="/itineraries/:slug" element={<ItineraryDetail />} />
-        <Route path="/results" element={<TripResults />} />
-        <Route path="/become-guide" element={<BecomeGuide/>}/>
-      </Route>
+      <Route path="/" element={homeContent} />
+      <Route path="/results" element={<TripResults />} />
 
-      {/* ===== ROUTES WITHOUT HEADER ===== */}
+      {/* ✅ FIXED ITINERARIES */}
+      <Route
+        path="/itineraries"
+        element={
+          <ItineraryPage
+            onItineraryClick={(slug) => {
+              console.log("NAVIGATE SLUG:", slug);
+              navigate(`/itineraries/${slug}`);
+            }}
+          />
+        }
+      />
+
+      {/* ✅ FIXED PARAM NAME */}
+      <Route
+        path="/itineraries/:slug"
+        element={<ItineraryDetail />}
+      />
+
+      {/* Cities */}
+      <Route path="/cities" element={<ExploreCities onCityClick={(slug) => navigate(`/cities/${slug}`)} />} />
+      <Route path="/cities/:slug" element={<CityPage />} />
+
+      {/* Others */}
+      <Route path="/packing" element={<PackingList />} />
+      <Route path="/distance" element={<DistanceCalculator />} />
+      <Route path="/blogs" element={<Blogs />} />
+      <Route path="/profile" element={<ProfilePage user={currentUser} onLogout={handleLogout} />} />
+      <Route path="/saved" element={<SavedItineraries />} />
+      <Route path="/become-guide" element={<BecomeGuide />} />
+      <Route path="/ai-failed" element={<AiFailPage />} />
       <Route path="/qr-trip/:id" element={<QrTripPage />} />
+
+      <Route path="*" element={homeContent} />
     </Routes>
   );
 };

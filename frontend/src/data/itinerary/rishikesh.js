@@ -1,5 +1,5 @@
 const rishikeshItinerary = {
-  citySlug:"rishikesh",
+  slug:"rishikesh",
   title: "Rishikesh Yoga & Adventure",
   duration: "4 days",
   location: "Rishikesh, Uttarakhand, India",

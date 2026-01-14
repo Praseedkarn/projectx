@@ -1,5 +1,5 @@
 const Kashmir = {
-  citySlug:"kashmir-valley",
+  slug:"kashmir-valley",
   title: 'Kashmir Valley',
   duration: '6 days',
   location: 'Srinagar → Gulmarg → Pahalgam, Kashmir',

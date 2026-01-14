@@ -38,4 +38,5 @@ const MainLayout = ({ user, onLogoutClick }) => {
   );
 };
 
+
 export default MainLayout;

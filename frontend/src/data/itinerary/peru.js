@@ -1,5 +1,5 @@
 const peru = {
-  citySlug:"peru-discovery",
+  slug:"peru-discovery",
   title: 'Peru Discovery',
   duration: '9 days',
   location: 'Lima → Cusco → Sacred Valley → Machu Picchu',

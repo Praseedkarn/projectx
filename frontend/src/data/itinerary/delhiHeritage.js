@@ -1,5 +1,5 @@
 const Delhi = {
-  citySlug:"delhi",
+  slug:"delhi",
   title: 'Delhi Heritage Tour',
   duration: '3 days',
   location: 'Delhi, India',

@@ -1,6 +1,6 @@
 
 const santoriniItinerary = {
-  citySlug:"santorini",
+  slug:"santorini",
   title: "Santorini Island Romance",
   duration: "4 days",
   location: "Santorini, Greece",

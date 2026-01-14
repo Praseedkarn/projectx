@@ -12,7 +12,11 @@ router.post("/itinerary", async (req, res) => {
     }
 
     const result = await generateItinerary(description, detailLevel);
-    res.json(result);
+
+    // ✅ NORMALIZED RESPONSE
+    res.status(200).json({
+      text: result.text
+    });
 
   } catch (error) {
     console.error("❌ Route error:", error.message);

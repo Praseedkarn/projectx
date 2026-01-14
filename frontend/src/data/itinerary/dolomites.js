@@ -1,5 +1,5 @@
 const dolomitesItinerary = {
-  citySlug:"dolomites",
+  slug:"dolomites",
   title: "Dolomites Hiking Tour",
   duration: "6 days",
   location: "Bolzano → Cortina d’Ampezzo → Val Gardena, Italy",

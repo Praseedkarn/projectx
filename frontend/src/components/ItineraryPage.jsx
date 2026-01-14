@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 // import '../styles/ItineraryPage.css';
-import { useNavigate } from  "react-router-dom";
+import { useNavigate ,useLocation} from  "react-router-dom";
 
 const getImageUrl = (url, width = 400) => {
   if (!url) {
@@ -21,6 +21,11 @@ const getImageUrl = (url, width = 400) => {
 
 const ItineraryPage = () => {
   const navigate=useNavigate();
+  const location = useLocation();
+  const [currentPage, setCurrentPage] = useState(
+  location.state?.page || 1
+);
+const [searchQuery, setSearchQuery] = useState("");
   const [popularItineraries] = useState([
   {
     id: 1,
@@ -1172,12 +1177,11 @@ const ItineraryPage = () => {
 
   // Function to handle itinerary click
  const handleItineraryClick = (itinerary) => {
-  if (!itinerary.citySlug) {
-    console.error("Missing citySlug for:", itinerary.title);
-    return;
-  }
-  navigate(`/itineraries/${itinerary.citySlug}`);
+  navigate(`/itineraries/${itinerary.citySlug}`,{
+    state:{page:currentPage}
+  } );
 };
+
 
 
 
@@ -1218,15 +1222,26 @@ const ItineraryPage = () => {
     return savedItineraries.some(item => item.id === id);
   };
 
-const ITEMS_PER_PAGE = 9; // 3x3 grid
-const [currentPage, setCurrentPage] = useState(1);
+  const filteredItineraries = popularItineraries.filter(itinerary => {
+  const q = searchQuery.toLowerCase();
 
-const totalPages = Math.ceil(popularItineraries.length / ITEMS_PER_PAGE);
+  return (
+    itinerary.title.toLowerCase().includes(q) ||
+    itinerary.location.toLowerCase().includes(q) ||
+    itinerary.tags?.some(tag => tag.toLowerCase().includes(q))
+  );
+});
 
-const paginatedItineraries = popularItineraries.slice(
+
+const ITEMS_PER_PAGE = 9;
+
+const totalPages = Math.ceil(filteredItineraries.length / ITEMS_PER_PAGE);
+
+const paginatedItineraries = filteredItineraries.slice(
   (currentPage - 1) * ITEMS_PER_PAGE,
   currentPage * ITEMS_PER_PAGE
 );
+
 
 if (loading) {
   return (
@@ -1280,6 +1295,23 @@ if (loading) {
               ` · You have ${savedCount} saved ${savedCount === 1 ? "itinerary" : "itineraries"}`}
           </p>
         </div>
+
+        {/* ===== SEARCH BAR ===== */}
+<div className="flex justify-center">
+  <input
+    type="text"
+    placeholder="Search itineraries by city, country, or theme…"
+    value={searchQuery}
+    onChange={(e) => {
+      setSearchQuery(e.target.value);
+      setCurrentPage(1); // reset page on search
+    }}
+    className="w-full max-w-md rounded-full border px-5 py-3
+               text-sm focus:outline-none focus:ring-2
+               focus:ring-[#5b7c67]"
+  />
+</div>
+
 
         {/* ===== ITINERARY LIST ===== */}
        {/* ===== ITINERARY GRID ===== */}

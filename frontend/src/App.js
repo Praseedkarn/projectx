@@ -25,7 +25,8 @@ import BecomeGuide from "./components/BecomeGuide";
 import { demoItinerary } from "./data/demoItineraries";
 import { generateTravelItinerary } from "./services/api";
 import AiFailPage from "./components/AiFaliPage";
-
+import AppRouter from "./AppRouter";
+import { buildPrompt } from "./services/promptBuilder";
 function App() {
   /* ================= ROUTER ================= */
   const navigate = useNavigate();
@@ -88,6 +89,8 @@ function App() {
   const [Transport, setTransport] = useState("");
   const [detailLevel, setDetailLevel] = useState("morning");
   const [suggestions, setSuggestions] = useState("");
+  const [citySuggestions, setCitySuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
   /* ================= AI ================= */
   const [apiStatus, setApiStatus] = useState("checking");
@@ -113,6 +116,30 @@ function App() {
 
 }, [location.pathname]);
 
+useEffect(() => {
+  const timeout = setTimeout(async () => {
+    if (!place || place.length < 3) {
+      setCitySuggestions([]);
+      return;
+    }
+
+    try {
+      const res = await fetch(
+        `https://secure.geonames.org/searchJSON?name_startsWith=${place}&maxRows=6&cities=cities15000&username=praseed`
+      );
+
+      const data = await res.json();
+      setCitySuggestions(data.geonames || []);
+    } catch (err) {
+      console.error("GeoNames error", err);
+    }
+  }, 400); // debounce
+
+  return () => clearTimeout(timeout);
+}, [place]);
+
+
+
 
 
   /* ================= AUTH ================= */
@@ -133,7 +160,7 @@ function App() {
   };
 
   /* ================= SUBMIT ================= */
- const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
   e.preventDefault();
 
   if (!currentUser) {
@@ -154,15 +181,26 @@ function App() {
   try {
     let result;
 
-    /* ===== DEMO MODE ===== */
+    /* ===== DEMO MODE (NO AI, NO PROMPT) ===== */
     if (isDemoRequest) {
       result = { text: demoItinerary.text };
-    } else {
-      /* ===== REAL AI CALL ===== */
-      const aiResponse = await generateTravelItinerary(
-        cleanedPlace,
-        detailLevel
-      );
+    } 
+    /* ===== AI MODE (PROMPT BUILDER) ===== */
+    else {
+      const prompt = buildPrompt({
+        place: cleanedPlace,
+        tripType,
+        days,
+        hours,
+        group,
+        suggestions,
+      });
+
+       console.log("🧠 PROMPT SENT TO AI:");
+  console.log(prompt);
+  console.log("📌 META:", { tripType, days, hours, group });
+
+      const aiResponse = await generateTravelItinerary(prompt);
 
       if (!aiResponse?.text) {
         throw new Error("AI_EMPTY");
@@ -174,18 +212,16 @@ function App() {
     // Save for refresh safety
     localStorage.setItem("lastTripResult", JSON.stringify(result));
 
-    /* ===== DELAY BEFORE REDIRECT ===== */
     setTimeout(() => {
       navigate("/results", {
         state: {
           suggestions: result,
           city: isDemoRequest ? "Demo City" : cleanedPlace,
           isDemo: isDemoRequest,
-          reason: isDemoRequest ? "You requested demo mode" : undefined,
         },
       });
       setLoading(false);
-    }, 3000);
+    }, 2000);
 
   } catch (err) {
     console.error(err);
@@ -205,90 +241,28 @@ function App() {
 
 
 
+
   /* ================= RENDER PAGE ================= */
-  const renderPage = () => {
-    switch (activeComponent) {
-      case "distance":
-        return <DistanceCalculator onBack={() => setActiveComponent("home")} />;
+ 
 
-      case "itineraries":
-        return (
-          <ItineraryPage
-            onItineraryClick={(id) => {
-              setSelectedItineraryId(id);
-              setActiveComponent("itinerary-detail");
-            }}
-          />
-        );
-        case "become-guide":
-          return <BecomeGuide />;
-
-
-        case "results":
-          return <TripResults />;
-
-        case "ai-failed":
-         return <AiFailPage />;
-
-
-      case "itinerary-detail":
-        return <ItineraryDetail itineraryId={selectedItineraryId} />;
-
-      case "cities":
-        return (
-          <ExploreCities
-            onCityClick={(slug) => {
-              setSelectedCity(slug);
-              go(`/cities/${slug}`, "city");
-            }}
-          />
-        );
-
-      case "city":
-        return <CityPage slug={selectedCity} />;
-
-      case "packing":
-        return <PackingList />;
-
-      case "profile":
-        return <ProfilePage user={currentUser} onLogout={handleLogout} />;
-
-      case "saved":
-        return <SavedItineraries />;
-
-      case "blogs":
-        return <Blogs onBlogClick={(slug) => setSelectedBlogSlug(slug)} />;
-
-      case "blog-detail":
-        return <BlogDetail slug={selectedBlogSlug} />;
-
-      case "admin-blog":
-        return <AdminBlog />;
-
-      default:
-        return null;
-    }
-  };
-
-
-
-  return (
+return (
     <div className="App">
+      {/* ===== HEADER ===== */}
       <Header
-      ref={headerRef}
+        ref={headerRef}
         variant={location.pathname === "/" ? "home" : "compact"}
         user={currentUser}
         onSignInClick={() => setShowSignIn(true)}
         onLogoutClick={handleLogout}
-        onHomeClick={() => go("/", "home")}
-        onItinerariesClick={() => go("/itineraries", "itineraries")}
-        onSavedClick={() => go("/saved", "saved")}
-        onPackingListClick={() => go("/packing", "packing")}
-        onProfileClick={() => go("/profile", "profile")}
-        onBlogsClick={() => go("/blogs", "blogs")}
-
+        onHomeClick={() => navigate("/")}
+        onItinerariesClick={() => navigate("/itineraries")}
+        onSavedClick={() => navigate("/saved")}
+        onPackingListClick={() => navigate("/packing")}
+        onProfileClick={() => navigate("/profile")}
+        onBlogsClick={() => navigate("/blogs")}
       />
-      
+
+      {/* ===== SIGN IN MODAL ===== */}
       {showSignIn && (
         <SignIn
           onClose={() => setShowSignIn(false)}
@@ -296,333 +270,208 @@ function App() {
         />
       )}
 
+      {/* ===== MAIN CONTENT AREA ===== */}
       <main
-              className={`px-2 lg:px- pb-24 overflow-hidden
-                ${activeComponent === "home" ? "bg-[#d7f26e]" : "bg-white"}
-              `}
-            >
-
-        {/* ===== HERO (HOME ONLY) ===== */}
-        {activeComponent === "home" && (
-          <div className="max-w-6xl mx-auto mb-20 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-            <div className="space-y-5 text-center md:text-left">
-              <h2 className="text-3xl md:text-4xl font-semibold text-gray-800">
-                What is PROJECT X ?
-              </h2>
-              <p className="text-gray-600">
-                {/* Handpicked itineraries for every kind of traveler */}
-                Project X is an AI-powered travel planning platform designed to help travelers create realistic, well-paced itineraries based on their available time, travel style, budget, and destination.
-              </p>
-              <button
-                onClick={() =>
-                  formCardRef.current?.scrollIntoView({ behavior: "smooth" })
-                }
-                className="rounded-full bg-[#5b7c67] px-6 py-3 text-white"
-              >
-                 Start Planning
-              </button>
-            </div>
-
-            <div className="flex justify-center md:justify-end">
-              <img
-                src="/world_map_PNG34.png"
-                alt="Map"
-                className=" w-72 md:w-96
-                opacity-95
-                -rotate-2
-                drop-shadow-[0_25px_40px_rgba(91,124,103,0.35)]
-                transition-transform duration-500
-                hover:rotate-0 hover:scale-105"
-              />
-            </div>
-          </div>
-        )}
-        {/* HOME */}
-        {activeComponent === "home" && (
-          <>
-          <div className="w-full bg-white rounded-[80px] shadow-[0_10px_30px_rgba(0,0,0,0.12)]">
-            <div ref = {formCardRef} className="
-             max-w-[1400px] mx-auto px-8 md:px-20 py-10
-              ">
-
-              {/* card header */}
-                <div className="text-center space-y-2 mb-10">
-                  <h2 className="text-2xl md:text-3xl font-semibold text-gray-800">
-                    Tell us your travel preferences
+        className={`px-2 lg:px-4 pb-24 overflow-hidden  transition-all duration-500${
+          location.pathname === "/" ? " pt-[250px] bg-[#d7f26e]" 
+          : " pt-32 bg-white"
+        }`}
+      >
+        <AppRouter 
+          currentUser={currentUser}
+          handleLogout={handleLogout}
+          selectedItineraryId={selectedItineraryId}
+          setSelectedItineraryId={setSelectedItineraryId}
+          navigate={navigate}
+          // QUICK FIX: Pass your entire Home logic as a prop so variables stay linked
+          homeContent={
+            <>
+              {/* HERO SECTION */}
+              <div className="max-w-6xl mx-auto mb-20 grid grid-cols-1 md:grid-cols-2 gap-12 items-center  mt-60 md:mt-60">
+                <div className="space-y-5 text-center md:text-left">
+                  <h2 className="text-3xl md:text-4xl font-semibold text-gray-800">
+                    What is PROJECT X ?
                   </h2>
-                  <p className="text-sm text-gray-500">
-                    Just provide some basic information and we’ll plan your trip.
+                  <p className="text-gray-600">
+                    Project X is an AI-powered travel planning platform designed to help travelers create realistic, well-paced itineraries based on their available time, travel style, budget, and destination.
                   </p>
-
-                  {/* ===== AI STATUS ===== */}
-                  {currentUser && apiStatus !== "checking" && (
-                    <div
-                      className={`inline-flex items-center gap-2 mt-3 px-3 py-1.5
-                        rounded-full text-xs font-medium
-                        ${
-                          apiStatus === "available"
-                            ? "bg-green-50 text-green-700"
-                            : "bg-red-50 text-red-600"
-                        }`}
-                    >
-                      <span
-                        className={`h-2 w-2 rounded-full ${
-                          apiStatus === "available" ? "bg-green-500" : "bg-red-500"
-                        }`}
-                      />
-                      {apiStatus === "available"
-                        ? "AI assistant is online"
-                        : "AI assistant is offline"}
-                    </div>
-                  )}
-                </div>
-             <form onSubmit={handleSubmit} className="space-y-4">
-
-                {/* ===== Trip Type ===== */}
-               {/* ===== TRIP TYPE (FLIGHT STYLE) ===== */}
-              <div className="flex flex-wrap gap-6 items-center">
-
-                {[
-                  { key: "hours", label: "Few Hours" },
-                  { key: "day", label: "One Day" },
-                  { key: "multi", label: "Multiple days" },
-                ].map((t) => (
                   <button
-                    key={t.key}
-                    type="button"
-                    onClick={() => setTripType(t.key)}
-                    className={`flex items-center gap-3 px-5 py-3 rounded-full border
-                      transition-all duration-200 text-sm font-medium
-                      ${
-                        tripType === t.key
-                          ? "border-blue-600 bg-blue-50 text-blue-700"
-                          : "border-gray-300 text-gray-700 hover:border-blue-400"
-                      }`}
+                    onClick={() => formCardRef.current?.scrollIntoView({ behavior: "smooth" })}
+                    className="rounded-full bg-[#5b7c67] px-6 py-3 text-white font-medium hover:bg-[#4a6a58] transition"
                   >
-                    {/* Radio circle */}
-                    <span
-                      className={`w-4 h-4 rounded-full border flex items-center justify-center
-                        ${
-                          tripType === t.key
-                            ? "border-blue-600"
-                            : "border-gray-400"
-                        }`}
-                    >
-                      {tripType === t.key && (
-                        <span className="w-2 h-2 rounded-full bg-blue-600" />
-                      )}
-                    </span>
-
-                    {t.label}
+                    Start Planning
                   </button>
-                ))}
-              </div>
-                {/* ===== Conditional Fields ===== */}
-                {tripType === "hours" && (
-                   <div className="space-y-2  pb-6">
-                      <label className="text-sm font-medium text-gray-700">
-                        Number of hours
-                      </label>
-                      <input
-                        type="number"
-                        min={1}
-                        max={12}
-                        value={hours}
-                        onChange={(e) => setHours(Number(e.target.value))}
-                        className="w-full rounded-xl border border-gray-300 px-4 py-3"
-                      />
-                    </div>
-                )}
-                {tripType === "multi" && (
-                <div className="space-y-2  pb-6">
-                    <label className="text-sm font-medium text-gray-700">
-                      Number of days
-                    </label>
-                    <input
-                      type="number"
-                      min={2}
-                      value={days}
-                      onChange={(e) => setDays(Number(e.target.value))}
-                      className="w-full rounded-xl border border-gray-300 px-4 py-3"
-                    />
-                  </div>
-                )}
-              <div className="grid grid-cols-1  gap-4 pb-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">
-                    Destination
-                  </label>
-                  <input
-                    value={place}
-                    onChange={(e) => setPlace(e.target.value)}
-                    placeholder="Enter city or place"
-                    className="w-full rounded-xl border px-4 py-3"
-                  />
                 </div>
 
-                {/* <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">
-                    Travel date
-                  </label>
-                  <input
-                    type="date"
-                    className="w-full rounded-xl border px-4 py-3"
+                <div className="flex justify-center md:justify-end">
+                  <img
+                    src="/world_map_PNG34.png"
+                    alt="Map"
+                    className="w-72 md:w-96 opacity-95 -rotate-2 drop-shadow-[0_25px_40px_rgba(91,124,103,0.35)] transition-transform duration-500 hover:rotate-0 hover:scale-105"
                   />
-                </div> */}
+                </div>
               </div>
-              {/* ===== BUDGET + GROUP + TRANSPORT ===== */}
-              <div className="grid grid-cols-1  gap-4 pb-4">
 
-                {/* ===== BUDGET (only for day & multi) ===== */}
-                {/* {(tripType === "day" || tripType === "multi") && (
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">
-                      Budget
-                    </label>
+              {/* AI FORM CARD */}
+              <div className="w-full bg-white rounded-[80px] shadow-[0_10px_30px_rgba(0,0,0,0.12)]">
+                <div ref={formCardRef} className="max-w-[1400px] mx-auto px-8 md:px-20 py-10">
+                  <div className="text-center space-y-2 mb-10">
+                    <h2 className="text-2xl md:text-3xl font-semibold text-gray-800">
+                      Tell us your travel preferences
+                    </h2>
+                    <p className="text-sm text-gray-500">
+                      Just provide some basic information and we’ll plan your trip.
+                    </p>
 
-                    <div className="grid grid-cols-3 gap-2">
-                      {["Low", "Medium", "Luxury"].map((b) => (
+                    {currentUser && apiStatus !== "checking" && (
+                      <div className={`inline-flex items-center gap-2 mt-3 px-3 py-1.5 rounded-full text-xs font-medium ${apiStatus === "available" ? "bg-green-50 text-green-700" : "bg-red-50 text-red-600"}`}>
+                        <span className={`h-2 w-2 rounded-full ${apiStatus === "available" ? "bg-green-500" : "bg-red-500"}`} />
+                        {apiStatus === "available" ? "AI assistant is online" : "AI assistant is offline"}
+                      </div>
+                    )}
+                  </div>
+
+                  <form onSubmit={handleSubmit} className="space-y-6">
+                    <div className="flex flex-wrap gap-6 items-center">
+                      {[{ key: "hours", label: "Few Hours" }, { key: "day", label: "One Day" }, { key: "multi", label: "Multiple days" }].map((t) => (
                         <button
-                          key={b}
+                          key={t.key}
                           type="button"
-                          onClick={() => setBudget(b)}
-                          className={`rounded-lg border px-3 py-2 text-sm transition
-                            ${
-                              budget === b
-                                ? "border-[#5b7c67] bg-[#5b7c67]/10 font-medium"
-                                : "hover:bg-gray-50"
-                            }`}
+                          onClick={() => setTripType(t.key)}
+                          className={`flex items-center gap-3 px-5 py-3 rounded-full border transition-all duration-200 text-sm font-medium ${tripType === t.key ? "border-blue-600 bg-blue-50 text-blue-700" : "border-gray-300 text-gray-700 hover:border-blue-400"}`}
                         >
-                          {b}
+                          <span className={`w-4 h-4 rounded-full border flex items-center justify-center ${tripType === t.key ? "border-blue-600" : "border-gray-400"}`}>
+                            {tripType === t.key && <span className="w-2 h-2 rounded-full bg-blue-600" />}
+                          </span>
+                          {t.label}
                         </button>
                       ))}
                     </div>
-                  </div>
-                )} */}
 
-              {/* ===== TRAVEL GROUP ===== */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">
-                  Travel group
-                </label>
+                    {tripType === "hours" && (
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-gray-700">Number of hours</label>
+                        <input type="number" min={1} max={12} value={hours} onChange={(e) => setHours(Number(e.target.value))} className="w-full rounded-xl border border-gray-300 px-4 py-3" />
+                      </div>
+                    )}
+                    {tripType === "multi" && (
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-gray-700">Number of days</label>
+                        <input type="number" min={2} value={days} onChange={(e) => setDays(Number(e.target.value))} className="w-full rounded-xl border border-gray-300 px-4 py-3" />
+                      </div>
+                    )}
 
-                <div className="grid grid-cols-4 gap-2">
-                  {["Solo", "Couple", "Family", "Friends"].map((g) => (
-                    <button
-                      key={g}
-                      type="button"
-                      onClick={() => setGroup(g)}
-                      className={`rounded-lg border px-3 py-2 text-sm transition
-                        ${
-                          group === g
-                            ? "border-[#5b7c67] bg-[#5b7c67]/10 font-medium"
-                            : "hover:bg-gray-50"
-                        }`}
-                    >
-                      {g}
-                    </button>
-                  ))}
+                   <div className="relative space-y-2">
+  <label className="text-sm font-medium text-gray-700">Destination</label>
+
+  <input
+    value={place}
+    onChange={(e) => setPlace(e.target.value)}
+    onFocus={() => setShowSuggestions(true)}
+    onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
+    placeholder="Enter city or place"
+    className="w-full rounded-xl border px-4 py-3
+               focus:ring-2 focus:ring-[#5b7c67] outline-none"
+  />
+
+  {/* ===== SUGGESTIONS DROPDOWN ===== */}
+  {showSuggestions && citySuggestions.length > 0 && (
+    <div className="absolute z-20 w-full bg-white border
+                    rounded-xl shadow mt-1 max-h-60 overflow-y-auto">
+      {citySuggestions.map((city) => (
+        <div
+          key={city.geonameId}
+          onMouseDown={(e) => {
+            e.preventDefault();
+            setPlace(`${city.name}, ${city.countryName}`);
+            setShowSuggestions(false);
+          }}
+          className="px-4 py-2 hover:bg-gray-100
+                     cursor-pointer text-sm"
+        >
+          <strong>{city.name}</strong>, {city.countryName}
+        </div>
+      ))}
+    </div>
+  )}
+</div>
+
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-700">Travel group</label>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                        {["Solo", "Couple", "Family", "Friends"].map((g) => (
+                          <button
+                            key={g}
+                            type="button"
+                            onClick={() => setGroup(g)}
+                            className={`rounded-lg border px-3 py-2 text-sm transition ${group === g ? "border-[#5b7c67] bg-[#5b7c67]/10 font-medium" : "hover:bg-gray-50"}`}
+                          >
+                            {g}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-700">Special preferences (optional)</label>
+                      <input
+                        value={suggestions}
+                        onChange={(e) => setSuggestions(e.target.value)}
+                        placeholder="Avoid crowds, cafes, photography spots..."
+                        className="w-full rounded-lg border px-3 py-2 text-sm"
+                      />
+                    </div>
+
+                    <div className="pt-6 border-t border-gray-100">
+                      <button
+                        type="submit"
+                        disabled={loading}
+                        className="w-full rounded-full bg-[#5b7c67] py-4 text-white font-medium hover:bg-[#4a6a58] transition disabled:opacity-60"
+                      >
+                        {loading ? "Planning your trip..." : "Generate itinerary"}
+                      </button>
+                      {loading && <p className="text-center text-sm text-gray-500 mt-2">Analyzing destinations, routes & experiences...</p>}
+                    </div>
+                  </form>
                 </div>
               </div>
 
-              {/* ===== TRANSPORT ===== */}
-              {/* <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">
-                  Transport
-                </label>
-                <select
-                  value={Transport}
-                  onChange={(e) => setTransport(e.target.value)}
-                  className="w-full rounded-lg border px-3 py-2 text-sm"
-                >
-                  <option>Public transport</option>
-                  <option>Rented car</option>
-                  <option>Walking</option>
-                </select>
-              </div> */}
-            </div>
-
-            {/* ===== PREFERENCES ===== */}
-            <div className="space-y-2 pb-2">
-              <label className="text-sm font-medium text-gray-700">
-                Special preferences (optional)
-              </label>
-              <input
-                value={suggestions}
-                onChange={(e) => setSuggestions(e.target.value)}
-                placeholder="Avoid crowds, cafes, photography spots..."
-                className="w-full rounded-lg border px-3 py-2 text-sm"
+              {/* LOWER SECTIONS */}
+              <AiFeedbackBanner source="AI Planner" />
+              <FeatureCards onNavigate={(path) => navigate(path)} />
+              <ItinerarySlider
+                onItineraryClick={(id) => {
+                  setSelectedItineraryId(id);
+                  navigate(`/itineraries/${id}`);
+                }}
               />
-            </div>           
-                {/* ===== Grid Fields ===== */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              </div>
 
-                {/* ===== ACTION AREA ===== */}
-                <div className="pt-6 border-t border-gray-100 space-y-2">
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full rounded-full bg-[#5b7c67] py-4 text-white
-                              font-medium hover:bg-[#4a6a58]
-                              transition disabled:opacity-60"
-                  >
-                    {loading ? "Planning your trip…" : "Generate itinerary"}
-                  </button>
-
-                  {loading && (
-                    <p className="text-center text-sm text-gray-500">
-                      Analyzing destinations, routes & experiences…
-                    </p>
-                  )}
-                </div>
-              </form>
-            </div>
-          </div>
-        
-            <AiFeedbackBanner source="AI Planner" />
-            <FeatureCards onNavigate={(id) => navigate(id)} />
-            <ItinerarySlider onItineraryClick={(id) => { setSelectedItineraryId(id); setActiveComponent("itinerary-detail");
-             }} 
-            />
-
-            {/* ===== BECOME A GUIDE CTA ===== */}
-            <div className="mt-20">
-               <div
-                className=" bg-[#d7f26e]
-                          py-16 px-6 text-center
-                          "
-              >
-                <div className="max-w-3xl mx-auto space-y-6">
-                  <div className="w-16 h-1 bg-black/30 mx-auto rounded-full" />
-
-                  <h2 className="text-3xl md:text-4xl font-semibold text-black">
-                    You too can earn while on the move
-                  </h2>
-
-                  <button
-                    onClick={() => navigate("/become-guide")}
-                    className="inline-flex items-center justify-center
-                              rounded-full bg-[#556b00]
-                              px-8 py-4 text-white
-                              text-lg font-medium
-                              hover:scale-105 transition"
-                  >
-                    Become a local guide
-                  </button>
+              <div className="mt-20">
+                <div className="bg-[#d7f26e] py-16 px-6 text-center">
+                  <div className="max-w-3xl mx-auto space-y-6">
+                    <div className="w-16 h-1 bg-black/30 mx-auto rounded-full" />
+                    <h2 className="text-3xl md:text-4xl font-serif text-black">You too can earn while on the move</h2>
+                    <button
+                      onClick={() => navigate("/become-guide")}
+                      className="inline-flex items-center justify-center rounded-full bg-[#556b00] px-8 py-4 text-white text-lg font-medium hover:scale-105 transition"
+                    >
+                      Become a local guide
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-
-          </>
-        )}
-
-        {activeComponent !== "home" &&  renderPage()}
+            </>
+          } 
+        />
       </main>
-        
-      {activeComponent==="home" && <FaqFooterSection />}
+
+      {/* FOOTER */}
+      {location.pathname === "/" && <FaqFooterSection />}
     </div>
   );
+
+  
 }
 
 export default App;   

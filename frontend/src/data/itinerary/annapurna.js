@@ -1,5 +1,5 @@
 const annapurnaCircuitItinerary = {
-  cityslug:"annapurna-circuit",
+  slug:"annapurna-circuit",
   title: "Annapurna Circuit Trek",
   duration: "10 days",
   location: "Besisahar → Manang → Thorong La Pass → Muktinath, Nepal",

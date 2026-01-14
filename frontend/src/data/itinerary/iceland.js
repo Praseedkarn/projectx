@@ -1,5 +1,5 @@
 const icelandRingRoadItinerary = {
-  citySlug:"iceland-ring-road",
+  slug:"iceland-ring-road",
   title: "Iceland Ring Road Adventure",
   duration: "8 days",
   location: "Reykjavík → Golden Circle → South Coast → East Fjords → North Iceland → Reykjavík",

@@ -39,16 +39,18 @@ useEffect(() => {
   const loadItinerary = async () => {
     try {
       const staticData = Object.values(detailedItineraries).find(
-        (it) => it.citySlug === slug
+        (it) => it.slug === slug
       );
 
 
-      if (staticData) {
-        setItineraryDetails(staticData);
-      } else {
-        const dbData = await fetchItineraryBySlug(slug);
-        setItineraryDetails(dbData);
-      }
+     if (staticData) {
+  setItineraryDetails(staticData);
+  return;
+}
+
+const dbData = await fetchItineraryBySlug(slug);
+setItineraryDetails(dbData);
+
     } catch (err) {
       console.error("Failed to load itinerary:", err);
       setItineraryDetails(null);

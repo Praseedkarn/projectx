@@ -1,5 +1,5 @@
 const European={
-      citySlug:"europe",
+      slug:"europe",
       title: 'European Capitals',
       duration: '10 days',
       location: 'Paris, Rome, Amsterdam',

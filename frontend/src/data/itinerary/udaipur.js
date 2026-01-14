@@ -1,5 +1,5 @@
 const udaipurItinerary = {
-  citySlug:"udaipur",
+  slug:"udaipur",
   title: "Udaipur Romantic Escape",
   duration: "4 days",
   location: "Udaipur, Rajasthan, India",

@@ -1,5 +1,5 @@
 const northEastItinerary = {
-  citySlug:"north-east-explorer",
+  slug:"north-east-explorer",
   title: "North East Explorer",
   duration: "7 days",
   location: "Meghalaya & Assam, India",
