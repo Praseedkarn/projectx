@@ -1,26 +1,41 @@
 import express from "express";
 import { generateItinerary } from "../services/ai.service.js";
+import User from "../models/User.js";
+import authMiddleware from "../middleware/auth.middleware.js";
 
 const router = express.Router();
+const TOKEN_COST = 25;
 
-router.post("/itinerary", async (req, res) => {
+router.post("/itinerary", authMiddleware, async (req, res) => {
   try {
-    const { description, detailLevel } = req.body;
+    const { description } = req.body;
+    const { id, role } = req.user;
 
-    if (!description) {
-      return res.status(400).json({ error: "Description required" });
+    console.log("🔥 AI route hit, role:", role);
+
+    if (role === "admin") {
+      const result = await generateItinerary(description);
+      return res.json({ text: result.text });
     }
 
-    const result = await generateItinerary(description, detailLevel);
+    const user = await User.findById(id);
 
-    // ✅ NORMALIZED RESPONSE
-    res.status(200).json({
-      text: result.text
+    console.log("🪙 BEFORE:", user.tokens);
+
+    user.tokens -= TOKEN_COST;
+    await user.save();
+
+    console.log("🪙 AFTER:", user.tokens);
+
+    const result = await generateItinerary(description);
+
+    return res.json({
+      text: result.text,
+      remainingTokens: user.tokens,
     });
-
-  } catch (error) {
-    console.error("❌ Route error:", error.message);
-    res.status(500).json({ error: "AI failed" });
+  } catch (err) {
+    console.error("AI ERROR:", err);
+    res.status(500).json({ message: "AI failed" });
   }
 });
 

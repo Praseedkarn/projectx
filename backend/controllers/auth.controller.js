@@ -26,15 +26,18 @@ export const register = async (req, res) => {
       password: hashedPassword,
     });
 
-    res.status(201).json({
+   res.status(201).json({
       message: "User created",
       user: {
         id: user._id,
         name: user.name,
         username: user.username,
         email: user.email,
+        role: user.role,
+        tokens: user.tokens,
       },
     });
+
   } catch (err) {
     res.status(500).json({ message: "Signup failed" });
   }
@@ -59,8 +62,10 @@ export const login = async (req, res) => {
           username: "admin",
           email: "test@test.com",
           role: "admin",
+          tokens: Infinity,
         },
       });
+
     }
     const user = await User.findOne({ email });
     if (!user) {
@@ -78,16 +83,18 @@ export const login = async (req, res) => {
       { expiresIn: "7d" }
     );
 
-    res.json({
-      token,
-      user: {
-        id: user._id,
-        name: user.name,
-        username: user.username,
-        email: user.email,
-        role:"user",
-      },
-    });
+   res.json({
+  token,
+  user: {
+    id: user._id,
+    name: user.name,
+    username: user.username,
+    email: user.email,
+    role: user.role,
+    tokens: user.tokens,
+  },
+});
+
   } catch (err) {
     console.error("LOGIN ERROR:", err.message);
     res.status(500).json({ message: err.message });

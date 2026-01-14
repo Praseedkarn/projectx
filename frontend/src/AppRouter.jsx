@@ -15,7 +15,7 @@ import AiFailPage from "./components/AiFaliPage";
 import Blogs from "./components/Blogs";
 import DistanceCalculator from "./components/DistanceCalculator";
 import QrTripPage from "./components/QrTripPage";
-
+import QuizPage from "./pages/QuizPage";
 const AppRouter = ({
   currentUser,
   handleLogout,
@@ -39,6 +39,8 @@ const AppRouter = ({
           />
         }
       />
+      
+
 
       {/* ✅ FIXED PARAM NAME */}
       <Route
@@ -59,7 +61,7 @@ const AppRouter = ({
       <Route path="/become-guide" element={<BecomeGuide />} />
       <Route path="/ai-failed" element={<AiFailPage />} />
       <Route path="/qr-trip/:id" element={<QrTripPage />} />
-
+      <Route path="/quiz" element={<QuizPage />} />
       <Route path="*" element={homeContent} />
     </Routes>
   );

@@ -27,6 +27,8 @@ import { generateTravelItinerary } from "./services/api";
 import AiFailPage from "./components/AiFaliPage";
 import AppRouter from "./AppRouter";
 import { buildPrompt } from "./services/promptBuilder";
+import QuizPage from "./pages/QuizPage";
+
 function App() {
   /* ================= ROUTER ================= */
   const navigate = useNavigate();
@@ -225,6 +227,12 @@ const handleSubmit = async (e) => {
 
   } catch (err) {
     console.error(err);
+    if (err.code === "NO_TOKENS") {
+      navigate("/quiz");   // 🔥 OPEN QUIZ
+      setLoading(false);
+      return;
+    }
+
 
     navigate("/ai-failed", {
       state: {
@@ -433,6 +441,17 @@ return (
                       </button>
                       {loading && <p className="text-center text-sm text-gray-500 mt-2">Analyzing destinations, routes & experiences...</p>}
                     </div>
+                        
+                    <button
+                      type="button"
+                      onClick={() => navigate("/quiz")}
+                      className="text-sm text-blue-600 underline hover:text-blue-800"
+                    >
+                      Earn tokens (Take Quiz)
+                    </button>
+
+
+
                   </form>
                 </div>
               </div>
@@ -468,6 +487,10 @@ return (
 
       {/* FOOTER */}
       {location.pathname === "/" && <FaqFooterSection />}
+ 
+
+
+
     </div>
   );
 

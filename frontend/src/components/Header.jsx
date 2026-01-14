@@ -1,10 +1,10 @@
-import React, { useState, useEffect, forwardRef } from "react";
+import React, { useState, useEffect, forwardRef ,useRef} from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const Header = forwardRef(({ user, variant = "home", onSignInClick, onLogoutClick }, ref) => {
   const navigate = useNavigate();
   const location = useLocation();
-
+  const profileMenuRef=useRef(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [hideHeader, setHideHeader] = useState(false);
@@ -45,6 +45,24 @@ const Header = forwardRef(({ user, variant = "home", onSignInClick, onLogoutClic
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScrollY]);
+
+  useEffect(() => {
+  const handleClickOutside = (event) => {
+    if (
+      profileMenuRef.current &&
+      !profileMenuRef.current.contains(event.target)
+    ) {
+      setShowProfileMenu(false);
+      setIsMenuOpen(false);
+    }
+  };
+
+  document.addEventListener("mousedown", handleClickOutside);
+  return () => {
+    document.removeEventListener("mousedown", handleClickOutside);
+  };
+}, []);
+
 
   return (
     <header
@@ -93,8 +111,29 @@ const Header = forwardRef(({ user, variant = "home", onSignInClick, onLogoutClic
             <button onClick={() => alert("Help coming soon")}>Help</button>
           </nav>
 
+                    {/* TOKEN BADGE */}
+          {user && typeof user.tokens === "number" && (
+            <div
+              className="
+                flex items-center gap-1
+                px-3 py-1.5
+                rounded-full
+                bg-[#5b6f00]/10
+                text-[#5b6f00]
+                text-sm
+                font-semibold
+                border border-[#5b6f00]/20
+              "
+              title="Available tokens"
+            >
+              <span>🪙</span>
+              <span>{user.tokens}</span>
+            </div>
+          )}
+
+
           {/* RIGHT */}
-          <div className="relative flex items-center gap-3">
+          <div ref={profileMenuRef} className="relative flex items-center gap-3">
             {/* PROFILE */}
             {user ? (
               <button
@@ -234,7 +273,7 @@ const Header = forwardRef(({ user, variant = "home", onSignInClick, onLogoutClic
         {/* ===== HERO (HOME ONLY) ===== */}
         {variant === "home" && (
           <div
-            className={`mt-28 text-center max-w-3xl mx-auto transition-all duration-500
+            className={`mt-32 text-center max-w-3xl mx-auto transition-all duration-500
               ${
                 showHero
                   ? "opacity-100 translate-y-0"
