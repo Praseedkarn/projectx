@@ -28,11 +28,14 @@ import AiFailPage from "./components/AiFaliPage";
 import AppRouter from "./AppRouter";
 import { buildPrompt } from "./services/promptBuilder";
 import QuizPage from "./pages/QuizPage";
+import { logTokenChange } from "./services/api";
+import LogoLoader from "./components/LogoLoader";
 
 function App() {
   /* ================= ROUTER ================= */
   const navigate = useNavigate();
   const location = useLocation();
+  const isQrTrip = location.pathname.startsWith("/qr-trip/");
 
   /* ================= STATE ================= */
   const [activeComponent, setActiveComponent] = useState("home");
@@ -49,10 +52,12 @@ function App() {
   const formCardRef = useRef(null);
   const headerRef = useRef(null);
 
+    /* ================= AI ================= */
+  const [apiStatus, setApiStatus] = useState("checking");
   /* ================= USER ================= */
   const [currentUser, setCurrentUser] = useState(() => {
     try {
-      return JSON.parse(localStorage.getItem("user"));
+      return JSON.parse(sessionStorage.getItem("user"));
     } catch {
       return null;
     }
@@ -95,7 +100,6 @@ function App() {
   const [showSuggestions, setShowSuggestions] = useState(false);
 
   /* ================= AI ================= */
-  const [apiStatus, setApiStatus] = useState("checking");
 
   /* ================= URL → STATE SYNC ================= */
  useEffect(() => {
@@ -146,14 +150,22 @@ useEffect(() => {
 
   /* ================= AUTH ================= */
   const handleLoginSuccess = (user) => {
-    localStorage.setItem("user", JSON.stringify(user));
-    window.location.reload();
-  };
+  const safeUser =
+    user.role === "admin"
+      ? { ...user, tokens: Infinity }
+      : user;
 
-  const handleLogout = () => {
-    localStorage.removeItem("user");
-    window.location.reload();
-  };
+  sessionStorage.setItem("user", JSON.stringify(safeUser));
+  setCurrentUser(safeUser);
+};
+
+
+ 
+const handleLogout = () => {
+  sessionStorage.clear();
+  setCurrentUser(null);
+  navigate("/");
+};
 
   /* ================= NAV ================= */
   const go = (path, component) => {
@@ -182,13 +194,11 @@ const handleSubmit = async (e) => {
 
   try {
     let result;
+    let aiResponse;
 
-    /* ===== DEMO MODE (NO AI, NO PROMPT) ===== */
     if (isDemoRequest) {
       result = { text: demoItinerary.text };
-    } 
-    /* ===== AI MODE (PROMPT BUILDER) ===== */
-    else {
+    } else {
       const prompt = buildPrompt({
         place: cleanedPlace,
         tripType,
@@ -198,22 +208,29 @@ const handleSubmit = async (e) => {
         suggestions,
       });
 
-       console.log("🧠 PROMPT SENT TO AI:");
-  console.log(prompt);
-  console.log("📌 META:", { tripType, days, hours, group });
+      aiResponse = await generateTravelItinerary(prompt);
 
-      const aiResponse = await generateTravelItinerary(prompt);
-
-      if (!aiResponse?.text) {
-        throw new Error("AI_EMPTY");
-      }
+      if (!aiResponse?.text) throw new Error("AI_EMPTY");
 
       result = { text: aiResponse.text };
+
+      if (
+        currentUser.role !== "admin" &&
+        typeof aiResponse.remainingTokens === "number"
+      ) {
+        const updatedUser = {
+          ...currentUser,
+          tokens: aiResponse.remainingTokens,
+        };
+
+        sessionStorage.setItem("user", JSON.stringify(updatedUser));
+        setCurrentUser(updatedUser);
+      }
     }
 
-    // Save for refresh safety
     localStorage.setItem("lastTripResult", JSON.stringify(result));
 
+    // ⏱️ KEEP LOADER FOR 5 SECONDS
     setTimeout(() => {
       navigate("/results", {
         state: {
@@ -223,26 +240,24 @@ const handleSubmit = async (e) => {
         },
       });
       setLoading(false);
-    }, 2000);
+    }, 5000);
 
   } catch (err) {
-    console.error(err);
+    console.error("AI ERROR:", err);
+    setLoading(false);
+
     if (err.code === "NO_TOKENS") {
-      navigate("/quiz");   // 🔥 OPEN QUIZ
-      setLoading(false);
+      navigate("/quiz");
       return;
     }
 
-
     navigate("/ai-failed", {
-      state: {
-        reason: "AI service temporarily unavailable",
-      },
+      state: { reason: "AI service temporarily unavailable" },
     });
-
-    setLoading(false);
   }
 };
+
+
 
 
 
@@ -255,20 +270,24 @@ const handleSubmit = async (e) => {
 
 return (
     <div className="App">
+      {loading && <LogoLoader />}
       {/* ===== HEADER ===== */}
-      <Header
-        ref={headerRef}
-        variant={location.pathname === "/" ? "home" : "compact"}
-        user={currentUser}
-        onSignInClick={() => setShowSignIn(true)}
-        onLogoutClick={handleLogout}
-        onHomeClick={() => navigate("/")}
-        onItinerariesClick={() => navigate("/itineraries")}
-        onSavedClick={() => navigate("/saved")}
-        onPackingListClick={() => navigate("/packing")}
-        onProfileClick={() => navigate("/profile")}
-        onBlogsClick={() => navigate("/blogs")}
-      />
+      {!isQrTrip && (
+  <Header
+    ref={headerRef}
+    variant={location.pathname === "/" ? "home" : "compact"}
+    user={currentUser}
+    onSignInClick={() => setShowSignIn(true)}
+    onLogoutClick={handleLogout}
+    onHomeClick={() => navigate("/")}
+    onItinerariesClick={() => navigate("/itineraries")}
+    onSavedClick={() => navigate("/saved")}
+    onPackingListClick={() => navigate("/packing")}
+    onProfileClick={() => navigate("/profile")}
+    onBlogsClick={() => navigate("/blogs")}
+  />
+)}
+
 
       {/* ===== SIGN IN MODAL ===== */}
       {showSignIn && (
@@ -280,11 +299,15 @@ return (
 
       {/* ===== MAIN CONTENT AREA ===== */}
       <main
-        className={`px-2 lg:px-4 pb-24 overflow-hidden  transition-all duration-500${
-          location.pathname === "/" ? " pt-[250px] bg-[#d7f26e]" 
-          : " pt-32 bg-white"
+        className={`px-2 lg:px-4 pb-24 overflow-hidden transition-all duration-500 ${
+          isQrTrip
+            ? "pt-0 bg-[#f6f7f9]"
+            : location.pathname === "/"
+            ? "pt-[250px] bg-[#d7f26e]"
+            : "pt-32 bg-white"
         }`}
       >
+
         <AppRouter 
           currentUser={currentUser}
           handleLogout={handleLogout}

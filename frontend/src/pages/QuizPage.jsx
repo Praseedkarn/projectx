@@ -13,6 +13,8 @@ export default function QuizPage({ currentUser, setCurrentUser }) {
 
   const [cooldownUntil, setCooldownUntil] = useState(null);
   const [timeLeft, setTimeLeft] = useState("");
+  const [showRewardCard, setShowRewardCard] = useState(false);
+  const [earnedTokens, setEarnedTokens] = useState(0);
 
   /* ================= LOAD QUIZ ================= */
   useEffect(() => {
@@ -81,6 +83,8 @@ export default function QuizPage({ currentUser, setCurrentUser }) {
       setError("Please answer all questions");
       return;
     }
+    if (cooldownUntil) return;
+
 
     setSubmitting(true);
     try {
@@ -94,8 +98,10 @@ export default function QuizPage({ currentUser, setCurrentUser }) {
           ...currentUser,
           tokens: res.tokens,
         };
-        localStorage.setItem("user", JSON.stringify(updatedUser));
+        sessionStorage.setItem("user", JSON.stringify(updatedUser));
         setCurrentUser(updatedUser);
+        setEarnedTokens(res.reward); // 20
+        setShowRewardCard(true);
       }
     } catch {
       setError("Quiz submission failed");
@@ -109,6 +115,34 @@ export default function QuizPage({ currentUser, setCurrentUser }) {
 return (
   <div className="min-h-screen bg-[#f6f8f5] flex items-center justify-center px-4">
     <div className="w-full max-w-3xl bg-white rounded-2xl shadow-xl p-8 space-y-6">
+    {showRewardCard && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+    <div className="bg-white rounded-2xl p-8 max-w-sm w-full text-center shadow-xl space-y-4">
+      <h2 className="text-2xl font-semibold text-green-600">
+        🎉 Quiz Passed!
+      </h2>
+
+      <p className="text-gray-700">
+        <strong>+{earnedTokens} tokens</strong> have been credited to your account.
+      </p>
+
+      <div className="flex justify-center items-center gap-2 text-lg font-bold text-[#5b6f00]">
+        <span>🪙</span>
+        <span>{currentUser?.tokens}</span>
+      </div>
+
+      <button
+        onClick={() => {
+          setShowRewardCard(false);
+          navigate(-1);
+        }}
+        className="w-full mt-4 rounded-lg bg-green-600 text-white py-2 hover:bg-green-700"
+      >
+        Continue
+      </button>
+    </div>
+  </div>
+)}
 
       {/* PAGE TITLE */}
       <div className="text-center">
@@ -134,8 +168,24 @@ return (
         </p>
       )}
 
+      {/* COOLDOWN TIMER */}
+      {cooldownUntil && (
+        <div className="bg-yellow-50 border border-yellow-300 rounded-xl p-5 text-center">
+          <h2 className="text-lg font-semibold text-yellow-800">
+            Quiz Locked ⏳
+          </h2>
+          <p className="text-yellow-700 mt-2">
+            You can attempt the quiz again in:
+          </p>
+          <p className="text-2xl font-bold text-yellow-900 mt-2">
+            {timeLeft}
+          </p>
+        </div>
+      )}
+
+
       {/* QUIZ QUESTIONS */}
-      {!loading && questions.length > 0 && (
+      {!loading && !cooldownUntil && questions.length > 0 && (
         <div className="space-y-6">
           {questions.map((q, i) => (
             <div
@@ -179,7 +229,7 @@ return (
 
           <button
             onClick={handleSubmit}
-            disabled={submitting}
+            disabled={submitting ||cooldownUntil}
             className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-60"
           >
             {submitting ? "Submitting..." : "Submit Quiz"}

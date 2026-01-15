@@ -88,37 +88,29 @@ const QrTripPage = () => {
       <header className="sticky top-0 z-10 bg-white border-b print:hidden">
         <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
 
-          {/* BRAND */}
-          <div className="flex items-center gap-3">
-            <img
-              src="/logo.png"     // <-- put your logo in /public/logo.png
-              alt="ProjectX"
-              className="h-8 w-8"
-            />
-            <div>
-              <h1 className="text-lg font-semibold leading-tight">
-                ProjectX
-              </h1>
-              <p className="text-xs text-gray-500">
-                AI Travel Planner
-              </p>
-            </div>
-          </div>
+          
 
           {/* ACTION */}
-          <button
-            onClick={handleDownloadPDF}
-            className="rounded-full border px-4 py-2 text-sm
-                       hover:bg-gray-100 transition"
-          >
-            ⬇ Download PDF
-          </button>
+          
         </div>
       </header>
 
       {/* ================= CONTENT ================= */}
       <main className="max-w-5xl mx-auto px-6 py-10 bg-white print:px-0 print:py-0">
+    {/* ===== PROJECT X COMBINED LOGO ===== */}
+        <div className="flex justify-center items-center gap-2 mb-10">
+          <span className="text-3xl md:text-4xl font-bold text-gray-800 tracking-wide">
+            Project
+          </span>
 
+          <img
+            src="/logo.png"
+            alt="X"
+            className="h-10 md:h-12"
+          />
+        </div>
+
+      
         {/* TITLE */}
         <div className="mb-8">
           <h2 className="text-3xl font-semibold">
@@ -154,7 +146,18 @@ const QrTripPage = () => {
           Plan smarter. Travel better.
         </footer>
 
+        
+
       </main>
+
+      <button
+            onClick={handleDownloadPDF}
+            className="rounded-full border px-4 py-2 text-sm 
+                       hover:bg-gray-100 transition"
+          >
+            ⬇ Download PDF
+          </button>
+       
     </div>
   );
 };

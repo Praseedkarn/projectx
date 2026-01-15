@@ -1,73 +1,47 @@
 import axios from "axios";
 
-/* =========================
-   Utility: Sleep (rate limit safe)
-========================= */
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+const GROQ_MODEL = "llama-3.1-8b-instant";
 
-/* =========================
-   OpenRouter Call
-========================= */
-const callOpenRouter = async (model, prompt, apiKey) => {
-  const response = await axios.post(
-    "https://openrouter.ai/api/v1/chat/completions",
-    {
-      model,
-      messages: [
-        {
-          role: "user",
-          content: prompt,
-        },
-      ],
-      temperature: 0.6,
-      max_tokens: 900, // keep free models safe
-    },
-    {
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-        "HTTP-Referer": "http://localhost:3000",
-        "X-Title": "AI Travel Planner",
-      },
-      timeout: 30000, // free models are slow
-    }
-  );
-
-  return response.data.choices[0]; // ✅ correct structure
-};
+const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 
 export const generateItinerary = async (prompt) => {
-  const models = [
-    "deepseek/deepseek-r1-0528:free",
-    "arcee/trinity-mini:free",
-  ];
+  try {
+    console.log("🤖 Using Groq model:", GROQ_MODEL);
 
-  const apiKeys = [
-    process.env.AI_API_KEY_PRIMARY,
-    process.env.AI_API_KEY_SECONDARY,
-  ];
-
-  for (const key of apiKeys) {
-    if (!key) continue;
-
-    for (const model of models) {
-      try {
-        const choice = await callOpenRouter(model, prompt, key);
-
-        const text = choice.message?.content;
-
-        if (!text || text.length < 200) continue;
-
-        return {
-          provider: model,
-          text: text.replace(/```/g, "").trim(),
-        };
-      } catch {
-        await sleep(3000);
+    const response = await axios.post(
+      GROQ_API_URL,
+      {
+        model: GROQ_MODEL,
+        messages: [
+          { role: "user", content: prompt }
+        ],
+        temperature: 0.7,
+        max_tokens: 800,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        timeout: 20000,
       }
+    );
+
+    const text = response.data?.choices?.[0]?.message?.content;
+
+    if (!text || text.length < 50) {
+      throw new Error("Weak AI response");
     }
+
+    return {
+      provider: "groq",
+      text: text.trim(),
+    };
+  } catch (err) {
+    console.error(
+      "❌ Groq error:",
+      err.response?.data || err.message
+    );
+    throw err;
   }
-
-  throw new Error("AI providers failed");
 };
-

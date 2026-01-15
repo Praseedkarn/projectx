@@ -38,8 +38,8 @@ const SignIn = ({ onClose, onLoginSuccess }) => {
 
     const data = await res.json();
 
-    localStorage.setItem("token", data.token);
-    localStorage.setItem("user", JSON.stringify(data.user));
+    sessionStorage.setItem("token", data.token);
+    sessionStorage.setItem("user", JSON.stringify(data.user));
 
     onLoginSuccess(data.user);
     onClose();

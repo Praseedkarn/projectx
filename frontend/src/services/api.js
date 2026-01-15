@@ -10,8 +10,7 @@
    ===================================================== */
 
 export const generateTravelItinerary = async (description, detailLevel) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  const token = localStorage.getItem("token"); // JWT
+  const token = sessionStorage.getItem("token"); // ✅ FIX
 
   const response = await fetch("/api/ai/itinerary", {
     method: "POST",
@@ -24,11 +23,12 @@ export const generateTravelItinerary = async (description, detailLevel) => {
 
   if (!response.ok) {
     const err = await response.json();
-    throw err; // pass backend error to frontend
+    throw err;
   }
 
   return response.json();
 };
+
 
 
 /* =====================================================
@@ -133,7 +133,7 @@ export const registerUser = async (userData) => {
 ===================================================== */
 
 export const fetchQuiz = async () => {
-  const token = localStorage.getItem("token");
+  const token = sessionStorage.getItem("token");
 
   const res = await fetch("/api/quiz", {
     headers: {
@@ -150,7 +150,7 @@ export const fetchQuiz = async () => {
 };
 
 export const submitQuiz = async (answers) => {
-  const token = localStorage.getItem("token");
+  const token = sessionStorage.getItem("token");
 
   const res = await fetch("/api/quiz/submit", {
     method: "POST",
@@ -169,3 +169,13 @@ export const submitQuiz = async (answers) => {
   return res.json();
 };
 
+
+
+export const logTokenChange = (entry) => {
+  const history = JSON.parse(sessionStorage.getItem("tokenHistory")) || [];
+  history.unshift({
+    ...entry,
+    time: new Date().toISOString(),
+  });
+  sessionStorage.setItem("tokenHistory", JSON.stringify(history));
+};

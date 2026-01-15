@@ -112,24 +112,27 @@ const Header = forwardRef(({ user, variant = "home", onSignInClick, onLogoutClic
           </nav>
 
                     {/* TOKEN BADGE */}
-          {user && typeof user.tokens === "number" && (
-            <div
-              className="
-                flex items-center gap-1
-                px-3 py-1.5
-                rounded-full
-                bg-[#5b6f00]/10
-                text-[#5b6f00]
-                text-sm
-                font-semibold
-                border border-[#5b6f00]/20
-              "
-              title="Available tokens"
-            >
-              <span>🪙</span>
-              <span>{user.tokens}</span>
-            </div>
-          )}
+         {user && (
+  <div
+    className="
+      flex items-center gap-1
+      px-3 py-1.5
+      rounded-full
+      bg-[#5b6f00]/10
+      text-[#5b6f00]
+      text-sm
+      font-semibold
+      border border-[#5b6f00]/20
+    "
+    title="Available tokens"
+  >
+    <span>🪙</span>
+    <span>
+      {user.role === "admin" ? "∞" : user.tokens}
+    </span>
+  </div>
+)}
+
 
 
           {/* RIGHT */}
@@ -177,6 +180,15 @@ const Header = forwardRef(({ user, variant = "home", onSignInClick, onLogoutClic
                   >
                     Logout
                   </button>
+                  {user.role === "admin" && (
+                    <button
+                      onClick={() => navigate("/admin")}
+                      className="menu-item"
+                    >
+                      Admin Dashboard
+                    </button>
+                  )}
+
                 </div>
               </div>
             )}

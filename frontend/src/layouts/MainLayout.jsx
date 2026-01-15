@@ -6,25 +6,28 @@ const MainLayout = ({ user, onLogoutClick }) => {
   const navigate = useNavigate();
 
   const isHome = location.pathname === "/";
+  const isQrTrip = location.pathname.startsWith("/qr-trip/");
 
   return (
     <>
-      {/* ===== HEADER ===== */}
-      <Header
-        user={user}
-        variant={isHome ? "home" : "compact"}
-        onHomeClick={() => navigate("/")}
-        onItinerariesClick={() => navigate("/itineraries")}
-        onSavedClick={() => navigate("/saved")}
-        onBlogsClick={() => navigate("/blogs")}
-        onCitClick={() =>navigate("/cities")}
-        onLogoutClick={onLogoutClick}
-      />
+      {/* ===== HEADER (HIDDEN ON QR PAGE) ===== */}
+      {!isQrTrip && (
+        <>
+          <Header
+            user={user}
+            variant={isHome ? "home" : "compact"}
+            onHomeClick={() => navigate("/")}
+            onItinerariesClick={() => navigate("/itineraries")}
+            onSavedClick={() => navigate("/saved")}
+            onBlogsClick={() => navigate("/blogs")}
+            onCitClick={() => navigate("/cities")}
+            onLogoutClick={onLogoutClick}
+          />
 
-      {/* ===== HEADER SPACER (CRITICAL FIX) ===== */}
-      <div
-        className={isHome ? "h-[520px]" : "h-[88px]"}
-      />
+          {/* ===== HEADER SPACER ===== */}
+          <div className={isHome ? "h-[520px]" : "h-[88px]"} />
+        </>
+      )}
 
       {/* ===== PAGE CONTENT ===== */}
       <main
@@ -37,6 +40,5 @@ const MainLayout = ({ user, onLogoutClick }) => {
     </>
   );
 };
-
 
 export default MainLayout;

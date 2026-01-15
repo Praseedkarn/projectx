@@ -18,6 +18,9 @@ import qrTripRoutes from "./routes/qrTrip.routes.js";
 import guideRoutes from "./routes/guide.routes.js"
 import wikiRoutes from "./routes/wiki.routes.js";
 import quizRoutes from "./routes/quiz.routes.js";
+import adminRoutes from "./routes/admin.routes.js";
+
+
 // 🔎 DEBUG (SAFE TO KEEP)
 // console.log("🔥 THIS IS THE ACTIVE SERVER.JS FILE");
 // console.log("SMTP_HOST:", process.env.SMTP_HOST);
@@ -46,6 +49,8 @@ app.use("/api/qr-trips",qrTripRoutes);
 app.use("/api/guides",guideRoutes);
 app.use("/api/wiki",wikiRoutes);
 app.use("/api/quiz", quizRoutes);
+app.use("/api/admin", adminRoutes);
+
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok" });
 });

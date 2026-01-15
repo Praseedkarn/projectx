@@ -1,195 +1,146 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../styles/ProfilePage.css";
 
-const ProfilePage = () => {
+const ProfilePage = ({ user, onLogout }) => {
   const navigate = useNavigate();
-
-  /* ================= USER ================= */
-  const [userData, setUserData] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem("user"));
-    } catch {
-      return null;
-    }
-  });
-
   const [isEditing, setIsEditing] = useState(false);
+  const [localUser, setLocalUser] = useState(user);
 
   const [editForm, setEditForm] = useState({
-    name: userData?.name || "",
-    email: userData?.email || "",
-    phone: userData?.phone || "",
-    location: userData?.location || "",
+    name: "",
+    phone: "",
+    location: "",
   });
 
-  /* ================= INIT ================= */
   useEffect(() => {
-    if (!userData) {
-      navigate("/"); // 🔐 not logged in
+    if (!user) {
+      navigate("/");
       return;
     }
 
-    const saved = localStorage.getItem(
-      `userProfile_${userData.id || userData.email}`
-    );
+    setEditForm({
+      name: user.name || "",
+      phone: user.phone || "",
+      location: user.location || "",
+    });
+  }, [user, navigate]);
 
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      setUserData(parsed);
-      setEditForm({
-        name: parsed.name || "",
-        email: parsed.email || "",
-        phone: parsed.phone || "",
-        location: parsed.location || "",
-      });
-    }
-  }, [navigate]);
-
-  /* ================= SAVE PROFILE ================= */
-  const handleEditSubmit = (e) => {
+  /* ===== SAVE PROFILE ===== */
+  const handleSave = (e) => {
     e.preventDefault();
 
     const updatedUser = {
-      ...userData,
+      ...localUser,
       ...editForm,
-      updatedAt: new Date().toISOString(),
     };
 
-    localStorage.setItem(
-      `userProfile_${userData.id || userData.email}`,
-      JSON.stringify(updatedUser)
-    );
-    localStorage.setItem("user", JSON.stringify(updatedUser));
+    // ✅ single source of truth
+    sessionStorage.setItem("user", JSON.stringify(updatedUser));
+    setLocalUser(updatedUser); // local re-render
 
-    setUserData(updatedUser);
     setIsEditing(false);
-
-    alert("Profile updated successfully ✨");
   };
 
-  /* ================= LOGOUT ================= */
-  const handleLogout = () => {
-    localStorage.removeItem("user");
-    navigate("/");
-    window.location.reload();
-  };
-
-  /* ================= STATS ================= */
-  const getUserStats = () => {
-    const trips = JSON.parse(localStorage.getItem("userTrips") || "[]");
-    const packing = JSON.parse(
-      localStorage.getItem(`packing_guest`) || "[]"
-    );
-
-    return {
-      totalTrips: trips.length,
-      packingLists: packing.length,
-      joinedDate: new Date(
-        userData?.createdAt || Date.now()
-      ).toDateString(),
-    };
-  };
-
-  const stats = getUserStats();
-
-  if (!userData) return null;
+  if (!localUser) return null;
 
   return (
-    <div className="profile-page">
-      {/* HEADER */}
-      <div className="profile-header">
-        <button className="back-btn" onClick={() => navigate(-1)}>
-          ← Back
-        </button>
-        <h1>👤 My Profile</h1>
-      </div>
+    <div className="pt-28 px-4 max-w-3xl mx-auto">
+      <div className="bg-white rounded-3xl shadow p-8 space-y-6">
 
-      <div className="profile-content-container">
-        <div className="profile-main-card">
-          {/* BASIC INFO */}
-          <div className="profile-header-section">
-            <div className="profile-avatar-large">
-              {userData.name?.charAt(0)?.toUpperCase()}
-            </div>
-            <div className="profile-basic-info">
-              <h2>{userData.name}</h2>
-              <p>{userData.email}</p>
-              <p>Member since: {stats.joinedDate}</p>
-            </div>
+        <div className="flex justify-between items-center">
+          <h1 className="text-2xl font-semibold">My Profile</h1>
+          <button onClick={() => navigate(-1)} className="text-sm text-gray-500">
+            ← Back
+          </button>
+        </div>
+
+        <div className="flex items-center gap-5">
+          <div className="w-16 h-16 rounded-full bg-[#5b6f00]/10 flex items-center justify-center text-2xl font-bold">
+            {localUser.name?.[0]?.toUpperCase()}
           </div>
 
-          {/* STATS */}
-          <div className="quick-stats">
-            <div className="stat-box">
-              <h4>Trips Planned</h4>
-              <p>{stats.totalTrips}</p>
-            </div>
-            <div className="stat-box">
-              <h4>Packing Lists</h4>
-              <p>{stats.packingLists}</p>
-            </div>
+          <div>
+            <p className="font-semibold text-lg">{localUser.name}</p>
+            <p className="text-sm text-gray-500">{localUser.email}</p>
+            <p className="text-sm mt-1">
+              🪙 Tokens: <strong>{localUser.tokens}</strong>
+            </p>
           </div>
+        </div>
 
-          {/* EDIT / VIEW */}
-          {isEditing ? (
-            <form className="edit-form" onSubmit={handleEditSubmit}>
-              <input
-                value={editForm.name}
-                onChange={(e) =>
-                  setEditForm({ ...editForm, name: e.target.value })
-                }
-                placeholder="Name"
-                required
-              />
-              <input
-                value={editForm.email}
-                onChange={(e) =>
-                  setEditForm({ ...editForm, email: e.target.value })
-                }
-                required
-              />
-              <input
-                value={editForm.phone}
-                onChange={(e) =>
-                  setEditForm({ ...editForm, phone: e.target.value })
-                }
-                placeholder="Phone"
-              />
-              <input
-                value={editForm.location}
-                onChange={(e) =>
-                  setEditForm({ ...editForm, location: e.target.value })
-                }
-                placeholder="Location"
-              />
+        {isEditing ? (
+          <form onSubmit={handleSave} className="space-y-4">
+            <input
+              value={editForm.name}
+              onChange={(e) =>
+                setEditForm({ ...editForm, name: e.target.value })
+              }
+              className="w-full border rounded-xl px-4 py-2"
+              required
+            />
 
-              <button type="submit">💾 Save</button>
-              <button type="button" onClick={() => setIsEditing(false)}>
+            <input
+              value={editForm.phone}
+              onChange={(e) =>
+                setEditForm({ ...editForm, phone: e.target.value })
+              }
+              className="w-full border rounded-xl px-4 py-2"
+            />
+
+            <input
+              value={editForm.location}
+              onChange={(e) =>
+                setEditForm({ ...editForm, location: e.target.value })
+              }
+              className="w-full border rounded-xl px-4 py-2"
+            />
+
+            <div className="flex gap-3">
+              <button
+                type="submit"
+                className="px-6 py-2 rounded-full bg-[#5b7c67] text-white"
+              >
+                Save
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsEditing(false)}
+                className="px-6 py-2 rounded-full border"
+              >
                 Cancel
               </button>
-            </form>
-          ) : (
-            <div className="profile-details">
-              <p>Phone: {userData.phone || "—"}</p>
-              <p>Location: {userData.location || "—"}</p>
+
+
             </div>
-          )}
-
-          {/* ACTIONS */}
-          <div className="profile-actions">
-            <button onClick={() => setIsEditing(!isEditing)}>
-              {isEditing ? "View Profile" : "Edit Profile"}
-            </button>
-
-            <button onClick={() => navigate("/packing")}>
-              🧳 Packing List
-            </button>
-
-            <button className="logout-btn" onClick={handleLogout}>
-              🚪 Logout
-            </button>
+          </form>
+        ) : (
+          <div className="space-y-2 text-sm">
+            <p>📞 Phone: {localUser.phone || "—"}</p>
+            <p>📍 Location: {localUser.location || "—"}</p>
           </div>
+        )}
+
+        <div className="flex gap-3 pt-4 border-t">
+          <button
+            onClick={() => setIsEditing((p) => !p)}
+            className="px-5 py-2 rounded-full border"
+          >
+            {isEditing ? "View Profile" : "Edit Profile"}
+          </button>
+
+          <button
+            onClick={() => navigate("/tokens")}
+            className="px-5 py-2 rounded-full border flex items-center gap-2"
+          >
+            🪙 Token History
+          </button>
+
+          <button
+            onClick={onLogout}
+            className="px-5 py-2 rounded-full bg-red-50 text-red-600"
+          >
+            Logout
+          </button>
         </div>
       </div>
     </div>

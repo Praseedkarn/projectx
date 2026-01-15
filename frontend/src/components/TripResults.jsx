@@ -236,46 +236,69 @@ useEffect(() => {
         </div>
 
         {/* ================= CITY INFO (WIKIPEDIA) ================= */}
-{city && (
-  <div className="bg-white rounded-3xl shadow p-6 space-y-4">
-    {cityLoading ? (
-      <p className="text-gray-500 text-sm">
-        Loading information about {city}…
-      </p>
-    ) : cityInfo ? (
-      <>
-        <h2 className="text-2xl font-semibold">
-          About {cityInfo.title}
-        </h2>
+        {city && (
+          <div className="bg-white rounded-3xl shadow p-6 space-y-4">
+            {cityLoading ? (
+              <p className="text-gray-500 text-sm">
+                Loading information about {city}…
+              </p>
+            ) : cityInfo ? (
+              <>
+                <h2 className="text-2xl font-semibold">
+                  About {cityInfo.title}
+                </h2>
 
-        {cityInfo.image && (
-          <img
-            src={cityInfo.image}
-            alt={cityInfo.title}
-            className="w-full max-h-64 object-cover rounded-xl"
-          />
+                {cityInfo.image && (
+                  <img
+                    src={cityInfo.image}
+                    alt={cityInfo.title}
+                    className="w-full max-h-64 object-cover rounded-xl"
+                  />
+                )}
+
+                <p className="text-gray-700 leading-relaxed">
+                  {cityInfo.description}
+                </p>
+
+                <a
+                  href={cityInfo.wikipediaUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-indigo-600 text-sm font-medium"
+                >
+                  Read more on Wikipedia →
+                </a>
+              </>
+            ) : (
+              <p className="text-gray-500 text-sm">
+                No information found for {city}.
+              </p>
+            )}
+          </div>
         )}
 
-        <p className="text-gray-700 leading-relaxed">
-          {cityInfo.description}
-        </p>
+        {city && (
+  <div className="bg-white rounded-3xl shadow p-6 space-y-3">
+    <h3 className="text-lg font-semibold text-gray-800">
+      Explore {city}
+    </h3>
 
-        <a
-          href={cityInfo.wikipediaUrl}
-          target="_blank"
-          rel="noreferrer"
-          className="text-indigo-600 text-sm font-medium"
-        >
-          Read more on Wikipedia →
-        </a>
-      </>
-    ) : (
-      <p className="text-gray-500 text-sm">
-        No information found for {city}.
-      </p>
-    )}
+    <p className="text-sm text-gray-500">
+      Zoom in to see famous places, attractions, and landmarks
+    </p>
+
+    <iframe
+      title="city-attractions-map"
+      className="w-full h-96 rounded-xl"
+      loading="lazy"
+      src={`https://www.google.com/maps?q=top+tourist+attractions+in+${encodeURIComponent(
+        city
+      )}&z=13&output=embed`}
+    />
   </div>
 )}
+
+
 
 
         {/* CONTENT */}
