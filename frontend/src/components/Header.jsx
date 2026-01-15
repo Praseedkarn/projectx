@@ -338,7 +338,7 @@ const Header = forwardRef(({ user, variant = "home", onSignInClick, onLogoutClic
           />
         </div> */}
 
-            <h1 className="-mt-4 text-4xl md:text-6xl italic text-[#5b6f00]">
+            <h1 className="-mt-4 text-5xl md:text-6xl italic text-[#5b6f00]">
               Off the beaten path
             </h1>
             <p className="mt-4 text-lg italic text-gray-500">

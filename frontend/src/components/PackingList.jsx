@@ -14,28 +14,24 @@ const PackingList = () => {
 
   const STORAGE_KEY = "packing_guest";
 
-  /* ================= DERIVED ================= */
   const hasItems = items.length > 0;
 
   /* ================= CATEGORIES ================= */
   const categories = [
-    { id: "clothing", name: "Clothing", icon: "👕", border: "border-green-500" },
-    { id: "toiletries", name: "Toiletries", icon: "🧴", border: "border-blue-500" },
-    { id: "electronics", name: "Electronics", icon: "📱", border: "border-orange-500" },
-    { id: "documents", name: "Documents", icon: "📄", border: "border-purple-500" },
-    { id: "medications", name: "Medications", icon: "💊", border: "border-red-500" },
-    { id: "essentials", name: "Essentials", icon: "🎒", border: "border-amber-500" },
-    { id: "food", name: "Food & Snacks", icon: "🍎", border: "border-pink-500" },
-    { id: "other", name: "Other", icon: "📦", border: "border-gray-500" }
+    { id: "clothing", name: "Clothing", icon: "👕" },
+    { id: "toiletries", name: "Toiletries", icon: "🧴" },
+    { id: "electronics", name: "Electronics", icon: "📱" },
+    { id: "documents", name: "Documents", icon: "📄" },
+    { id: "medications", name: "Medications", icon: "💊" },
+    { id: "essentials", name: "Essentials", icon: "🎒" },
+    { id: "food", name: "Food & Snacks", icon: "🍎" },
+    { id: "other", name: "Other", icon: "📦" }
   ];
 
   /* ================= INIT ================= */
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      if (parsed.length > 0) setItems(parsed);
-    }
+    if (saved) setItems(JSON.parse(saved));
   }, []);
 
   /* ================= PERSIST ================= */
@@ -51,7 +47,7 @@ const PackingList = () => {
     setTimeout(() => {
       setItems(generateItems());
       setIsLoading(false);
-    }, 1500);
+    }, 1200);
   };
 
   const generateItems = () => {
@@ -75,73 +71,29 @@ const PackingList = () => {
   const toggleItem = (id) =>
     setItems(items.map(i => i.id === id ? { ...i, packed: !i.packed } : i));
 
-  const updateQuantity = (id, delta) =>
-    setItems(items.map(i =>
-      i.id === id ? { ...i, quantity: Math.max(1, i.quantity + delta) } : i
-    ));
-
   const removeItem = (id) =>
     setItems(items.filter(i => i.id !== id));
-
-  const addQuickItem = (name, category) =>
-    setItems([...items, {
-      id: Date.now(),
-      name,
-      category,
-      quantity: 1,
-      packed: false,
-      essential: false,
-      custom: true
-    }]);
 
   const addCustomItem = (e) => {
     e.preventDefault();
     if (!customItemName.trim()) return;
 
-    addQuickItem(customItemName, customItemCategory);
+    setItems([
+      ...items,
+      {
+        id: Date.now(),
+        name: customItemName,
+        category: customItemCategory,
+        quantity: 1,
+        packed: false,
+        essential: false,
+        custom: true
+      }
+    ]);
+
     setCustomItemName("");
     setCustomItemCategory("other");
     setShowCustomCard(false);
-  };
-
-  const startNewList = () => {
-    setItems([]);
-    setTripDescription("");
-    setShowCustomCard(false);
-    localStorage.removeItem(STORAGE_KEY);
-  };
-
-  /* ================= PRINT ================= */
-  const printList = () => {
-    const content = document.getElementById("packing-list-content").innerHTML;
-    const original = document.body.innerHTML;
-
-    document.body.innerHTML = `
-      <div style="font-family:Arial;padding:20px">
-        <h1>🧳 Personalized Packing List</h1>
-        <p>${tripDescription || "My Trip"}</p>
-        ${content}
-      </div>
-    `;
-
-    window.print();
-    document.body.innerHTML = original;
-    window.location.reload();
-  };
-
-  /* ================= EXPORT ================= */
-  const exportList = () => {
-    const text = items
-      .map(i => `${i.packed ? "✅" : "⬜"} ${i.name} x${i.quantity}`)
-      .join("\n");
-
-    const blob = new Blob([text], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "packing-list.txt";
-    a.click();
   };
 
   const progress = hasItems
@@ -157,20 +109,10 @@ const PackingList = () => {
           ← Back
         </button>
         <h1 className="text-xl font-semibold">🧳 Packing List</h1>
-        {hasItems && (
-          <div className="flex gap-2">
-            <button onClick={printList} className="border px-3 py-1.5 rounded-lg text-sm">
-              🖨️ Print
-            </button>
-            <button onClick={exportList} className="border px-3 py-1.5 rounded-lg text-sm">
-              📥 Export
-            </button>
-          </div>
-        )}
       </div>
 
       {/* CONTENT */}
-      <div className="max-w-6xl mx-auto px-6 pt-20 pb-6">
+      <div className="max-w-6xl mx-auto px-6 pt-20 pb-10">
         {!hasItems && (
           <div className="bg-white rounded-3xl p-6 shadow-lg">
             <textarea
@@ -184,13 +126,14 @@ const PackingList = () => {
               onClick={generatePackingList}
               className="mt-4 bg-black text-white px-6 py-3 rounded-xl"
             >
-              Create My Packing List
+              {isLoading ? "Generating..." : "Create My Packing List"}
             </button>
           </div>
         )}
 
         {hasItems && (
-          <div id="packing-list-content" className="space-y-6">
+          <div className="space-y-6">
+            {/* PROGRESS */}
             <div className="bg-white p-5 rounded-2xl shadow">
               <div className="flex justify-between text-sm mb-2">
                 <span>Packing Progress</span>
@@ -201,13 +144,16 @@ const PackingList = () => {
               </div>
             </div>
 
+            {/* CATEGORIES */}
             {categories.map(cat => {
               const list = items.filter(i => i.category === cat.id);
               if (!list.length) return null;
 
               return (
                 <div key={cat.id} className="bg-white rounded-2xl shadow p-5">
-                  <h3 className="font-semibold mb-3">{cat.icon} {cat.name}</h3>
+                  <h3 className="font-semibold mb-3">
+                    {cat.icon} {cat.name}
+                  </h3>
                   {list.map(item => (
                     <div key={item.id} className="flex justify-between py-2 border-b">
                       <label className="flex gap-2">
@@ -218,12 +164,70 @@ const PackingList = () => {
                         />
                         {item.name}
                       </label>
-                      <button onClick={() => removeItem(item.id)} className="text-red-500">×</button>
+                      <button
+                        onClick={() => removeItem(item.id)}
+                        className="text-red-500"
+                      >
+                        ×
+                      </button>
                     </div>
                   ))}
                 </div>
               );
             })}
+
+            {/* ADD MORE ITEM */}
+            <button
+              onClick={() => setShowCustomCard(true)}
+              className="w-full bg-white border-2 border-dashed border-gray-300 py-4 rounded-2xl text-gray-600 hover:border-black hover:text-black"
+            >
+              ➕ Add more items
+            </button>
+
+            {showCustomCard && (
+              <form
+                onSubmit={addCustomItem}
+                className="bg-white p-6 rounded-2xl shadow space-y-4"
+              >
+                <h3 className="font-semibold text-lg">Add Custom Item</h3>
+
+                <input
+                  type="text"
+                  value={customItemName}
+                  onChange={(e) => setCustomItemName(e.target.value)}
+                  placeholder="Item name"
+                  className="w-full border rounded-xl p-3"
+                />
+
+                <select
+                  value={customItemCategory}
+                  onChange={(e) => setCustomItemCategory(e.target.value)}
+                  className="w-full border rounded-xl p-3"
+                >
+                  {categories.map(cat => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.name}
+                    </option>
+                  ))}
+                </select>
+
+                <div className="flex gap-3">
+                  <button
+                    type="submit"
+                    className="bg-black text-white px-5 py-2 rounded-xl"
+                  >
+                    Add Item
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowCustomCard(false)}
+                    className="border px-5 py-2 rounded-xl"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
         )}
       </div>

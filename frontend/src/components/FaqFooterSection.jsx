@@ -1,16 +1,44 @@
 import { useState } from "react";
 
 const faqs = [
-  "Why yet another trip planning tool?",
-  "What can I do with Project X?",
-  "Who is Project X for?",
-  "How can I plan my stay with Project X?",
-  "How does the trip budgeting work?",
-  "Can I book plane tickets or accommodations?",
-  "Why are there so few places listed on Project X?",
-  "How can I connect with communities and travelers?",
-  "What activities can I experience on Project X?",
+  {
+    q: "Why yet another trip planning tool?",
+    a: "Most travel tools focus on bookings. Project X focuses on planning, clarity, and real-world travel logic before you spend money."
+  },
+  {
+    q: "What can I do with Project X?",
+    a: "You can plan trips day-by-day, estimate budgets, discover destinations, and organize travel details in one place."
+  },
+  {
+    q: "Who is Project X for?",
+    a: "Project X is for solo travelers, families, students, and anyone who wants stress-free and realistic trip planning."
+  },
+  {
+    q: "How can I plan my stay with Project X?",
+    a: "You can explore destinations, choose activities, estimate stay duration, and build a structured itinerary based on your travel style."
+  },
+  {
+    q: "How does the trip budgeting work?",
+    a: "Project X provides rough cost estimates for transport, stay, food, and activities to help you plan within your budget."
+  },
+  {
+    q: "Can I book plane tickets or accommodations?",
+    a: "Currently, Project X focuses on planning. Booking integrations may be added in the future."
+  },
+  {
+    q: "Why are there so few places listed on Project X?",
+    a: "Project X is growing gradually to ensure accurate and meaningful data rather than overwhelming users with unreliable information."
+  },
+  {
+    q: "How can I connect with communities and travelers?",
+    a: "Future updates will allow you to connect with travelers, local guides, and communities for shared experiences and tips."
+  },
+  {
+    q: "What activities can I experience on Project X?",
+    a: "You can explore sightseeing spots, local experiences, nature activities, cultural visits, and travel-friendly adventures."
+  }
 ];
+
 
 export default function FaqFooterSection() {
   const [open, setOpen] = useState(null);
@@ -27,13 +55,13 @@ export default function FaqFooterSection() {
             </h2>
 
             <div className="space-y-5">
-              {faqs.map((q, i) => (
+              {faqs.map((item, i) => (
                 <div key={i} className="border-b border-black/10 pb-4">
                   <button
                     onClick={() => setOpen(open === i ? null : i)}
                     className="w-full flex justify-between items-center text-left text-base font-medium"
                   >
-                    {q}
+                    {item.q}
                     <span className="text-xl">
                       {open === i ? "−" : "+"}
                     </span>
@@ -41,8 +69,7 @@ export default function FaqFooterSection() {
 
                   {open === i && (
                     <p className="mt-3 text-sm text-gray-700 max-w-2xl">
-                      Project X provides curated tools, trusted data, and
-                      community-driven travel experiences.
+                      {item.a}
                     </p>
                   )}
                 </div>
