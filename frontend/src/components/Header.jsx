@@ -325,7 +325,7 @@ const Header = forwardRef(({ user, variant = "home", onSignInClick, onLogoutClic
               }`}
           >
             {/* MOBILE HERO IMAGE */}
-        <div className="md:hidden absolute -top-24 left-1/2 -translate-x-1/2 z-0 ">
+        {/* <div className="md:hidden absolute -top-24 left-1/2 -translate-x-1/2 z-0 ">
           <img
             src="/p.png"
             alt="Travel illustration"
@@ -336,7 +336,7 @@ const Header = forwardRef(({ user, variant = "home", onSignInClick, onLogoutClic
       pointer-events-none
             "
           />
-        </div>
+        </div> */}
 
             <h1 className="-mt-4 text-4xl md:text-6xl italic text-[#5b6f00]">
               Off the beaten path
