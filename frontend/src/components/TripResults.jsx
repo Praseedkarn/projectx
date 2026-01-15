@@ -163,7 +163,7 @@ useEffect(() => {
         setDisplayText("");
         setIsTyping(false);
       }
-    }, 80);
+    }, 110+ Math.random()*40);
 
     return () => clearInterval(typingInterval);
   }, [suggestions]);
@@ -210,7 +210,7 @@ useEffect(() => {
 
   /* ================= RESULT ================= */
   return (
-    <div className=" pt-24 px-4">
+    <div className=" pt-24 px-4 animate-fade-in">
       <div className="max-w-4xl mx-auto space-y-6">
 
         {/* HEADER */}
@@ -333,7 +333,7 @@ useEffect(() => {
             {isTyping && displayText !== "" && (
               <>
                 {displayText}
-                <span className="animate-pulse">▍</span>
+                <span className="ml-1 animate-pulse">▍</span>
               </>
             )}
 

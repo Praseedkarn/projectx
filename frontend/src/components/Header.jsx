@@ -112,57 +112,59 @@ const Header = forwardRef(({ user, variant = "home", onSignInClick, onLogoutClic
           </nav>
 
                     {/* TOKEN BADGE */}
-         {user && (
-  <div
-    className="
-      flex items-center gap-1
-      px-3 py-1.5
-      rounded-full
-      bg-[#5b6f00]/10
-      text-[#5b6f00]
-      text-sm
-      font-semibold
-      border border-[#5b6f00]/20
-    "
-    title="Available tokens"
-  >
-    <span>🪙</span>
-    <span>
-      {user.role === "admin" ? "∞" : user.tokens}
-    </span>
-  </div>
-)}
+                  {user && (
+                    <div
+                      className="
+                        hidden md:flex
+                        items-center gap-1
+                        px-3 py-1.5
+                        rounded-full
+                        bg-[#5b6f00]/10
+                        text-[#5b6f00]
+                        text-sm
+                        font-semibold
+                        border border-[#5b6f00]/20
+                      "
+                    >
+                      <span>🪙</span>
+                      <span>{user.role === "admin" ? "∞" : user.tokens}</span>
+                    </div>
+                  )}
+
 
 
 
           {/* RIGHT */}
           <div ref={profileMenuRef} className="relative flex items-center gap-3">
             {/* PROFILE */}
-            {user ? (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowProfileMenu((p) => !p);
-                }}
-                className="flex items-center gap-2 px-3 py-1.5 border rounded-full"
-              >
-                <span className="w-7 h-7 rounded-full bg-[#5b6f00]/10 flex items-center justify-center">
-                  {user.name?.[0]?.toUpperCase() || "U"}
-                </span>
-                <span className="hidden sm:block">{user.name}</span>
-              </button>
-            ) : (
-              <button
-                onClick={onSignInClick}
-                className="px-4 py-2 rounded-full bg-[#5b7c67] text-white text-sm"
-              >
-                Sign in
-              </button>
-            )}
+           
+                  {/* PROFILE (DESKTOP ONLY) */}
+              {user ? (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowProfileMenu((p) => !p);
+                  }}
+                  className="hidden md:flex items-center gap-2 px-3 py-1.5 border rounded-full"
+                >
+                  <span className="w-7 h-7 rounded-full bg-[#5b6f00]/10 flex items-center justify-center">
+                    {user.name?.[0]?.toUpperCase() || "U"}
+                  </span>
+                  <span>{user.name}</span>
+                </button>
+              ) : (
+                <button
+                  onClick={onSignInClick}
+                  className="hidden md:block px-4 py-2 rounded-full bg-[#5b7c67] text-white text-sm"
+                >
+                  Sign in
+                </button>
+              )}
 
             {/* PROFILE MENU */}
             {showProfileMenu && user && (
-              <div className="absolute right-0 top-12 w-56 rounded-xl border bg-white shadow-xl">
+              <div className="absolute right-0 top-12 w-56 rounded-xl bg-white shadow-2xl border border-gray-200">
+
                 <div className="px-4 py-3">
                   <p className="font-semibold">{user.name}</p>
                   <p className="text-xs text-gray-500">{user.email}</p>
@@ -200,10 +202,33 @@ const Header = forwardRef(({ user, variant = "home", onSignInClick, onLogoutClic
             >
               ☰
             </button>
-
-            {/* MOBILE MENU */}
             {isMenuOpen && (
-              <div className="absolute right-0 top-12 w-60 rounded-xl border bg-white p-3 shadow-xl">
+              <div className="
+              absolute right-0 top-12 w-64
+              rounded-xl
+              bg-white
+              p-4
+              shadow-2xl
+              border border-gray-200
+              z-50
+              md:bg-white
+              ">
+
+                {/* USER INFO */}
+                {user && (
+                  <div className="pb-3 border-b">
+                    <p className="font-semibold">{user.name}</p>
+                    <p className="text-xs text-gray-500">{user.email}</p>
+
+                    <div className="mt-2 inline-flex items-center gap-2 text-sm
+                                    bg-[#5b6f00]/10 text-[#5b6f00]
+                                    px-3 py-1.5 rounded-full">
+                      🪙 {user.role === "admin" ? "∞" : user.tokens}
+                    </div>
+                  </div>
+                )}
+
+                {/* NAV */}
                 <button onClick={() => navigate("/")} className="menu-item">
                   Home
                 </button>
@@ -213,25 +238,28 @@ const Header = forwardRef(({ user, variant = "home", onSignInClick, onLogoutClic
 
                 {user && (
                   <>
-                    <button
-                      onClick={() => navigate("/itineraries")}
-                      className="menu-item"
-                    >
+                    <button onClick={() => navigate("/itineraries")} className="menu-item">
                       Itineraries
                     </button>
-                    <button
-                      onClick={() => navigate("/saved")}
-                      className="menu-item"
-                    >
+                    <button onClick={() => navigate("/saved")} className="menu-item">
                       Saved
                     </button>
-                    <button
-                      onClick={() => navigate("/packing")}
-                      className="menu-item"
-                    >
+                    <button onClick={() => navigate("/packing")} className="menu-item">
                       Packing list
                     </button>
+                    <button onClick={() => navigate("/profile")} className="menu-item">
+                      My profile
+                    </button>
                   </>
+                )}
+
+                {!user && (
+                  <button
+                    onClick={onSignInClick}
+                    className="w-full rounded-lg bg-[#5b7c67] text-white py-2 text-sm"
+                  >
+                    Sign in
+                  </button>
                 )}
 
                 {user && (
@@ -244,55 +272,73 @@ const Header = forwardRef(({ user, variant = "home", onSignInClick, onLogoutClic
                 )}
               </div>
             )}
+
+          
           </div>
         </div>
         {variant === "home" && (
-  <img
-    src="/airplane.png"
-    alt="Travel path"
-    className="
-      absolute
-      bottom-[80px]     /* 👈 controls vertical position */
-      left-1/2
-      left-16 md:left-24
-      w-28 md:w-36       /* 👈 smaller size */
-      opacity-20
-      drop-shadow-[0_20px_30px_rgba(91,111,0,0.25)]
-      pointer-events-none
-      z-0
-    "
-  />
-)}
-{variant === "home" && (
-  <img
-    src="/t.png"
-    alt="Travel path right"
-    className="
-      absolute
-      bottom-[130px]          /* slightly different height = natural look */
-      right-6 sm:right-12 md:right-24
-      w-24 md:w-32            /* a bit smaller for depth */
-      opacity-20
-      rotate-6
-      scale-x-[-1]            /* 👈 mirror horizontally */
-      pointer-events-none
-      z-0
-    "
-  />
-)}
+          <img
+            src="/airplane.png"
+            alt="Travel path"
+            className="
+            hidden md:block
+              absolute
+            bottom-[220px] md:bottom-[80px]   /* 👈 much higher on mobile */
+            left-1/2 -translate-x-1/2         /* center on mobile */
+            md:left-24 md:translate-x-0
+            w-20 md:w-36
+            opacity-20
+            drop-shadow-[0_20px_30px_rgba(91,111,0,0.25)]
+            pointer-events-none
+            z-0
+            "
+          />
+          )}
+          {variant === "home" && (
+          <img
+            src="/t.png"
+            alt="Travel path right"
+            className="
+              hidden md:block                /* 👈 hide on mobile */
+              absolute
+              bottom-[130px]
+              right-24
+              w-32
+              opacity-20
+              rotate-6
+              scale-x-[-1]
+              pointer-events-none
+              z-0
+            "
+          />
+          )}
 
 
         {/* ===== HERO (HOME ONLY) ===== */}
         {variant === "home" && (
           <div
-            className={`mt-32 text-center max-w-3xl mx-auto transition-all duration-500
+            className={`relative mt-40 text-center max-w-3xl mx-auto transition-all duration-500
               ${
                 showHero
                   ? "opacity-100 translate-y-0"
                   : "opacity-0 -translate-y-6 pointer-events-none"
               }`}
           >
-            <h1 className="text-4xl md:text-6xl italic text-[#5b6f00]">
+            {/* MOBILE HERO IMAGE */}
+        <div className="md:hidden absolute -top-24 left-1/2 -translate-x-1/2 z-0 ">
+          <img
+            src="/p.png"
+            alt="Travel illustration"
+            className="
+              w-36
+      opacity-30
+      drop-shadow-[0_12px_20px_rgba(91,111,0,0.18)]
+      pointer-events-none
+            "
+          />
+        </div>
+
+            <h1 className="-mt-4 text-4xl md:text-6xl italic text-[#5b6f00]">
               Off the beaten path
             </h1>
             <p className="mt-4 text-lg italic text-gray-500">

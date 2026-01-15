@@ -94,7 +94,6 @@ export default function FaqFooterSection() {
               <ul className="space-y-2 text-gray-700">
                 <li>Blog</li>
                 <li>Instagram</li>
-                <li>TikTok</li>
                 <li>Local Guides</li>
               </ul>
             </div>

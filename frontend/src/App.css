@@ -2,19 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
-
-
+/* ================= GLOBAL ================= */
 html,
 body {
   background-color: #d7f26e;
   overscroll-behavior: none;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 * {
   -webkit-tap-highlight-color: transparent;
 }
+
+/* ================= PAGE ANIMATION ================= */
 .animate-page {
-  animation: pageFade 0.35s ease-out;
+  animation: pageFade 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @keyframes pageFade {
@@ -27,10 +33,14 @@ body {
     transform: translateY(0);
   }
 }
+
+/* ================= REVEAL ================= */
 .reveal {
   opacity: 0;
-  transform: translateY(20px);
-  transition: all 0.6s ease;
+  transform: translateY(16px);
+  transition:
+    opacity 0.6s ease,
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .reveal.show {
@@ -38,26 +48,21 @@ body {
   transform: translateY(0);
 }
 
-@keyframes fadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
+/* ================= CURSOR BLINK ================= */
+@keyframes blink {
+  0%, 50%, 100% {
     opacity: 1;
-    transform: translateY(0);
+  }
+  25%, 75% {
+    opacity: 0;
   }
 }
-@keyframes fadeLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+
+.animate-blink {
+  animation: blink 1.2s infinite;
 }
+
+/* ================= PROGRESS (OPTIONAL) ================= */
 @keyframes progress {
   0% {
     width: 0%;
@@ -73,16 +78,13 @@ body {
   }
 }
 
-
+/* ================= PRINT ================= */
 @media print {
   body {
     background: white !important;
   }
 
-  header {
-    display: none !important;
-  }
-
+  header,
   button {
     display: none !important;
   }
