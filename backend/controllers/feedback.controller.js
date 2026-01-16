@@ -5,22 +5,27 @@ export const submitFeedback = async (req, res) => {
   try {
     const { message, email, source } = req.body;
 
-    if (!message) {
+    // 🔴 Validation
+    if (!message || !message.trim()) {
       return res.status(400).json({
         success: false,
         message: "Feedback message is required",
       });
     }
 
+    // ✅ Save feedback to DB
     const feedback = await Feedback.create({
       message,
       email,
       source,
     });
 
-    // ✅ SEND EMAIL ALERT (non-blocking)
-    sendFeedbackEmail({ message, email, source })
-      .catch(err => console.error("Email error:", err));
+    // ✅ SEND EMAIL (awaited)
+    await sendFeedbackEmail({
+      message,
+      email,
+      source,
+    });
 
     return res.status(201).json({
       success: true,
@@ -28,8 +33,9 @@ export const submitFeedback = async (req, res) => {
       feedback,
     });
   } catch (error) {
-    console.error("Feedback error:", error);
-    res.status(500).json({
+    console.error("❌ Feedback submit error:", error);
+
+    return res.status(500).json({
       success: false,
       message: "Server error while submitting feedback",
     });

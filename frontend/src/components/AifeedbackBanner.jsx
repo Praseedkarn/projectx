@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 export default function AiFeedbackBanner({ source = "AI Planner" }) {
   const [message, setMessage] = useState("");
   const [email, setEmail] = useState("");
@@ -12,7 +14,9 @@ export default function AiFeedbackBanner({ source = "AI Planner" }) {
     try {
       setLoading(true);
 
-      await fetch("https://projectx-yzu3.onrender.com/api/feedback", {
+      console.log("Sending feedback to:", API_URL); // 🔎 debug
+
+      await fetch(`${API_URL}/api/feedback`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -35,7 +39,6 @@ export default function AiFeedbackBanner({ source = "AI Planner" }) {
   return (
     <section className="relative my-16">
       <div className="rounded-[36px] bg-[#d7f26e]/80 px-6 py-12 md:px-14 md:py-16">
-
         <div className="max-w-4xl">
           <h2 className="text-3xl md:text-4xl font-semibold text-black">
             Having trouble with AI results?
@@ -88,7 +91,7 @@ export default function AiFeedbackBanner({ source = "AI Planner" }) {
 
           <p className="mt-4 text-xs text-black/70">
             By contacting us, you agree to our
-            <span className="underline ml-1">Privacy Policy</span> &
+            <span className="underline ml-1">Privacy Policy</span> &amp;
             <span className="underline ml-1">Terms of Use</span>.
           </p>
         </div>
