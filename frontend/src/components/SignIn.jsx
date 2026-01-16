@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+const API_URL = process.env.REACT_APP_API_URL;
 
 const SignIn = ({ onClose, onLoginSuccess }) => {
   const [isLogin, setIsLogin] = useState(true);
@@ -25,7 +26,7 @@ const SignIn = ({ onClose, onLoginSuccess }) => {
       throw new Error("Email and password required");
     }
 
-    const res = await fetch("https://projectx-yzu3.onrender.com/api/auth/login", {
+    const res = await fetch(`${API_URL}/api/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
@@ -57,7 +58,8 @@ const SignIn = ({ onClose, onLoginSuccess }) => {
       throw new Error("Passwords do not match");
     }
 
-    const res = await fetch("https://projectx-yzu3.onrender.com/api/auth/register", {
+    const res = await  fetch(`${API_URL}/api/auth/register`, 
+ {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, username, email, password }),
