@@ -5,30 +5,30 @@ import "./App.css";
 /* ===== COMPONENT IMPORTS ===== */
 import Header from "./components/Header";
 import SignIn from "./components/SignIn";
-import TripResults from "./components/TripResults";
-import ProfilePage from "./components/ProfilePage";
-import ItineraryPage from "./components/ItineraryPage";
-import ItineraryDetail from "./components/ItineraryDetail";
-import SavedItineraries from "./components/SavedItineraries";
-import PackingList from "./components/PackingList";
+// import TripResults from "./components/TripResults";
+// import ProfilePage from "./components/ProfilePage";
+// import ItineraryPage from "./components/ItineraryPage";
+// import ItineraryDetail from "./components/ItineraryDetail";
+// import SavedItineraries from "./components/SavedItineraries";
+// import PackingList from "./components/PackingList";
 import ItinerarySlider from "./components/ItinerarySlider";
-import BlogDetail from "./components/BlogDetail";
-import Blogs from "./components/Blogs";
-import AdminBlog from "./components/AdminBlog";
+// import BlogDetail from "./components/BlogDetail";
+// import Blogs from "./components/Blogs";
+// import AdminBlog from "./components/AdminBlog";
 import FeatureCards from "./components/FeatureCards";
-import DistanceCalculator from "./components/DistanceCalculator";
-import ExploreCities from "./components/ExploreCities";
-import CityPage from "./components/CityPage";
+// import DistanceCalculator from "./components/DistanceCalculator";
+// import ExploreCities from "./components/ExploreCities";
+// import CityPage from "./components/CityPage";
 import AiFeedbackBanner from "./components/AifeedbackBanner";
 import FaqFooterSection from "./components/FaqFooterSection";
-import BecomeGuide from "./components/BecomeGuide";
+// import BecomeGuide from "./components/BecomeGuide";
 import { demoItinerary } from "./data/demoItineraries";
 import { generateTravelItinerary } from "./services/api";
-import AiFailPage from "./components/AiFaliPage";
+// import AiFailPage from "./components/AiFaliPage";
 import AppRouter from "./AppRouter";
 import { buildPrompt } from "./services/promptBuilder";
-import QuizPage from "./pages/QuizPage";
-import { logTokenChange } from "./services/api";
+// import QuizPage from "./pages/QuizPage";
+// import { logTokenChange } from "./services/api";
 import LogoLoader from "./components/LogoLoader";
 
 function App() {
@@ -43,9 +43,9 @@ function App() {
   const [loading, setLoading] = useState(false);
 
   // const [selectedItineraryId, setSelectedItineraryId] = useState(null);
-  const [selectedBlogSlug, setSelectedBlogSlug] = useState(null);
+  // const [selectedBlogSlug, setSelectedBlogSlug] = useState(null);
   // const [selectedCity, setSelectedCity] = useState(null);
-  const [showBecomeGuide, setShowBecomeGuide] = useState(false);
+  // const [showBecomeGuide, setShowBecomeGuide] = useState(false);
 
 
   /* ================= REFS ================= */
@@ -92,8 +92,8 @@ function App() {
   const [hours, setHours] = useState(4);
   const [place, setPlace] = useState("");
   const [group, setGroup] = useState("Family");
-  const [budget, setBudget] = useState("Medium");
-  const [Transport, setTransport] = useState("");
+  // const [budget, setBudget] = useState("Medium");
+  // const [Transport, setTransport] = useState("");
   const [suggestions, setSuggestions] = useState("");
   const [citySuggestions, setCitySuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);

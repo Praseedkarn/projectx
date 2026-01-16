@@ -83,7 +83,7 @@ const TripResults = () => {
     }, 2500);
 
     return () => clearInterval(interval);
-  }, [loading]);
+  }, [loading ,messages.length]);
 
   /* ================= GUIDE (STAGE 1 - MANUAL) ================= */
 

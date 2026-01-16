@@ -1,5 +1,5 @@
 import React, { useState, useEffect, forwardRef ,useRef} from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Header = forwardRef(({ user, variant = "home", onSignInClick, onLogoutClick }, ref) => {
   const navigate = useNavigate();
