@@ -1,129 +1,104 @@
 import User from "../models/User.js";
+import QuizQuestion from "../models/QuizQuestion.js";
 
 const QUIZ_REWARD = 20;
 const QUIZ_COOLDOWN_HOURS = 12;
+const QUIZ_SIZE = 5;
 
-// Static quiz
-const QUESTIONS = [
-  {
-    id: 1,
-    question: "What does this app generate?",
-    options: ["Flight tickets", "Travel itineraries", "Hotel bookings", "Maps only"],
-    correctIndex: 1,
-  },
-  {
-    id: 2,
-    question: "Which is safer while traveling?",
-    options: ["Sharing OTPs", "No ID", "Carrying ID", "Public WiFi everywhere"],
-    correctIndex: 2,
-  },
-  {
-    id: 3,
-    question: "Best time to visit hill stations?",
-    options: ["Monsoon", "Winter", "Summer", "Anytime"],
-    correctIndex: 1,
-  },
-  {
-    id: 4,
-    question: "What helps reduce travel stress?",
-    options: ["No planning", "Last-minute booking", "Good itinerary", "Skipping rest"],
-    correctIndex: 2,
-  },
-  {
-    id: 5,
-    question: "What should you carry at night?",
-    options: ["Nothing", "Only cash", "Phone + emergency contacts", "Unknown links"],
-    correctIndex: 2,
-  },
-];
-
-// 👉 GET QUIZ
+/* ================= GET QUIZ ================= */
 export const getQuiz = async (req, res) => {
   try {
-    // 🚫 HARD BLOCK ADMIN — MUST BE FIRST LINE
+    // 🚫 Admin should not play quiz
     if (req.user.role === "admin") {
-      return res.status(403).json({
-        message: "Admin does not need quiz",
-      });
+      return res.status(403).json({ message: "Admin does not need quiz" });
     }
 
-    // ✅ ONLY NORMAL USERS REACH HERE
     const user = await User.findById(req.user.id);
-
     if (!user) {
       return res.status(401).json({ message: "User not found" });
     }
 
+    // ⏳ Cooldown check
     if (user.lastQuizAttempt) {
-      const diff = Date.now() - new Date(user.lastQuizAttempt).getTime();
-      const hoursPassed = diff / (1000 * 60 * 60);
+      const diff = Date.now() - user.lastQuizAttempt.getTime();
+      const cooldownMs = QUIZ_COOLDOWN_HOURS * 60 * 60 * 1000;
 
-      if (hoursPassed < QUIZ_COOLDOWN_HOURS) {
+      if (diff < cooldownMs) {
         return res.status(429).json({
           code: "QUIZ_COOLDOWN",
-          remainingMs:
-            QUIZ_COOLDOWN_HOURS * 60 * 60 * 1000 - diff,
+          remainingMs: cooldownMs - diff,
         });
       }
     }
 
-    res.json({
-      questions: QUESTIONS.map(({ correctIndex, ...q }) => q),
-    });
+    // 🎲 Get random 5 questions (hide correctIndex)
+    const questions = await QuizQuestion.aggregate([
+      { $match: { isActive: true } },
+      { $sample: { size: QUIZ_SIZE } },
+      { $project: { correctIndex: 0 } },
+    ]);
+
+    res.json({ questions });
   } catch (err) {
     console.error("QUIZ GET ERROR:", err);
     res.status(500).json({ message: "Quiz error" });
   }
 };
 
-
-
-// 👉 SUBMIT QUIZ
+/* ================= SUBMIT QUIZ ================= */
 export const submitQuiz = async (req, res) => {
   try {
+    // 🚫 Admin cannot submit quiz
+    // if (req.user.role === "admin") {
+    //   return res.status(403).json({ message: "Admin cannot submit quiz" });
+    // }
 
-    // 🚫 BLOCK ADMIN FIRST
-    if (req.user.role === "admin") {
-      return res.status(403).json({
-        message: "Admin cannot submit quiz",
-      });
+    const { answers, questionIds } = req.body;
+
+    if (!answers || !questionIds || answers.length !== questionIds.length) {
+      return res.status(400).json({ message: "Invalid quiz submission" });
     }
-    const { answers } = req.body;
+
     const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(401).json({ message: "User not found" });
+    }
 
-    if (!user) return res.status(401).json({ message: "User not found" });
-
-    let score = 0;
-    QUESTIONS.forEach((q, i) => {
-      if (answers[i] === q.correctIndex) score++;
+    // 🔍 Fetch questions from DB
+    const questions = await QuizQuestion.find({
+      _id: { $in: questionIds },
     });
 
+    let score = 0;
+    questions.forEach((q, index) => {
+      if (answers[index] === q.correctIndex) {
+        score++;
+      }
+    });
+
+    // ⏳ Update last attempt
     user.lastQuizAttempt = new Date();
 
     const nextQuizAt =
       user.lastQuizAttempt.getTime() +
       QUIZ_COOLDOWN_HOURS * 60 * 60 * 1000;
 
+    // 🪙 Reward
     if (score >= 3) {
       user.tokens += QUIZ_REWARD;
-      await user.save();
-
-      return res.json({
-        passed: true,
-        reward: QUIZ_REWARD,
-        tokens: user.tokens,
-        nextQuizAt,
-      });
     }
 
     await user.save();
 
     res.json({
-      passed: false,
+      passed: score >= 3,
       score,
+      reward: score >= 3 ? QUIZ_REWARD : 0,
+      tokens: user.tokens,
       nextQuizAt,
     });
   } catch (err) {
+    console.error("QUIZ SUBMIT ERROR:", err);
     res.status(500).json({ message: "Quiz submit failed" });
   }
 };

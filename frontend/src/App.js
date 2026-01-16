@@ -38,13 +38,13 @@ function App() {
   const isQrTrip = location.pathname.startsWith("/qr-trip/");
 
   /* ================= STATE ================= */
-  const [activeComponent, setActiveComponent] = useState("home");
+  // const [activeComponent, setActiveComponent] = useState("home");
   const [showSignIn, setShowSignIn] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const [selectedItineraryId, setSelectedItineraryId] = useState(null);
+  // const [selectedItineraryId, setSelectedItineraryId] = useState(null);
   const [selectedBlogSlug, setSelectedBlogSlug] = useState(null);
-  const [selectedCity, setSelectedCity] = useState(null);
+  // const [selectedCity, setSelectedCity] = useState(null);
   const [showBecomeGuide, setShowBecomeGuide] = useState(false);
 
 
@@ -102,25 +102,25 @@ function App() {
   /* ================= AI ================= */
 
   /* ================= URL → STATE SYNC ================= */
- useEffect(() => {
-  const path = location.pathname;
+//  useEffect(() => {
+//   const path = location.pathname;
 
-  if (path === "/") setActiveComponent("home");
-  else if (path === "/cities") setActiveComponent("cities");
-  else if (path.startsWith("/cities/")) {
-    setSelectedCity(path.split("/")[2]);
-    setActiveComponent("city");
-  }
-  else if (path === "/itineraries") setActiveComponent("itineraries");
-  else if (path.startsWith("/itineraries/")) {
-    setSelectedItineraryId(path.split("/")[2]);
-    setActiveComponent("itinerary-detail");
-  }
-  else if (path === "/packing") setActiveComponent("packing");
-  else if (path === "/become-guide") setActiveComponent("become-guide");
-  else if (path === "/ai-failed") setActiveComponent("ai-failed");
+//   if (path === "/") setActiveComponent("home");
+//   else if (path === "/cities") setActiveComponent("cities");
+//   else if (path.startsWith("/cities/")) {
+//     setSelectedCity(path.split("/")[2]);
+//     setActiveComponent("city");
+//   }
+//   else if (path === "/itineraries") setActiveComponent("itineraries");
+//   else if (path.startsWith("/itineraries/")) {
+//     setSelectedItineraryId(path.split("/")[2]);
+//     setActiveComponent("itinerary-detail");
+//   }
+//   else if (path === "/packing") setActiveComponent("packing");
+//   else if (path === "/become-guide") setActiveComponent("become-guide");
+//   else if (path === "/ai-failed") setActiveComponent("ai-failed");
 
-}, [location.pathname]);
+// }, [location.pathname]);
 
 useEffect(() => {
   const timeout = setTimeout(async () => {
@@ -168,10 +168,7 @@ const handleLogout = () => {
 };
 
   /* ================= NAV ================= */
-  const go = (path, component) => {
-    navigate(path);
-    setActiveComponent(component);
-  };
+ 
 
   /* ================= SUBMIT ================= */
 const handleSubmit = async (e) => {
@@ -311,8 +308,7 @@ return (
         <AppRouter 
           currentUser={currentUser}
           handleLogout={handleLogout}
-          selectedItineraryId={selectedItineraryId}
-          setSelectedItineraryId={setSelectedItineraryId}
+       
           navigate={navigate}
           // QUICK FIX: Pass your entire Home logic as a prop so variables stay linked
           homeContent={
@@ -483,11 +479,11 @@ return (
               <AiFeedbackBanner source="AI Planner" />
               <FeatureCards onNavigate={(path) => navigate(path)} />
               <ItinerarySlider
-                onItineraryClick={(id) => {
-                  setSelectedItineraryId(id);
-                  navigate(`/itineraries/${id}`);
-                }}
-              />
+                  onItineraryClick={(slug) => {
+                    navigate(`/itineraries/${slug}`);
+                  }}
+                />
+
 
               <div className="mt-20">
                 <div className="bg-[#d7f26e] py-16 px-6 text-center">

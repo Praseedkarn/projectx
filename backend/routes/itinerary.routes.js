@@ -4,7 +4,7 @@ import {
   getItineraries,
   getItineraryById,
 } from "../controllers/itinerary.controller.js";
-import Itinerary from "../models/Itinerary.js";
+import Itinerary from "../models/itinerary.js";
 
 const router = express.Router();
 

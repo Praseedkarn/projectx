@@ -148,8 +148,7 @@ export const fetchQuiz = async () => {
 
   return res.json();
 };
-
-export const submitQuiz = async (answers) => {
+export const submitQuiz = async (data) => {
   const token = sessionStorage.getItem("token");
 
   const res = await fetch("/api/quiz/submit", {
@@ -158,7 +157,7 @@ export const submitQuiz = async (answers) => {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify({ answers }),
+    body: JSON.stringify(data), // 🔥 answers + questionIds
   });
 
   if (!res.ok) {

@@ -15,6 +15,12 @@ export default function QuizPage({ currentUser, setCurrentUser }) {
   const [timeLeft, setTimeLeft] = useState("");
   const [showRewardCard, setShowRewardCard] = useState(false);
   const [earnedTokens, setEarnedTokens] = useState(0);
+  const [quizScore , setQuizScore] = useState(0);
+  const [quizFinished, setQuizFinished] = useState(false);
+
+  const cooldownKey = currentUser
+  ? `quizCooldownUntil_${currentUser._id}`
+  : null;
 
   /* ================= LOAD QUIZ ================= */
   useEffect(() => {
@@ -27,7 +33,10 @@ export default function QuizPage({ currentUser, setCurrentUser }) {
         if (err.code === "QUIZ_COOLDOWN") {
           const until = Date.now() + err.remainingMs;
           setCooldownUntil(until);
-          localStorage.setItem("quizCooldownUntil", until);
+          if (cooldownKey) {
+              localStorage.setItem(cooldownKey, until);
+            }
+
         } else {
           setError("Quiz not available");
         }
@@ -37,15 +46,18 @@ export default function QuizPage({ currentUser, setCurrentUser }) {
     };
 
     loadQuiz();
-  }, []);
+  }, [cooldownKey]);
 
   /* ================= RESTORE TIMER ================= */
-  useEffect(() => {
-    const saved = localStorage.getItem("quizCooldownUntil");
-    if (saved && Date.now() < saved) {
-      setCooldownUntil(Number(saved));
-    }
-  }, []);
+ useEffect(() => {
+  if (!cooldownKey) return;
+
+  const saved = localStorage.getItem(cooldownKey);
+  if (saved && Date.now() < saved) {
+    setCooldownUntil(Number(saved));
+  }
+}, [cooldownKey]);
+
 
   /* ================= COUNTDOWN TIMER ================= */
   useEffect(() => {
@@ -58,7 +70,10 @@ export default function QuizPage({ currentUser, setCurrentUser }) {
         clearInterval(interval);
         setCooldownUntil(null);
         setTimeLeft("");
-        localStorage.removeItem("quizCooldownUntil");
+        if (cooldownKey) {
+          localStorage.removeItem(cooldownKey);
+        }
+
       } else {
         const h = Math.floor(diff / 3600000);
         const m = Math.floor((diff % 3600000) / 60000);
@@ -88,10 +103,17 @@ export default function QuizPage({ currentUser, setCurrentUser }) {
 
     setSubmitting(true);
     try {
-      const res = await submitQuiz(answers);
-
+      const res = await submitQuiz(
+        {answers,
+          questionIds: questions.map(q=>q._id),
+         }) ;
+      setQuizScore(res.score);
+      setQuizFinished(true);
       setCooldownUntil(res.nextQuizAt);
-      localStorage.setItem("quizCooldownUntil", res.nextQuizAt);
+     if (cooldownKey) {
+      localStorage.setItem(cooldownKey, res.nextQuizAt);
+    }
+
 
       if (res.passed) {
         const updatedUser = {
@@ -116,33 +138,75 @@ return (
   <div className="min-h-screen bg-[#f6f8f5] flex items-center justify-center px-4">
     <div className="w-full max-w-3xl bg-white rounded-2xl shadow-xl p-8 space-y-6">
     {showRewardCard && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-    <div className="bg-white rounded-2xl p-8 max-w-sm w-full text-center shadow-xl space-y-4">
-      <h2 className="text-2xl font-semibold text-green-600">
-        🎉 Quiz Passed!
-      </h2>
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+        <div className="bg-white rounded-2xl p-8 max-w-sm w-full text-center shadow-xl space-y-4">
 
-      <p className="text-gray-700">
-        <strong>+{earnedTokens} tokens</strong> have been credited to your account.
-      </p>
+          <h2 className="text-2xl font-semibold text-green-600">
+            🎉 Quiz Completed!
+          </h2>
 
-      <div className="flex justify-center items-center gap-2 text-lg font-bold text-[#5b6f00]">
-        <span>🪙</span>
-        <span>{currentUser?.tokens}</span>
+          <p className="text-gray-700 text-lg">
+            Your Score:
+            <span className="font-bold text-gray-900">
+              {" "}{quizScore} / {questions.length}
+            </span>
+          </p>
+
+          <div className="border rounded-xl py-3 bg-green-50">
+            <p className="text-green-700 font-semibold text-lg">
+              {earnedTokens > 0
+                ? `+${earnedTokens} Tokens Added`
+                : "No tokens earned"}
+            </p>
+
+          </div>
+
+          <div className="flex justify-center items-center gap-2 text-lg font-bold text-[#5b6f00]">
+            <span>🪙</span>
+            <span>{currentUser?.tokens}</span>
+          </div>
+
+          <button
+            onClick={() => {
+              setShowRewardCard(false);
+              navigate(-1);
+            }}
+            className="w-full mt-4 rounded-lg bg-green-600 text-white py-2 hover:bg-green-700"
+          >
+            Continue
+          </button>
+        </div>
       </div>
+    )}
 
-      <button
-        onClick={() => {
-          setShowRewardCard(false);
-          navigate(-1);
-        }}
-        className="w-full mt-4 rounded-lg bg-green-600 text-white py-2 hover:bg-green-700"
-      >
-        Continue
-      </button>
-    </div>
-  </div>
-)}
+        {quizFinished && !showRewardCard && quizScore < 3 &&(
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+        <div className="bg-white rounded-2xl p-8 max-w-sm w-full text-center shadow-xl space-y-4">
+
+          <h2 className="text-2xl font-semibold text-red-600">
+            ❌ Quiz Failed
+          </h2>
+
+          <p className="text-gray-700 text-lg">
+            Your Score:
+            <strong> {quizScore} / {questions.length}</strong>
+          </p>
+
+          <p className="text-gray-500">
+            You need at least 3 correct answers to earn tokens.
+          </p>
+
+          <button
+            onClick={() => navigate(-1)}
+            className="w-full mt-4 rounded-lg bg-gray-600 text-white py-2 hover:bg-gray-700"
+          >
+            Go Back
+          </button>
+        </div>
+      </div>
+    )}
+
+
 
       {/* PAGE TITLE */}
       <div className="text-center">
@@ -189,7 +253,7 @@ return (
         <div className="space-y-6">
           {questions.map((q, i) => (
             <div
-              key={q.id}
+              key={q._id}
               className="border rounded-xl p-4 space-y-3"
             >
               <p className="font-medium text-gray-800">

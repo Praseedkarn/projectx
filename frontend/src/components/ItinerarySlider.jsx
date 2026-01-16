@@ -1,35 +1,36 @@
 import { useState } from "react";
-
 const itineraries = [
   {
-    id: 10,
+    slug:"goa",
     title: "Goa Beach Escape",
     duration: "5 days",
     location: "Goa, India",
-    image: "/goa.jpg", 
+    image: "/goa.jpg",
   },
   {
-    id: 33,
-    title: "Sikkim ",
+    slug: "sikkim-gangtok",
+    title: "Sikkim Explorer",
     duration: "6 days",
-    location: "Sikkim , india",
+    location: "Sikkim, India",
     image: "manali2.webp",
   },
   {
-    id: 12,
+    slug:"rajastan-royal",
     title: "Jaipur Heritage",
     duration: "3 days",
     location: "Rajasthan",
     image: "/jaipur.webp",
   },
   {
-    id: 13,
+    slug:"kerala-backwater",
     title: "Kerala Backwaters",
     duration: "4 days",
     location: "Kerala",
     image: "kerala.webp",
   },
 ];
+
+
 
 const ItinerarySlider = ({ onItineraryClick = () => {} }) => {
   const [index, setIndex] = useState(0);
@@ -44,17 +45,18 @@ const ItinerarySlider = ({ onItineraryClick = () => {} }) => {
   };
 
  return (
-  <section className="w-full max-w-7xl mx-auto px-4">
+  <section className="w-full max-w-7xl mx-auto px-4 mt-16 md-mt-24">
 
     {/* ===== HEADING ===== */}
     <div className="mb-6 mt-6 text-center">
-      <h2 className="text-4xl font-serif  text-gray-900">
-        Explore ready-made itineraries
-      </h2>
-      <p className="mt-2 text-gray-500 text-sm">
-        Hand-picked trips crafted by travelers like you
-      </p>
-    </div>
+  <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-gray-900">
+    Explore ready-made itineraries
+  </h2>
+  <p className="mt-2 text-gray-500 text-sm md:text-base">
+    Hand-picked trips crafted by travelers like you
+  </p>
+</div>
+
 
     {/* ===== SLIDER ===== */}
     <div className="relative w-full max-w-6xl mx-auto py-4 mt-2">
@@ -74,7 +76,7 @@ const ItinerarySlider = ({ onItineraryClick = () => {} }) => {
             return (
               <div key={item.id} className="min-w-full flex justify-center px-6">
                 <div
-                  onClick={() => onItineraryClick(item.id)}
+                  onClick={() => onItineraryClick(item.slug)}
                   className={`
                     cursor-pointer bg-white rounded-3xl p-6
                     transition-all duration-500 w-full max-w-md
