@@ -4,31 +4,14 @@ import { detailedItineraries } from "../data/itinerary";
 import { fetchItineraryBySlug } from "../services/api";
 
 
-/* ===== 360 STREET VIEW (NO API KEY) ===== */
-const StreetView360 = ({ place }) => {
-  if (!place) return null;
 
-  return (
-    <div className="w-full h-[320px] rounded-2xl overflow-hidden border">
-      <iframe
-        title={`360 view of ${place}`}
-        src={`https://www.google.com/maps?q=${encodeURIComponent(
-          place
-        )}&output=svembed`}
-        className="w-full h-full"
-        loading="lazy"
-        referrerPolicy="no-referrer-when-downgrade"
-      />
-    </div>
-  );
-};
 
 const ItineraryDetail = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
   /* ===== STATE ===== */
   const [itineraryDetails, setItineraryDetails] = useState(null);
-  const [selectedDay, setSelectedDay] = useState(1);
+
   const [selected360Place, setSelected360Place] = useState("");
   const [guide, setGuide] = useState(null);
   const [guideLoading, setGuideLoading] = useState(true);
@@ -56,7 +39,6 @@ const ItineraryDetail = () => {
         setItineraryDetails(null);
       }
 
-      setSelectedDay(1);
       window.scrollTo({ top: 0, behavior: "smooth" });
     };
 

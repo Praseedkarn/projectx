@@ -45,9 +45,9 @@ const TripResults = () => {
 
   const [qrTripId, setQrTripId] = useState(null);
   const [qrLoading, setQrLoading] = useState(false);
-  const [qrError, setQrError] = useState("");
+
   const [guide, setGuide] = useState(null);
-  const [guideLoading, setGuideLoading] = useState(false);
+
   const [cityInfo, setCityInfo] = useState(null);
   const [cityLoading, setCityLoading] = useState(false);
   const [osmData, setOsmData] = useState(null);
@@ -92,7 +92,7 @@ const TripResults = () => {
 
     const fetchGuide = async () => {
       try {
-        setGuideLoading(true);
+
 
         const res = await fetch(
           `https://projectx-yzu3.onrender.com/api/guides?city=${city}`
@@ -109,7 +109,7 @@ const TripResults = () => {
         console.error("Failed to fetch guide");
         setGuide(null);
       } finally {
-        setGuideLoading(false);
+
       }
     };
 
@@ -251,7 +251,7 @@ const TripResults = () => {
     if (!finalText || qrLoading) return;
 
     setQrLoading(true);
-    setQrError("");
+
 
     try {
       const res = await fetch("https://projectx-yzu3.onrender.com/api/qr-trips", {
@@ -265,7 +265,7 @@ const TripResults = () => {
 
       setQrTripId(data.qrTripId);
     } catch {
-      setQrError("Failed to generate QR. Try again.");
+
     } finally {
       setQrLoading(false);
     }
