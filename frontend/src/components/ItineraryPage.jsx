@@ -1138,7 +1138,7 @@ const ItineraryPage = () => {
 
   ]);
 
-  const [savedItineraries, setSavedItineraries] = useState([]);
+  // const [savedItineraries, setSavedItineraries] = useState([]);
   const [savedCount, setSavedCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
@@ -1157,7 +1157,7 @@ const ItineraryPage = () => {
     const loadSavedItineraries = () => {
       try {
         const saved = JSON.parse(localStorage.getItem('savedItineraries')) || [];
-        setSavedItineraries(saved);
+        
         setSavedCount(saved.length);
       } catch (error) {
         console.error('Error loading saved itineraries:', error);

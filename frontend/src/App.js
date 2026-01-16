@@ -94,7 +94,6 @@ function App() {
   const [group, setGroup] = useState("Family");
   const [budget, setBudget] = useState("Medium");
   const [Transport, setTransport] = useState("");
-  const [detailLevel, setDetailLevel] = useState("morning");
   const [suggestions, setSuggestions] = useState("");
   const [citySuggestions, setCitySuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);

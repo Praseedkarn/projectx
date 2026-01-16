@@ -110,11 +110,12 @@ export default function CityPage() {
   })();
 
   /* ================= SET DEFAULT MAP PLACE ================= */
-  useEffect(() => {
-    if (mapHighlights.length > 0) {
-      setSelectedMapPlace(mapHighlights[0].place);
-    }
-  }, [slug, cityItinerary, city]);
+ useEffect(() => {
+  if (mapHighlights.length > 0) {
+    setSelectedMapPlace(mapHighlights[0].place);
+  }
+}, [mapHighlights]);
+
 
   /* ================= STATES ================= */
   if (loading) {

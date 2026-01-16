@@ -3,7 +3,6 @@ import { useNavigate, useLocation } from "react-router-dom";
 
 const Header = forwardRef(({ user, variant = "home", onSignInClick, onLogoutClick }, ref) => {
   const navigate = useNavigate();
-  const location = useLocation();
   const profileMenuRef=useRef(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
