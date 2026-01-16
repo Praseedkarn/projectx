@@ -21,7 +21,7 @@ const GoogleMapEmbed = ({ place }) => {
 };
 
 export default function CityPage() {
- const { slug } = useParams();          // ✅ FROM URL
+  const { slug } = useParams();          // ✅ FROM URL
   const navigate = useNavigate();
   const [city, setCity] = useState(null);
   const [cityItinerary, setCityItinerary] = useState(null);
@@ -34,7 +34,7 @@ export default function CityPage() {
     setLoading(true);
     setError(false);
 
-    fetch(`http://localhost:5001/api/cities/${slug}`)
+    fetch(`https://projectx-yzu3.onrender.com/api/cities/${slug}`)
       .then((res) => {
         if (!res.ok) throw new Error("City not found");
         return res.json();
@@ -53,7 +53,7 @@ export default function CityPage() {
   useEffect(() => {
     if (!slug) return;
 
-    fetch(`http://localhost:5001/api/itineraries/${slug}`)
+    fetch(`https://projectx-yzu3.onrender.com/api/itineraries/${slug}`)
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => setCityItinerary(data))
       .catch(() => setCityItinerary(null));
@@ -135,7 +135,7 @@ export default function CityPage() {
 
         {/* BACK */}
         <button
-          onClick={()=>navigate("/cities")}
+          onClick={() => navigate("/cities")}
           className="text-sm text-gray-600 hover:underline"
         >
           ← Back to Cities
@@ -187,10 +187,9 @@ export default function CityPage() {
                 key={place}
                 onClick={() => setSelectedMapPlace(place)}
                 className={`px-4 py-2 rounded-full text-xs font-medium transition
-                  ${
-                    selectedMapPlace === place
-                      ? "bg-[#5b7c67] text-white shadow-md scale-105"
-                      : "bg-white border hover:bg-gray-50 hover:scale-105"
+                  ${selectedMapPlace === place
+                    ? "bg-[#5b7c67] text-white shadow-md scale-105"
+                    : "bg-white border hover:bg-gray-50 hover:scale-105"
                   }`}
               >
                 📍 {label}
@@ -219,71 +218,71 @@ export default function CityPage() {
         </Card>
 
         <Card title="🌡️ Average Temperature">
-  <div className="grid grid-cols-2 gap-4">
-    <div className="bg-gray-50 rounded-xl p-4">
-      <div className="text-sm text-gray-500">Summer</div>
-      <div className="text-lg font-semibold">
-        {city.avgTemp?.summer || "—"}
-      </div>
-    </div>
-    <div className="bg-gray-50 rounded-xl p-4">
-      <div className="text-sm text-gray-500">Winter</div>
-      <div className="text-lg font-semibold">
-        {city.avgTemp?.winter || "—"}
-      </div>
-    </div>
-  </div>
-</Card>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-gray-50 rounded-xl p-4">
+              <div className="text-sm text-gray-500">Summer</div>
+              <div className="text-lg font-semibold">
+                {city.avgTemp?.summer || "—"}
+              </div>
+            </div>
+            <div className="bg-gray-50 rounded-xl p-4">
+              <div className="text-sm text-gray-500">Winter</div>
+              <div className="text-lg font-semibold">
+                {city.avgTemp?.winter || "—"}
+              </div>
+            </div>
+          </div>
+        </Card>
 
-<Card title="👥 Best For">
-  <div className="space-y-3 text-sm text-gray-700">
-    <p><strong>Couples:</strong> {city.bestForPeople?.couples}</p>
-    <p><strong>Families:</strong> {city.bestForPeople?.families}</p>
-    <p><strong>Friends:</strong> {city.bestForPeople?.friends}</p>
-    <p><strong>Solo:</strong> {city.bestForPeople?.solo}</p>
-  </div>
-</Card>
-<Card title="🏙️ Neighborhoods">
-  <div className="grid sm:grid-cols-2 gap-4">
-    {city.neighborhoods?.map((n, i) => (
-      <div key={i} className="border rounded-2xl p-4">
-        <div className="font-medium">{n.name}</div>
-        <p className="text-sm text-gray-600 mt-1">{n.desc}</p>
-      </div>
-    ))}
-  </div>
-</Card>
-<Card title="🚇 Transport">
-  <div className="flex flex-wrap gap-2">
-    {city.transport?.map((t, i) => (
-      <span
-        key={i}
-        className="px-3 py-1 bg-gray-100 rounded-full text-sm"
-      >
-        {t}
-      </span>
-    ))}
-  </div>
-</Card>
-<Card title="🎯 Things To Do">
-  <ul className="list-disc pl-5 space-y-2 text-sm text-gray-700">
-    {city.thingsToDo?.map((item, i) => (
-      <li key={i}>{item}</li>
-    ))}
-  </ul>
-</Card>
-<Card title="🧭 Nearby Cities">
-  <div className="grid sm:grid-cols-2 gap-4">
-    {city.nearbyCities?.map((c, i) => (
-      <div key={i} className="border rounded-xl p-4">
-        <div className="font-medium">{c.name}</div>
-        <div className="text-sm text-gray-500">
-          {c.distance}
-        </div>
-      </div>
-    ))}
-  </div>
-</Card>
+        <Card title="👥 Best For">
+          <div className="space-y-3 text-sm text-gray-700">
+            <p><strong>Couples:</strong> {city.bestForPeople?.couples}</p>
+            <p><strong>Families:</strong> {city.bestForPeople?.families}</p>
+            <p><strong>Friends:</strong> {city.bestForPeople?.friends}</p>
+            <p><strong>Solo:</strong> {city.bestForPeople?.solo}</p>
+          </div>
+        </Card>
+        <Card title="🏙️ Neighborhoods">
+          <div className="grid sm:grid-cols-2 gap-4">
+            {city.neighborhoods?.map((n, i) => (
+              <div key={i} className="border rounded-2xl p-4">
+                <div className="font-medium">{n.name}</div>
+                <p className="text-sm text-gray-600 mt-1">{n.desc}</p>
+              </div>
+            ))}
+          </div>
+        </Card>
+        <Card title="🚇 Transport">
+          <div className="flex flex-wrap gap-2">
+            {city.transport?.map((t, i) => (
+              <span
+                key={i}
+                className="px-3 py-1 bg-gray-100 rounded-full text-sm"
+              >
+                {t}
+              </span>
+            ))}
+          </div>
+        </Card>
+        <Card title="🎯 Things To Do">
+          <ul className="list-disc pl-5 space-y-2 text-sm text-gray-700">
+            {city.thingsToDo?.map((item, i) => (
+              <li key={i}>{item}</li>
+            ))}
+          </ul>
+        </Card>
+        <Card title="🧭 Nearby Cities">
+          <div className="grid sm:grid-cols-2 gap-4">
+            {city.nearbyCities?.map((c, i) => (
+              <div key={i} className="border rounded-xl p-4">
+                <div className="font-medium">{c.name}</div>
+                <div className="text-sm text-gray-500">
+                  {c.distance}
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
 
 
 

@@ -11,7 +11,7 @@ const BlogDetail = () => {
   useEffect(() => {
     if (!slug) return;
 
-    fetch(`http://localhost:5001/api/blogs/${slug}`)
+    fetch(`https://projectx-yzu3.onrender.com/api/blogs/${slug}`)
       .then((res) => {
         if (!res.ok) throw new Error("Not found");
         return res.json();

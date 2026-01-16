@@ -12,7 +12,7 @@ export default function AiFeedbackBanner({ source = "AI Planner" }) {
     try {
       setLoading(true);
 
-      await fetch("http://localhost:5001/api/feedback", {
+      await fetch("https://projectx-yzu3.onrender.com/api/feedback", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

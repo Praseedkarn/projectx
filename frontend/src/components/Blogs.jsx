@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 const Blogs = () => {
-  const navigate=useNavigate();
+  const navigate = useNavigate();
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const isAdmin = localStorage.getItem("isAdmin") === "true";
 
   useEffect(() => {
-    fetch("http://localhost:5001/api/blogs")
+    fetch("https://projectx-yzu3.onrender.com/api/blogs")
       .then((res) => res.json())
       .then((data) => {
         setBlogs(Array.isArray(data) ? data : []);

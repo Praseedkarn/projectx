@@ -47,7 +47,7 @@ const AdminBlog = ({ onBack }) => {
     };
 
     try {
-      const res = await fetch("http://localhost:5001/api/blogs", {
+      const res = await fetch("https://projectx-yzu3.onrender.com/api/blogs", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -93,49 +93,49 @@ const AdminBlog = ({ onBack }) => {
         </div>
 
         {/* FORM */}
-       {/* FORM */}
-<form onSubmit={handleSubmit} className="space-y-6">
+        {/* FORM */}
+        <form onSubmit={handleSubmit} className="space-y-6">
 
-  {/* TITLE */}
-  <input
-    name="title"
-    placeholder="Blog title"
-    value={formData.title}
-    onChange={handleChange}
-    className="w-full border rounded-xl px-4 py-3 text-lg font-medium"
-    required
-  />
+          {/* TITLE */}
+          <input
+            name="title"
+            placeholder="Blog title"
+            value={formData.title}
+            onChange={handleChange}
+            className="w-full border rounded-xl px-4 py-3 text-lg font-medium"
+            required
+          />
 
-  {/* COVER IMAGE */}
-  <input
-    name="cover"
-    placeholder="Cover image URL (hero image)"
-    value={formData.cover}
-    onChange={handleChange}
-    className="w-full border rounded-xl px-4 py-2"
-    required
-  />
+          {/* COVER IMAGE */}
+          <input
+            name="cover"
+            placeholder="Cover image URL (hero image)"
+            value={formData.cover}
+            onChange={handleChange}
+            className="w-full border rounded-xl px-4 py-2"
+            required
+          />
 
-  {/* EXCERPT */}
-  <textarea
-    name="excerpt"
-    placeholder="Short excerpt (shown in blog list & SEO)"
-    value={formData.excerpt}
-    onChange={handleChange}
-    rows={3}
-    className="w-full border rounded-xl px-4 py-3 resize-none"
-    required
-  />
+          {/* EXCERPT */}
+          <textarea
+            name="excerpt"
+            placeholder="Short excerpt (shown in blog list & SEO)"
+            value={formData.excerpt}
+            onChange={handleChange}
+            rows={3}
+            className="w-full border rounded-xl px-4 py-3 resize-none"
+            required
+          />
 
-  {/* CONTENT EDITOR */}
-  <div className="space-y-2">
-    <label className="text-sm font-medium text-gray-600">
-      Blog content (free writing)
-    </label>
+          {/* CONTENT EDITOR */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-gray-600">
+              Blog content (free writing)
+            </label>
 
-    <textarea
-      name="content"
-      placeholder={`Write freely like a travel article...
+            <textarea
+              name="content"
+              placeholder={`Write freely like a travel article...
 
 Formatting tips:
 • Use blank lines between paragraphs
@@ -151,32 +151,32 @@ This island is famous for its reef.
 
 img:https://images.unsplash.com/xxxxx
 `}
-      value={formData.content}
-      onChange={handleChange}
-      rows={18}
-      className="w-full border rounded-2xl px-4 py-4
+              value={formData.content}
+              onChange={handleChange}
+              rows={18}
+              className="w-full border rounded-2xl px-4 py-4
                  text-[15px] leading-relaxed
                  resize-y focus:outline-none
                  focus:ring-2 focus:ring-[#5b7c67]/40"
-      required
-    />
-  </div>
+              required
+            />
+          </div>
 
-  {/* SUBMIT */}
-  <button
-    disabled={loading}
-    className="rounded-full bg-[#5b7c67] px-6 py-3
+          {/* SUBMIT */}
+          <button
+            disabled={loading}
+            className="rounded-full bg-[#5b7c67] px-6 py-3
                text-white font-medium disabled:opacity-60"
-  >
-    {loading ? "Publishing..." : "Publish Blog"}
-  </button>
+          >
+            {loading ? "Publishing..." : "Publish Blog"}
+          </button>
 
-  {success && (
-    <p className="text-green-600 text-sm">
-      ✅ Blog published successfully
-    </p>
-  )}
-</form>
+          {success && (
+            <p className="text-green-600 text-sm">
+              ✅ Blog published successfully
+            </p>
+          )}
+        </form>
 
 
       </div>

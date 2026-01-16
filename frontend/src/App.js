@@ -52,7 +52,7 @@ function App() {
   const formCardRef = useRef(null);
   const headerRef = useRef(null);
 
-    /* ================= AI ================= */
+  /* ================= AI ================= */
   const [apiStatus, setApiStatus] = useState("checking");
   /* ================= USER ================= */
   const [currentUser, setCurrentUser] = useState(() => {
@@ -64,26 +64,26 @@ function App() {
   });
 
   useEffect(() => {
-  let isMounted = true;
+    let isMounted = true;
 
-  const checkApiStatus = async () => {
-    try {
-      const res = await fetch("http://localhost:5001/api/health");
+    const checkApiStatus = async () => {
+      try {
+        const res = await fetch("https://projectx-yzu3.onrender.com/api/health");
 
-      if (!res.ok) throw new Error("API down");
+        if (!res.ok) throw new Error("API down");
 
-      if (isMounted) setApiStatus("available");
-    } catch (err) {
-      if (isMounted) setApiStatus("offline");
-    }
-  };
+        if (isMounted) setApiStatus("available");
+      } catch (err) {
+        if (isMounted) setApiStatus("offline");
+      }
+    };
 
-  checkApiStatus();
+    checkApiStatus();
 
-  return () => {
-    isMounted = false;
-  };
-}, []);
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
 
   /* ================= FORM ================= */
@@ -102,47 +102,47 @@ function App() {
   /* ================= AI ================= */
 
   /* ================= URL → STATE SYNC ================= */
-//  useEffect(() => {
-//   const path = location.pathname;
+  //  useEffect(() => {
+  //   const path = location.pathname;
 
-//   if (path === "/") setActiveComponent("home");
-//   else if (path === "/cities") setActiveComponent("cities");
-//   else if (path.startsWith("/cities/")) {
-//     setSelectedCity(path.split("/")[2]);
-//     setActiveComponent("city");
-//   }
-//   else if (path === "/itineraries") setActiveComponent("itineraries");
-//   else if (path.startsWith("/itineraries/")) {
-//     setSelectedItineraryId(path.split("/")[2]);
-//     setActiveComponent("itinerary-detail");
-//   }
-//   else if (path === "/packing") setActiveComponent("packing");
-//   else if (path === "/become-guide") setActiveComponent("become-guide");
-//   else if (path === "/ai-failed") setActiveComponent("ai-failed");
+  //   if (path === "/") setActiveComponent("home");
+  //   else if (path === "/cities") setActiveComponent("cities");
+  //   else if (path.startsWith("/cities/")) {
+  //     setSelectedCity(path.split("/")[2]);
+  //     setActiveComponent("city");
+  //   }
+  //   else if (path === "/itineraries") setActiveComponent("itineraries");
+  //   else if (path.startsWith("/itineraries/")) {
+  //     setSelectedItineraryId(path.split("/")[2]);
+  //     setActiveComponent("itinerary-detail");
+  //   }
+  //   else if (path === "/packing") setActiveComponent("packing");
+  //   else if (path === "/become-guide") setActiveComponent("become-guide");
+  //   else if (path === "/ai-failed") setActiveComponent("ai-failed");
 
-// }, [location.pathname]);
+  // }, [location.pathname]);
 
-useEffect(() => {
-  const timeout = setTimeout(async () => {
-    if (!place || place.length < 3) {
-      setCitySuggestions([]);
-      return;
-    }
+  useEffect(() => {
+    const timeout = setTimeout(async () => {
+      if (!place || place.length < 3) {
+        setCitySuggestions([]);
+        return;
+      }
 
-    try {
-      const res = await fetch(
-        `https://secure.geonames.org/searchJSON?name_startsWith=${place}&maxRows=6&cities=cities15000&username=praseed`
-      );
+      try {
+        const res = await fetch(
+          `https://secure.geonames.org/searchJSON?name_startsWith=${place}&maxRows=6&cities=cities15000&username=praseed`
+        );
 
-      const data = await res.json();
-      setCitySuggestions(data.geonames || []);
-    } catch (err) {
-      console.error("GeoNames error", err);
-    }
-  }, 400); // debounce
+        const data = await res.json();
+        setCitySuggestions(data.geonames || []);
+      } catch (err) {
+        console.error("GeoNames error", err);
+      }
+    }, 400); // debounce
 
-  return () => clearTimeout(timeout);
-}, [place]);
+    return () => clearTimeout(timeout);
+  }, [place]);
 
 
 
@@ -150,109 +150,109 @@ useEffect(() => {
 
   /* ================= AUTH ================= */
   const handleLoginSuccess = (user) => {
-  const safeUser =
-    user.role === "admin"
-      ? { ...user, tokens: Infinity }
-      : user;
+    const safeUser =
+      user.role === "admin"
+        ? { ...user, tokens: Infinity }
+        : user;
 
-  sessionStorage.setItem("user", JSON.stringify(safeUser));
-  setCurrentUser(safeUser);
-};
+    sessionStorage.setItem("user", JSON.stringify(safeUser));
+    setCurrentUser(safeUser);
+  };
 
 
- 
-const handleLogout = () => {
-  sessionStorage.clear();
-  setCurrentUser(null);
-  navigate("/");
-};
+
+  const handleLogout = () => {
+    sessionStorage.clear();
+    setCurrentUser(null);
+    navigate("/");
+  };
 
   /* ================= NAV ================= */
- 
+
 
   /* ================= SUBMIT ================= */
-const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  if (!currentUser) {
-    setShowSignIn(true);
-    return;
-  }
-
-  if (!place.trim()) {
-    alert("Please enter a destination");
-    return;
-  }
-
-  setLoading(true);
-
-  const cleanedPlace = place.trim();
-  const isDemoRequest = cleanedPlace.toLowerCase() === "demo";
-
-  try {
-    let result;
-    let aiResponse;
-
-    if (isDemoRequest) {
-      result = { text: demoItinerary.text };
-    } else {
-      const prompt = buildPrompt({
-        place: cleanedPlace,
-        tripType,
-        days,
-        hours,
-        group,
-        suggestions,
-      });
-
-      aiResponse = await generateTravelItinerary(prompt);
-
-      if (!aiResponse?.text) throw new Error("AI_EMPTY");
-
-      result = { text: aiResponse.text };
-
-      if (
-        currentUser.role !== "admin" &&
-        typeof aiResponse.remainingTokens === "number"
-      ) {
-        const updatedUser = {
-          ...currentUser,
-          tokens: aiResponse.remainingTokens,
-        };
-
-        sessionStorage.setItem("user", JSON.stringify(updatedUser));
-        setCurrentUser(updatedUser);
-      }
-    }
-
-    localStorage.setItem("lastTripResult", JSON.stringify(result));
-
-    // ⏱️ KEEP LOADER FOR 5 SECONDS
-    setTimeout(() => {
-      navigate("/results", {
-        state: {
-          suggestions: result,
-          city: isDemoRequest ? "Demo City" : cleanedPlace,
-          isDemo: isDemoRequest,
-        },
-      });
-      setLoading(false);
-    }, 5000);
-
-  } catch (err) {
-    console.error("AI ERROR:", err);
-    setLoading(false);
-
-    if (err.code === "NO_TOKENS") {
-      navigate("/quiz");
+    if (!currentUser) {
+      setShowSignIn(true);
       return;
     }
 
-    navigate("/ai-failed", {
-      state: { reason: "AI service temporarily unavailable" },
-    });
-  }
-};
+    if (!place.trim()) {
+      alert("Please enter a destination");
+      return;
+    }
+
+    setLoading(true);
+
+    const cleanedPlace = place.trim();
+    const isDemoRequest = cleanedPlace.toLowerCase() === "demo";
+
+    try {
+      let result;
+      let aiResponse;
+
+      if (isDemoRequest) {
+        result = { text: demoItinerary.text };
+      } else {
+        const prompt = buildPrompt({
+          place: cleanedPlace,
+          tripType,
+          days,
+          hours,
+          group,
+          suggestions,
+        });
+
+        aiResponse = await generateTravelItinerary(prompt);
+
+        if (!aiResponse?.text) throw new Error("AI_EMPTY");
+
+        result = { text: aiResponse.text };
+
+        if (
+          currentUser.role !== "admin" &&
+          typeof aiResponse.remainingTokens === "number"
+        ) {
+          const updatedUser = {
+            ...currentUser,
+            tokens: aiResponse.remainingTokens,
+          };
+
+          sessionStorage.setItem("user", JSON.stringify(updatedUser));
+          setCurrentUser(updatedUser);
+        }
+      }
+
+      localStorage.setItem("lastTripResult", JSON.stringify(result));
+
+      // ⏱️ KEEP LOADER FOR 5 SECONDS
+      setTimeout(() => {
+        navigate("/results", {
+          state: {
+            suggestions: result,
+            city: isDemoRequest ? "Demo City" : cleanedPlace,
+            isDemo: isDemoRequest,
+          },
+        });
+        setLoading(false);
+      }, 5000);
+
+    } catch (err) {
+      console.error("AI ERROR:", err);
+      setLoading(false);
+
+      if (err.code === "NO_TOKENS") {
+        navigate("/quiz");
+        return;
+      }
+
+      navigate("/ai-failed", {
+        state: { reason: "AI service temporarily unavailable" },
+      });
+    }
+  };
 
 
 
@@ -263,27 +263,27 @@ const handleSubmit = async (e) => {
 
 
   /* ================= RENDER PAGE ================= */
- 
 
-return (
+
+  return (
     <div className="App">
       {loading && <LogoLoader />}
       {/* ===== HEADER ===== */}
       {!isQrTrip && (
-  <Header
-    ref={headerRef}
-    variant={location.pathname === "/" ? "home" : "compact"}
-    user={currentUser}
-    onSignInClick={() => setShowSignIn(true)}
-    onLogoutClick={handleLogout}
-    onHomeClick={() => navigate("/")}
-    onItinerariesClick={() => navigate("/itineraries")}
-    onSavedClick={() => navigate("/saved")}
-    onPackingListClick={() => navigate("/packing")}
-    onProfileClick={() => navigate("/profile")}
-    onBlogsClick={() => navigate("/blogs")}
-  />
-)}
+        <Header
+          ref={headerRef}
+          variant={location.pathname === "/" ? "home" : "compact"}
+          user={currentUser}
+          onSignInClick={() => setShowSignIn(true)}
+          onLogoutClick={handleLogout}
+          onHomeClick={() => navigate("/")}
+          onItinerariesClick={() => navigate("/itineraries")}
+          onSavedClick={() => navigate("/saved")}
+          onPackingListClick={() => navigate("/packing")}
+          onProfileClick={() => navigate("/profile")}
+          onBlogsClick={() => navigate("/blogs")}
+        />
+      )}
 
 
       {/* ===== SIGN IN MODAL ===== */}
@@ -296,19 +296,18 @@ return (
 
       {/* ===== MAIN CONTENT AREA ===== */}
       <main
-        className={`px-2 lg:px-4 pb-24 overflow-hidden transition-all duration-500 ${
-          isQrTrip
+        className={`px-2 lg:px-4 pb-24 overflow-hidden transition-all duration-500 ${isQrTrip
             ? "pt-0 bg-[#f6f7f9]"
             : location.pathname === "/"
-            ? "pt-[250px] bg-[#d7f26e]"
-            : "pt-32 bg-white"
-        }`}
+              ? "pt-[250px] bg-[#d7f26e]"
+              : "pt-32 bg-white"
+          }`}
       >
 
-        <AppRouter 
+        <AppRouter
           currentUser={currentUser}
           handleLogout={handleLogout}
-       
+
           navigate={navigate}
           // QUICK FIX: Pass your entire Home logic as a prop so variables stay linked
           homeContent={
@@ -388,40 +387,40 @@ return (
                       </div>
                     )}
 
-                   <div className="relative space-y-2">
-  <label className="text-sm font-medium text-gray-700">Destination</label>
+                    <div className="relative space-y-2">
+                      <label className="text-sm font-medium text-gray-700">Destination</label>
 
-  <input
-    value={place}
-    onChange={(e) => setPlace(e.target.value)}
-    onFocus={() => setShowSuggestions(true)}
-    onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
-    placeholder="Enter city or place"
-    className="w-full rounded-xl border px-4 py-3
+                      <input
+                        value={place}
+                        onChange={(e) => setPlace(e.target.value)}
+                        onFocus={() => setShowSuggestions(true)}
+                        onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
+                        placeholder="Enter city or place"
+                        className="w-full rounded-xl border px-4 py-3
                focus:ring-2 focus:ring-[#5b7c67] outline-none"
-  />
+                      />
 
-  {/* ===== SUGGESTIONS DROPDOWN ===== */}
-  {showSuggestions && citySuggestions.length > 0 && (
-    <div className="absolute z-20 w-full bg-white border
+                      {/* ===== SUGGESTIONS DROPDOWN ===== */}
+                      {showSuggestions && citySuggestions.length > 0 && (
+                        <div className="absolute z-20 w-full bg-white border
                     rounded-xl shadow mt-1 max-h-60 overflow-y-auto">
-      {citySuggestions.map((city) => (
-        <div
-          key={city.geonameId}
-          onMouseDown={(e) => {
-            e.preventDefault();
-            setPlace(`${city.name}, ${city.countryName}`);
-            setShowSuggestions(false);
-          }}
-          className="px-4 py-2 hover:bg-gray-100
+                          {citySuggestions.map((city) => (
+                            <div
+                              key={city.geonameId}
+                              onMouseDown={(e) => {
+                                e.preventDefault();
+                                setPlace(`${city.name}, ${city.countryName}`);
+                                setShowSuggestions(false);
+                              }}
+                              className="px-4 py-2 hover:bg-gray-100
                      cursor-pointer text-sm"
-        >
-          <strong>{city.name}</strong>, {city.countryName}
-        </div>
-      ))}
-    </div>
-  )}
-</div>
+                            >
+                              <strong>{city.name}</strong>, {city.countryName}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
 
 
                     <div className="space-y-2">
@@ -460,7 +459,7 @@ return (
                       </button>
                       {loading && <p className="text-center text-sm text-gray-500 mt-2">Analyzing destinations, routes & experiences...</p>}
                     </div>
-                        
+
                     <button
                       type="button"
                       onClick={() => navigate("/quiz")}
@@ -479,10 +478,10 @@ return (
               <AiFeedbackBanner source="AI Planner" />
               <FeatureCards onNavigate={(path) => navigate(path)} />
               <ItinerarySlider
-                  onItineraryClick={(slug) => {
-                    navigate(`/itineraries/${slug}`);
-                  }}
-                />
+                onItineraryClick={(slug) => {
+                  navigate(`/itineraries/${slug}`);
+                }}
+              />
 
 
               <div className="mt-20">
@@ -500,20 +499,20 @@ return (
                 </div>
               </div>
             </>
-          } 
+          }
         />
       </main>
 
       {/* FOOTER */}
       {location.pathname === "/" && <FaqFooterSection />}
- 
+
 
 
 
     </div>
   );
 
-  
+
 }
 
 export default App;   

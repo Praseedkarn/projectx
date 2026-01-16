@@ -7,9 +7,8 @@ const TextSkeleton = ({ lines = 6 }) => (
     {Array.from({ length: lines }).map((_, i) => (
       <div
         key={i}
-        className={`h-4 rounded bg-gray-200 ${
-          i === lines - 1 ? "w-3/4" : "w-full"
-        }`}
+        className={`h-4 rounded bg-gray-200 ${i === lines - 1 ? "w-3/4" : "w-full"
+          }`}
       />
     ))}
   </div>
@@ -19,7 +18,7 @@ const TextSkeleton = ({ lines = 6 }) => (
 const TripResults = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const city =location.state?.city;
+  const city = location.state?.city;
   const isDemo = location.state?.isDemo;
   const demoReason = location.state?.reason;
 
@@ -49,8 +48,8 @@ const TripResults = () => {
   const [qrError, setQrError] = useState("");
   const [guide, setGuide] = useState(null);
   const [guideLoading, setGuideLoading] = useState(false);
-  const [cityInfo , setCityInfo ]=useState(null);
-  const [cityLoading  , setCityLoading ]=useState(false);
+  const [cityInfo, setCityInfo] = useState(null);
+  const [cityLoading, setCityLoading] = useState(false);
   const [osmData, setOsmData] = useState(null);
   const [osmLoading, setOsmLoading] = useState(false);
   const [osmError, setOsmError] = useState("");
@@ -67,12 +66,12 @@ const TripResults = () => {
   }, [suggestions, navigate]);
 
   useEffect(() => {
-  const timer = setTimeout(() => {
-    setLoading(false);
-  }, 3000);
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 3000);
 
-  return () => clearTimeout(timer);
-}, []);
+    return () => clearTimeout(timer);
+  }, []);
 
 
   /* ================= LOADING TEXT ================= */
@@ -88,131 +87,131 @@ const TripResults = () => {
 
   /* ================= GUIDE (STAGE 1 - MANUAL) ================= */
 
-useEffect(() => {
-  if (!city) return;
+  useEffect(() => {
+    if (!city) return;
 
-  const fetchGuide = async () => {
-    try {
-      setGuideLoading(true);
+    const fetchGuide = async () => {
+      try {
+        setGuideLoading(true);
 
-      const res = await fetch(
-        `http://localhost:5001/api/guides?city=${city}`
-      );
+        const res = await fetch(
+          `https://projectx-yzu3.onrender.com/api/guides?city=${city}`
+        );
 
-      const data = await res.json();
+        const data = await res.json();
 
-      if (data.available) {
-        setGuide(data.guide);
-      } else {
+        if (data.available) {
+          setGuide(data.guide);
+        } else {
+          setGuide(null);
+        }
+      } catch (err) {
+        console.error("Failed to fetch guide");
         setGuide(null);
+      } finally {
+        setGuideLoading(false);
       }
-    } catch (err) {
-      console.error("Failed to fetch guide");
-      setGuide(null);
-    } finally {
-      setGuideLoading(false);
+    };
+
+    fetchGuide();
+  }, [city]);
+
+  useEffect(() => {
+    if (!city) return;
+
+    const fetchCityInfo = async () => {
+      try {
+        setCityLoading(true);
+        const res = await fetch(
+          `https://projectx-yzu3.onrender.com/api/wiki?query=${encodeURIComponent(city)}`
+        );
+        const data = await res.json();
+
+        if (data.available) {
+          setCityInfo(data);
+        } else {
+          setCityInfo(null);
+        }
+      } catch {
+        setCityInfo(null);
+      } finally {
+        setCityLoading(false);
+      }
+    };
+
+    fetchCityInfo();
+  }, [city]);
+
+  useEffect(() => {
+    if (!city) return;
+
+    const fetchOSMData = async () => {
+      try {
+        setOsmLoading(true);
+        setOsmError("");
+        setOsmData(null);
+
+        const res = await fetch(
+          `https://projectx-yzu3.onrender.com/api/osm?city=${encodeURIComponent(city)}`
+        );
+
+        if (!res.ok) throw new Error("OSM request failed");
+
+        const data = await res.json();
+
+        if (data.available) {
+          setOsmData(data);
+        } else {
+          setOsmData(null);
+        }
+      } catch (err) {
+        setOsmError("Failed to load nearby places");
+        setOsmData(null);
+      } finally {
+        setOsmLoading(false);
+      }
+    };
+
+    fetchOSMData();
+  }, [city]);
+
+  const handleAttractionClick = async (place) => {
+    // Toggle close
+    if (activeAttraction === place.id) {
+      setActiveAttraction(null);
+      setAttractionSummary(null);
+      return;
     }
-  };
 
-  fetchGuide();
-}, [city]);
+    setActiveAttraction(place.id);
+    setAttractionSummary(null);
+    setSummaryLoading(true);
 
-useEffect(() => {
-  if (!city) return;
-
-  const fetchCityInfo = async () => {
     try {
-      setCityLoading(true);
+      const query = `${place.name} ${city}`;
       const res = await fetch(
-        `http://localhost:5001/api/wiki?query=${encodeURIComponent(city)}`
+        `https://projectx-yzu3.onrender.com/api/wiki?query=${encodeURIComponent(query)}`
       );
+
       const data = await res.json();
 
       if (data.available) {
-        setCityInfo(data);
+        setAttractionSummary(data);
       } else {
-        setCityInfo(null);
+        setAttractionSummary({
+          title: place.name,
+          description: "No summary available for this place.",
+        });
       }
     } catch {
-      setCityInfo(null);
-    } finally {
-      setCityLoading(false);
-    }
-  };
-
-  fetchCityInfo();
-}, [city]);
-
-useEffect(() => {
-  if (!city) return;
-
-  const fetchOSMData = async () => {
-    try {
-      setOsmLoading(true);
-      setOsmError("");
-      setOsmData(null);
-
-      const res = await fetch(
-        `http://localhost:5001/api/osm?city=${encodeURIComponent(city)}`
-      );
-
-      if (!res.ok) throw new Error("OSM request failed");
-
-      const data = await res.json();
-
-      if (data.available) {
-        setOsmData(data);
-      } else {
-        setOsmData(null);
-      }
-    } catch (err) {
-      setOsmError("Failed to load nearby places");
-      setOsmData(null);
-    } finally {
-      setOsmLoading(false);
-    }
-  };
-
-  fetchOSMData();
-}, [city]);
-
-const handleAttractionClick = async (place) => {
-  // Toggle close
-  if (activeAttraction === place.id) {
-    setActiveAttraction(null);
-    setAttractionSummary(null);
-    return;
-  }
-
-  setActiveAttraction(place.id);
-  setAttractionSummary(null);
-  setSummaryLoading(true);
-
-  try {
-    const query = `${place.name} ${city}`;
-    const res = await fetch(
-      `http://localhost:5001/api/wiki?query=${encodeURIComponent(query)}`
-    );
-
-    const data = await res.json();
-
-    if (data.available) {
-      setAttractionSummary(data);
-    } else {
       setAttractionSummary({
         title: place.name,
-        description: "No summary available for this place.",
+        description: "Failed to load information.",
       });
+    } finally {
+      setSummaryLoading(false);
     }
-  } catch {
-    setAttractionSummary({
-      title: place.name,
-      description: "Failed to load information.",
-    });
-  } finally {
-    setSummaryLoading(false);
-  }
-};
+  };
 
 
 
@@ -242,7 +241,7 @@ const handleAttractionClick = async (place) => {
         setDisplayText("");
         setIsTyping(false);
       }
-    }, 110+ Math.random()*40);
+    }, 110 + Math.random() * 40);
 
     return () => clearInterval(typingInterval);
   }, [suggestions]);
@@ -255,7 +254,7 @@ const handleAttractionClick = async (place) => {
     setQrError("");
 
     try {
-      const res = await fetch("http://localhost:5001/api/qr-trips", {
+      const res = await fetch("https://projectx-yzu3.onrender.com/api/qr-trips", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: finalText }),
@@ -295,9 +294,9 @@ const handleAttractionClick = async (place) => {
         {/* HEADER */}
         <div className="bg-white p-6 rounded-3xl shadow flex justify-between">
           <h2 className="text-xl font-semibold">Your AI Travel Plan</h2>
-       
 
-        {isDemo && (
+
+          {isDemo && (
             <div className="inline-flex items-center gap-2 text-xs
                             bg-yellow-100 text-yellow-800
                             px-3 py-1 rounded-full w-fit">
@@ -310,7 +309,7 @@ const handleAttractionClick = async (place) => {
               {demoReason}
             </p>
           )}
-                    <button onClick={() => navigate("/")}>✕</button>
+          <button onClick={() => navigate("/")}>✕</button>
 
         </div>
 
@@ -357,25 +356,25 @@ const handleAttractionClick = async (place) => {
         )}
 
         {city && (
-  <div className="bg-white rounded-3xl shadow p-6 space-y-3">
-    <h3 className="text-lg font-semibold text-gray-800">
-      Explore {city}
-    </h3>
+          <div className="bg-white rounded-3xl shadow p-6 space-y-3">
+            <h3 className="text-lg font-semibold text-gray-800">
+              Explore {city}
+            </h3>
 
-    <p className="text-sm text-gray-500">
-      Zoom in to see famous places, attractions, and landmarks
-    </p>
+            <p className="text-sm text-gray-500">
+              Zoom in to see famous places, attractions, and landmarks
+            </p>
 
-    <iframe
-      title="city-attractions-map"
-      className="w-full h-96 rounded-xl"
-      loading="lazy"
-      src={`https://www.google.com/maps?q=top+tourist+attractions+in+${encodeURIComponent(
-        city
-      )}&z=13&output=embed`}
-    />
-  </div>
-)}
+            <iframe
+              title="city-attractions-map"
+              className="w-full h-96 rounded-xl"
+              loading="lazy"
+              src={`https://www.google.com/maps?q=top+tourist+attractions+in+${encodeURIComponent(
+                city
+              )}&z=13&output=embed`}
+            />
+          </div>
+        )}
 
 
 
@@ -401,7 +400,7 @@ const handleAttractionClick = async (place) => {
             )}
           </div>
 
-         {/* AI TEXT AREA */}
+          {/* AI TEXT AREA */}
           <div className="bg-slate-50 p-5 rounded-xl whitespace-pre-wrap min-h-[300px]">
             {/* Skeleton before typing starts */}
             {isTyping && displayText === "" && (
@@ -423,7 +422,7 @@ const handleAttractionClick = async (place) => {
           </div>
 
 
-         
+
 
           {isEditing && (
             <textarea
@@ -445,178 +444,178 @@ const handleAttractionClick = async (place) => {
           {qrLoading ? "Generating QR..." : "📱 Generate QR"}
         </button>
 
-       {qrTripId && (
-  <div className="flex flex-col items-center gap-3 mt-4">
+        {qrTripId && (
+          <div className="flex flex-col items-center gap-3 mt-4">
 
-    <QRCodeCanvas
-      value={`${window.location.origin}/qr-trip/${qrTripId}`}
-      size={220}
-    />
+            <QRCodeCanvas
+              value={`${window.location.origin}/qr-trip/${qrTripId}`}
+              size={220}
+            />
 
-    {/* Clickable link */}
-    <a
-      href={`${window.location.origin}/qr-trip/${qrTripId}`}
-      target="_blank"
-      rel="noreferrer"
-      className="text-sm text-indigo-600 underline break-all"
-    >
-      {window.location.origin}/qr-trip/{qrTripId}
-    </a>
+            {/* Clickable link */}
+            <a
+              href={`${window.location.origin}/qr-trip/${qrTripId}`}
+              target="_blank"
+              rel="noreferrer"
+              className="text-sm text-indigo-600 underline break-all"
+            >
+              {window.location.origin}/qr-trip/{qrTripId}
+            </a>
 
-    {/* Expiry note */}
-    <p className="text-xs text-gray-500">
-      ⏳ This QR link will expire in <strong>7 days</strong>
-    </p>
-
-  </div>
-)}
-
-{/* ================= HOTELS & ATTRACTIONS (OSM) ================= */}
-{city && (
-  <div className="bg-white rounded-3xl shadow p-6 space-y-6">
-
-    <h2 className="text-xl font-semibold">
-      Hotels & Attractions in {city}
-    </h2>
-
-
- {osmData?.fallback && (
-  <div className="bg-yellow-50 border rounded-xl p-3 text-sm text-gray-700">
-    {osmData.fallbackReason === "UNSUPPORTED_CITY" && (
-      <>🚧 Detailed hotel & attraction support for <strong>{city}</strong> is coming soon.</>
-    )}
-
-    {osmData.fallbackReason === "NO_DATA" && (
-      <>ℹ️ Limited nearby hotel & attraction data available for <strong>{city}</strong>.</>
-    )}
-
-    {osmData.fallbackReason === "OVERPASS_ERROR" && (
-      <>⚠️ Map services are busy right now. Showing limited results.</>
-    )}
-  </div>
-)}
-
-  
-
-
-    {/* Loading */}
-    {osmLoading && (
-      <p className="text-sm text-gray-500">
-        Finding nearby hotels & attractions…
-      </p>
-    )}
-
-    {/* Error */}
-    {!osmLoading && osmError && !osmData?.fallback && (
-      <p className="text-sm text-red-500">{osmError}</p>
-    )}
-
-
-    {/* Data */}
-    {!osmLoading && osmData && (
-      <>
-        {/* HOTELS */}
-        <div>
-          <h3 className="text-lg font-medium mb-3">🏨 Hotels</h3>
-
-          {osmData.hotels.length === 0 ? (
-            <p className="text-sm text-gray-500">
-              No hotels found nearby
+            {/* Expiry note */}
+            <p className="text-xs text-gray-500">
+              ⏳ This QR link will expire in <strong>7 days</strong>
             </p>
-          ) : (
-            <div className="grid md:grid-cols-2 gap-4">
-              {osmData.hotels.slice(0, 8).map((hotel) => (
-                <div
-                  key={hotel.id}
-                  className="border rounded-xl p-4 hover:shadow transition"
-                >
-                  <p className="font-medium text-gray-800">
-                    {hotel.name}
-                  </p>
 
-                  {hotel.stars && (
-                    <p className="text-sm text-gray-600">
-                      ⭐ {hotel.stars} star
+          </div>
+        )}
+
+        {/* ================= HOTELS & ATTRACTIONS (OSM) ================= */}
+        {city && (
+          <div className="bg-white rounded-3xl shadow p-6 space-y-6">
+
+            <h2 className="text-xl font-semibold">
+              Hotels & Attractions in {city}
+            </h2>
+
+
+            {osmData?.fallback && (
+              <div className="bg-yellow-50 border rounded-xl p-3 text-sm text-gray-700">
+                {osmData.fallbackReason === "UNSUPPORTED_CITY" && (
+                  <>🚧 Detailed hotel & attraction support for <strong>{city}</strong> is coming soon.</>
+                )}
+
+                {osmData.fallbackReason === "NO_DATA" && (
+                  <>ℹ️ Limited nearby hotel & attraction data available for <strong>{city}</strong>.</>
+                )}
+
+                {osmData.fallbackReason === "OVERPASS_ERROR" && (
+                  <>⚠️ Map services are busy right now. Showing limited results.</>
+                )}
+              </div>
+            )}
+
+
+
+
+            {/* Loading */}
+            {osmLoading && (
+              <p className="text-sm text-gray-500">
+                Finding nearby hotels & attractions…
+              </p>
+            )}
+
+            {/* Error */}
+            {!osmLoading && osmError && !osmData?.fallback && (
+              <p className="text-sm text-red-500">{osmError}</p>
+            )}
+
+
+            {/* Data */}
+            {!osmLoading && osmData && (
+              <>
+                {/* HOTELS */}
+                <div>
+                  <h3 className="text-lg font-medium mb-3">🏨 Hotels</h3>
+
+                  {osmData.hotels.length === 0 ? (
+                    <p className="text-sm text-gray-500">
+                      No hotels found nearby
                     </p>
+                  ) : (
+                    <div className="grid md:grid-cols-2 gap-4">
+                      {osmData.hotels.slice(0, 8).map((hotel) => (
+                        <div
+                          key={hotel.id}
+                          className="border rounded-xl p-4 hover:shadow transition"
+                        >
+                          <p className="font-medium text-gray-800">
+                            {hotel.name}
+                          </p>
+
+                          {hotel.stars && (
+                            <p className="text-sm text-gray-600">
+                              ⭐ {hotel.stars} star
+                            </p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
                   )}
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
 
-        {/* ATTRACTIONS */}
-        <div>
-          <h3 className="text-lg font-medium mb-3">
-            📍 Tourist Attractions
-          </h3>
+                {/* ATTRACTIONS */}
+                <div>
+                  <h3 className="text-lg font-medium mb-3">
+                    📍 Tourist Attractions
+                  </h3>
 
-          {osmData.attractions.length === 0 ? (
-            <p className="text-sm text-gray-500">
-              No attractions found nearby
-            </p>
-          ) : (
-            <ul className="list-disc ml-5 space-y-1 text-sm text-gray-700">
-              {osmData.attractions.slice(0, 10).map((place) => (
-                  <li key={place.id} className="space-y-2">
-                    <button
-                      onClick={() => handleAttractionClick(place)}
-                      className="font-medium text-left text-gray-800 hover:underline"
-                    >
-                      {place.name}
-                    </button>
+                  {osmData.attractions.length === 0 ? (
+                    <p className="text-sm text-gray-500">
+                      No attractions found nearby
+                    </p>
+                  ) : (
+                    <ul className="list-disc ml-5 space-y-1 text-sm text-gray-700">
+                      {osmData.attractions.slice(0, 10).map((place) => (
+                        <li key={place.id} className="space-y-2">
+                          <button
+                            onClick={() => handleAttractionClick(place)}
+                            className="font-medium text-left text-gray-800 hover:underline"
+                          >
+                            {place.name}
+                          </button>
 
-                    {place.mapsLink && (
-                      <a
-                        href={place.mapsLink}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="ml-2 text-indigo-600 underline text-xs"
-                      >
-                        View on map
-                      </a>
-                    )}
+                          {place.mapsLink && (
+                            <a
+                              href={place.mapsLink}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="ml-2 text-indigo-600 underline text-xs"
+                            >
+                              View on map
+                            </a>
+                          )}
 
-                    {/* EXPANDABLE SUMMARY CARD */}
-                    {activeAttraction === place.id && (
-                      <div className="mt-2 border rounded-xl p-4 bg-slate-50">
-                        {summaryLoading ? (
-                          <p className="text-sm text-gray-500">Loading details…</p>
-                        ) : (
-                          <>
-                            <h4 className="font-semibold text-gray-800">
-                              {attractionSummary?.title}
-                            </h4>
+                          {/* EXPANDABLE SUMMARY CARD */}
+                          {activeAttraction === place.id && (
+                            <div className="mt-2 border rounded-xl p-4 bg-slate-50">
+                              {summaryLoading ? (
+                                <p className="text-sm text-gray-500">Loading details…</p>
+                              ) : (
+                                <>
+                                  <h4 className="font-semibold text-gray-800">
+                                    {attractionSummary?.title}
+                                  </h4>
 
-                            <p className="text-sm text-gray-700 mt-1">
-                              {attractionSummary?.description}
-                            </p>
+                                  <p className="text-sm text-gray-700 mt-1">
+                                    {attractionSummary?.description}
+                                  </p>
 
-                            {attractionSummary?.wikipediaUrl && (
-                              <a
-                                href={attractionSummary.wikipediaUrl}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="text-xs text-indigo-600 underline mt-2 inline-block"
-                              >
-                                Read more on Wikipedia →
-                              </a>
-                            )}
-                          </>
-                        )}
-                      </div>
-                    )}
-                  </li>
- 
+                                  {attractionSummary?.wikipediaUrl && (
+                                    <a
+                                      href={attractionSummary.wikipediaUrl}
+                                      target="_blank"
+                                      rel="noreferrer"
+                                      className="text-xs text-indigo-600 underline mt-2 inline-block"
+                                    >
+                                      Read more on Wikipedia →
+                                    </a>
+                                  )}
+                                </>
+                              )}
+                            </div>
+                          )}
+                        </li>
 
-                   ))}
-            </ul>
-          )}
-        </div>
-      </>
-    )}
-  </div>
-)}
+
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+        )}
 
 
         {/* ================= LOCAL GUIDE CARD ================= */}
@@ -625,7 +624,7 @@ const handleAttractionClick = async (place) => {
             <div className="bg-green-50 border border-green-200
                             rounded-3xl p-6 shadow-sm">
               <h3 className="text-xl font-semibold text-gray-800">
-                Local Guide Available in {city} 
+                Local Guide Available in {city}
               </h3>
 
               <p className="mt-2 text-gray-600">
