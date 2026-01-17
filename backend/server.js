@@ -21,6 +21,7 @@ import quizRoutes from "./routes/quiz.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import osmRoutes from "./routes/osm.routes.js";
 import quizAdminRoutes from "./routes/quiz.admin.js";
+import historyRoutes from "./routes/history.routes.js";
 
 // 🔎 DEBUG (SAFE TO KEEP)
 // console.log("🔥 THIS IS THE ACTIVE SERVER.JS FILE");
@@ -53,6 +54,7 @@ app.use("/api/quiz", quizRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/osm",osmRoutes);
 app.use("/api/admin/quiz", quizAdminRoutes);
+app.use("/api/history", historyRoutes);
 
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok" });

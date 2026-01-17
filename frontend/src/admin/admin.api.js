@@ -32,3 +32,16 @@ export const fetchAdminUsers = async () => {
   if (!res.ok) throw new Error("Admin users failed");
   return res.json();
 };
+
+export const fetchAdminSearches = async () => {
+  const token = sessionStorage.getItem("token");
+
+  const res = await fetch(`${API_URL}/api/history/search`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!res.ok) throw new Error("Admin searches failed");
+  return res.json();
+};

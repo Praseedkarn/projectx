@@ -1,6 +1,6 @@
 import User from "../models/User.js";
 import QuizQuestion from "../models/QuizQuestion.js";
-
+import TokenHistory from "../models/TokenHistory.js";
 const QUIZ_REWARD = 20;
 const QUIZ_COOLDOWN_HOURS = 12;
 const QUIZ_SIZE = 5;
@@ -86,6 +86,13 @@ export const submitQuiz = async (req, res) => {
     // 🪙 Reward
     if (score >= 3) {
       user.tokens += QUIZ_REWARD;
+
+       await TokenHistory.create({
+    user: user._id,
+    change: +QUIZ_REWARD,
+    reason: "QUIZ_REWARD",
+    balanceAfter: user.tokens,
+  });
     }
 
     await user.save();

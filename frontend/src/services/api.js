@@ -1,18 +1,13 @@
-/* =====================================================
-   BASE SETUP
-   ===================================================== */
-
-// proxy already set in package.json
-// "proxy": "http://localhost:5001"
+import API_BASE_URL from "./apiClient";
 
 /* =====================================================
    AI APIs
    ===================================================== */
 
 export const generateTravelItinerary = async (description, detailLevel) => {
-  const token = sessionStorage.getItem("token"); // ✅ FIX
+  const token = sessionStorage.getItem("token");
 
-  const response = await fetch("https://projectx-yzu3.onrender.com/api/ai/itinerary", {
+  const response = await fetch(`${API_BASE_URL}/api/ai/itinerary`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -29,17 +24,12 @@ export const generateTravelItinerary = async (description, detailLevel) => {
   return response.json();
 };
 
-
-
 /* =====================================================
-   ITINERARY APIs (STATIC + DB HYBRID)
+   ITINERARY APIs
    ===================================================== */
 
-/**
- * Fetch ALL itineraries from DB
- */
 export const fetchAllItineraries = async () => {
-  const response = await fetch("https://projectx-yzu3.onrender.com/api/itineraries");
+  const response = await fetch(`${API_BASE_URL}/api/itineraries`);
 
   if (!response.ok) {
     throw new Error("Failed to fetch itineraries");
@@ -48,13 +38,9 @@ export const fetchAllItineraries = async () => {
   return response.json();
 };
 
-/**
- * Fetch itinerary by legacyId
- * 🔥 THIS IS WHAT YOUR UI NEEDS
- */
 export const fetchItineraryBySlug = async (slug) => {
   const res = await fetch(
-    `https://projectx-yzu3.onrender.com/api/itineraries/${slug}`
+    `${API_BASE_URL}/api/itineraries/${slug}`
   );
 
   if (!res.ok) {
@@ -64,13 +50,10 @@ export const fetchItineraryBySlug = async (slug) => {
   return res.json();
 };
 
-
-/**
- * Fetch itinerary by MongoDB _id
- * (optional / admin)
- */
 export const fetchItineraryByMongoId = async (mongoId) => {
-  const response = await fetch(`https://projectx-yzu3.onrender.com/api/itineraries/mongo/${mongoId}`);
+  const response = await fetch(
+    `${API_BASE_URL}/api/itineraries/mongo/${mongoId}`
+  );
 
   if (!response.ok) {
     throw new Error("Failed to fetch itinerary");
@@ -79,11 +62,8 @@ export const fetchItineraryByMongoId = async (mongoId) => {
   return response.json();
 };
 
-/**
- * Save itinerary to DB
- */
 export const saveItineraryToDB = async (itineraryData) => {
-  const response = await fetch("https://projectx-yzu3.onrender.com/api/itineraries", {
+  const response = await fetch(`${API_BASE_URL}/api/itineraries`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(itineraryData),
@@ -101,7 +81,7 @@ export const saveItineraryToDB = async (itineraryData) => {
    ===================================================== */
 
 export const loginUser = async (email, password) => {
-  const response = await fetch("https://projectx-yzu3.onrender.com/api/auth/login", {
+  const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password }),
@@ -115,7 +95,7 @@ export const loginUser = async (email, password) => {
 };
 
 export const registerUser = async (userData) => {
-  const response = await fetch("https://projectx-yzu3.onrender.com/api/auth/register", {
+  const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(userData),
@@ -130,12 +110,12 @@ export const registerUser = async (userData) => {
 
 /* =====================================================
    QUIZ APIs
-===================================================== */
+   ===================================================== */
 
 export const fetchQuiz = async () => {
   const token = sessionStorage.getItem("token");
 
-  const res = await fetch("https://projectx-yzu3.onrender.com/api/quiz", {
+  const res = await fetch(`${API_BASE_URL}/api/quiz`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -148,16 +128,17 @@ export const fetchQuiz = async () => {
 
   return res.json();
 };
+
 export const submitQuiz = async (data) => {
   const token = sessionStorage.getItem("token");
 
-  const res = await fetch("https://projectx-yzu3.onrender.com/api/quiz/submit", {
+  const res = await fetch(`${API_BASE_URL}/api/quiz/submit`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify(data), // 🔥 answers + questionIds
+    body: JSON.stringify(data),
   });
 
   if (!res.ok) {
@@ -166,15 +147,4 @@ export const submitQuiz = async (data) => {
   }
 
   return res.json();
-};
-
-
-
-export const logTokenChange = (entry) => {
-  const history = JSON.parse(sessionStorage.getItem("tokenHistory")) || [];
-  history.unshift({
-    ...entry,
-    time: new Date().toISOString(),
-  });
-  sessionStorage.setItem("tokenHistory", JSON.stringify(history));
 };

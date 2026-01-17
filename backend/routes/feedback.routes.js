@@ -2,7 +2,7 @@ import express from "express";
 import { submitFeedback } from "../controllers/feedback.controller.js";
 import { sendFeedbackEmail } from "../utils/sendEmail.js";
 
-console.log("🔥 feedback.routes.js loaded");
+
 
 const router = express.Router();
 

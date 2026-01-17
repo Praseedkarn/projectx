@@ -292,8 +292,10 @@ const TripResults = () => {
       <div className="max-w-4xl mx-auto space-y-6">
 
         {/* HEADER */}
-        <div className="bg-white p-6 rounded-3xl shadow flex justify-between">
-          <h2 className="text-xl font-semibold">Your AI Travel Plan</h2>
+        <div className="bg-white p-6  ms:p-6 rounded-3xl shadow flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <h2 className="text-lg sm:text-x font-semibold">
+            Your AI Travel Plan
+          </h2>
 
 
           {isDemo && (
