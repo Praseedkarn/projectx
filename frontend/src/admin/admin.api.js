@@ -36,7 +36,7 @@ export const fetchAdminUsers = async () => {
 export const fetchAdminSearches = async () => {
   const token = sessionStorage.getItem("token");
 
-  const res = await fetch(`${API_URL}/api/history/search`, {
+  const res = await fetch(`${API_URL}/api/admin/searches`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },

@@ -36,9 +36,7 @@ router.get("/search", authMiddleware, async (req, res) => {
 
 // 🪙 Token history
 router.get("/tokens", authMiddleware, async (req, res) => {
-  if (req.user.role === "admin") {
-    return res.json([]);
-  }
+  if (req.user.id === "admin-id") return res.json([]);
 
   const history = await TokenHistory.find({
     user: req.user.id,

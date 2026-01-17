@@ -55,7 +55,9 @@ router.get("/users", authMiddleware, async (req, res) => {
   }
 });
 
+// 🔍 GET ALL SEARCHES
 router.get("/searches", authMiddleware, async (req, res) => {
+  console.log("🕵️ ADMIN SEARCHES REQUEST");
   try {
     if (req.user.role !== "admin") {
       return res.status(403).json({ message: "Admin only" });
