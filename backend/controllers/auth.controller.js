@@ -2,9 +2,7 @@ import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
-/* =====================================================
-   REGISTER (USER ONLY)
-   ===================================================== */
+/* ================= REGISTER ================= */
 export const register = async (req, res) => {
   try {
     const { name, username, email, password } = req.body;
@@ -13,7 +11,6 @@ export const register = async (req, res) => {
       return res.status(400).json({ message: "All fields required" });
     }
 
-    // ❌ BLOCK ADMIN EMAIL REGISTRATION
     if (email === "admin@projectx.com") {
       return res.status(403).json({ message: "Admin email reserved" });
     }
@@ -35,7 +32,6 @@ export const register = async (req, res) => {
     });
 
     res.status(201).json({
-      message: "User created",
       user: {
         id: user._id,
         name: user.name,
@@ -45,42 +41,18 @@ export const register = async (req, res) => {
         tokens: user.tokens,
       },
     });
-
   } catch (err) {
-    console.error("REGISTER ERROR:", err.message);
+    console.error("REGISTER ERROR:", err);
     res.status(500).json({ message: "Signup failed" });
   }
 };
 
-/* =====================================================
-   LOGIN (ADMIN + USER)
-   ===================================================== */
+/* ================= LOGIN ================= */
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    /* ================= ADMIN LOGIN ================= */
-    if (email === "admin@projectx.com" && password === "admin123") {
-      const token = jwt.sign(
-        { id: "admin-id", role: "admin" },
-        process.env.JWT_SECRET,
-        { expiresIn: "7d" }
-      );
-
-      return res.json({
-        token,
-        user: {
-          id: "admin-id",
-          name: "Admin",
-          username: "admin",
-          email: "admin@projectx.com",
-          role: "admin",
-          tokens: Infinity,
-        },
-      });
-    }
-
-    /* ================= USER LOGIN ================= */
+    // ✅ ADMIN LOGIN (REAL DB ADMIN)
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ message: "Invalid credentials" });
@@ -92,10 +64,7 @@ export const login = async (req, res) => {
     }
 
     const token = jwt.sign(
-      {
-        id: user._id,
-        role: user.role,
-      },
+      { id: user._id, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
@@ -111,9 +80,8 @@ export const login = async (req, res) => {
         tokens: user.tokens,
       },
     });
-
   } catch (err) {
-    console.error("LOGIN ERROR:", err.message);
+    console.error("LOGIN ERROR:", err);
     res.status(500).json({ message: "Login failed" });
   }
 };

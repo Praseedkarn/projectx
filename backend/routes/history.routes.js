@@ -5,47 +5,35 @@ import TokenHistory from "../models/TokenHistory.js";
 
 const router = express.Router();
 
-// 🔍 Search history
+/* ===== SEARCH HISTORY ===== */
 router.get("/search", authMiddleware, async (req, res) => {
   try {
-    // ✅ ADMIN: see all searches with user info
     if (req.user.role === "admin") {
-      const history = await SearchHistory.find()
+      const all = await SearchHistory.find()
         .populate("user", "name email")
-        .sort({ createdAt: -1 })
-        .limit(100);
-
-      return res.json(history);
+        .sort({ createdAt: -1 });
+      return res.json(all);
     }
 
-    // ✅ USER: see only own searches
-    const history = await SearchHistory.find({
-      user: req.user.id,
-    })
-      .sort({ createdAt: -1 })
-      .limit(20);
+    const history = await SearchHistory.find({ user: req.user.id })
+      .sort({ createdAt: -1 });
 
     res.json(history);
   } catch (err) {
-    console.error("SEARCH HISTORY ERROR:", err);
-    res.status(500).json({ message: "Failed to load search history" });
+    res.status(500).json({ message: "Search history failed" });
   }
 });
 
-
-
-// 🪙 Token history
+/* ===== TOKEN HISTORY ===== */
 router.get("/tokens", authMiddleware, async (req, res) => {
-  if (req.user.id === "admin-id") return res.json([]);
+  try {
+    const history = await TokenHistory.find({ user: req.user.id })
+      .sort({ createdAt: -1 });
 
-  const history = await TokenHistory.find({
-    user: req.user.id,
-  })
-    .sort({ createdAt: -1 })
-    .limit(50);
-
-  res.json(history);
+    res.json(history);
+  } catch (err) {
+    res.status(500).json({ message: "Token history failed" });
+  }
 });
-
 
 export default router;
