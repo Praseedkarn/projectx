@@ -15,6 +15,12 @@ const Header = forwardRef(({ user, variant = "home", onSignInClick, onLogoutClic
     setShowProfileMenu(false);
   };
 
+const go = (path) => {
+  closeAllMenus();
+  navigate(path);
+};
+
+
   /* ===== SCROLL BEHAVIOUR ===== */
   useEffect(() => {
     let ticking = false;
@@ -106,8 +112,10 @@ const Header = forwardRef(({ user, variant = "home", onSignInClick, onLogoutClic
                 <button onClick={() => navigate("/saved")}>Saved</button>
               </>
             )}
+              <button onClick={() => navigate("/help")}>
+                Help
+              </button>
 
-            <button onClick={() => alert("Help coming soon")}>Help</button>
           </nav>
 
                     {/* TOKEN BADGE */}
@@ -169,10 +177,10 @@ const Header = forwardRef(({ user, variant = "home", onSignInClick, onLogoutClic
                   <p className="text-xs text-gray-500">{user.email}</p>
                 </div>
                 <div className="border-t">
-                  <button onClick={() => navigate("/profile")} className="menu-item">
+                  <button onClick={() => go("/profile")} className="menu-item">
                     My profile
                   </button>
-                  <button onClick={() => navigate("/packing")} className="menu-item">
+                  <button onClick={() => go("/packing")} className="menu-item">
                     Packing list
                   </button>
                   <button
@@ -183,7 +191,7 @@ const Header = forwardRef(({ user, variant = "home", onSignInClick, onLogoutClic
                   </button>
                   {user.role === "admin" && (
                     <button
-                      onClick={() => navigate("/admin")}
+                      onClick={() => go("/admin")}
                       className="menu-item"
                     >
                       Admin Dashboard
@@ -201,76 +209,95 @@ const Header = forwardRef(({ user, variant = "home", onSignInClick, onLogoutClic
             >
               ☰
             </button>
-            {isMenuOpen && (
-              <div className="
-              absolute right-0 top-12 w-64
-              rounded-xl
-              bg-white
-              p-4
-              shadow-2xl
-              border border-gray-200
-              z-50
-              md:bg-white
-              ">
+           {isMenuOpen && (
+  <div className="
+    absolute right-0 top-12 w-64
+    rounded-xl
+    bg-white
+    p-4
+    shadow-2xl
+    border border-gray-200
+    z-50
+  ">
 
-                {/* USER INFO */}
-                {user && (
-                  <div className="pb-3 border-b">
-                    <p className="font-semibold">{user.name}</p>
-                    <p className="text-xs text-gray-500">{user.email}</p>
+    {/* USER INFO */}
+    {user && (
+      <div className="pb-3 border-b space-y-1">
+        <p className="font-semibold">{user.name}</p>
+        <p className="text-xs text-gray-500">{user.email}</p>
 
-                    <div className="mt-2 inline-flex items-center gap-2 text-sm
-                                    bg-[#5b6f00]/10 text-[#5b6f00]
-                                    px-3 py-1.5 rounded-full">
-                      🪙 {user.role === "admin" ? "∞" : user.tokens}
-                    </div>
-                  </div>
-                )}
+        <div className="mt-2 inline-flex items-center gap-2 text-sm
+                        bg-[#5b6f00]/10 text-[#5b6f00]
+                        px-3 py-1.5 rounded-full">
+          🪙 {user.role === "admin" ? "∞" : user.tokens}
+        </div>
+      </div>
+    )}
 
-                {/* NAV */}
-                <button onClick={() => navigate("/")} className="menu-item">
-                  Home
-                </button>
-                <button onClick={() => navigate("/blogs")} className="menu-item">
-                  Blogs
-                </button>
+    {/* NAVIGATION */}
+    <div className="pt-2">
+      <button onClick={() => go("/")} className="menu-item">Home</button>
+      <button onClick={() => go("/blogs")} className="menu-item">Blogs</button>
+      <button onClick={() => go("/help")} className="menu-item">Help</button>
 
-                {user && (
-                  <>
-                    <button onClick={() => navigate("/itineraries")} className="menu-item">
-                      Itineraries
-                    </button>
-                    <button onClick={() => navigate("/saved")} className="menu-item">
-                      Saved
-                    </button>
-                    <button onClick={() => navigate("/packing")} className="menu-item">
-                      Packing list
-                    </button>
-                    <button onClick={() => navigate("/profile")} className="menu-item">
-                      My profile
-                    </button>
-                  </>
-                )}
+      {user && (
+        <>
+          <button onClick={() => go("/itineraries")} className="menu-item">
+            Itineraries
+          </button>
+          <button onClick={() => go("/saved")} className="menu-item">
+            Saved
+          </button>
+          <button onClick={() => go("/packing")} className="menu-item">
+            Packing list
+          </button>
+        </>
+      )}
+    </div>
 
-                {!user && (
-                  <button
-                    onClick={onSignInClick}
-                    className="w-full rounded-lg bg-[#5b7c67] text-white py-2 text-sm"
-                  >
-                    Sign in
-                  </button>
-                )}
+    {/* ACCOUNT */}
+    {user && (
+      <div className="pt-2 border-t mt-2">
+        <button onClick={() => go("/profile")} className="menu-item">
+          My profile
+        </button>
 
-                {user && (
-                  <button
-                    onClick={onLogoutClick}
-                    className="menu-item text-red-600"
-                  >
-                    Logout
-                  </button>
-                )}
-              </div>
-            )}
+        <button onClick={() => go("/tokens")} className="menu-item">
+          🪙 Token History
+        </button>
+
+        {user.role === "admin" && (
+          <button onClick={() => go("/admin")} className="menu-item">
+            Admin Dashboard
+          </button>
+        )}
+
+        <button
+          onClick={() => {
+            closeAllMenus();
+            onLogoutClick();
+          }}
+          className="menu-item text-red-600"
+        >
+          Logout
+        </button>
+      </div>
+    )}
+
+    {!user && (
+      <button
+        onClick={() => {
+          closeAllMenus();
+          onSignInClick();
+        }}
+        className="mt-3 w-full rounded-lg bg-[#5b7c67] text-white py-2 text-sm"
+      >
+        Sign in
+      </button>
+    )}
+  </div>
+)}
+
 
           
           </div>

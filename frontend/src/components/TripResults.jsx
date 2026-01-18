@@ -288,11 +288,11 @@ const TripResults = () => {
 
   /* ================= RESULT ================= */
   return (
-    <div className=" pt-24 px-4 animate-fade-in">
+    <div className=" pt-16 sm:pt-20 px-4 animate-fade-in">
       <div className="max-w-4xl mx-auto space-y-6">
 
         {/* HEADER */}
-        <div className="bg-white p-6  ms:p-6 rounded-3xl shadow flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="bg-white p-4  sm:p-6 rounded-3xl shadow flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <h2 className="text-lg sm:text-x font-semibold">
             Your AI Travel Plan
           </h2>
@@ -402,27 +402,42 @@ const TripResults = () => {
             )}
           </div>
 
-          {/* AI TEXT AREA */}
-          <div className="bg-slate-50 p-5 rounded-xl whitespace-pre-wrap min-h-[300px]">
-            {/* Skeleton before typing starts */}
-            {isTyping && displayText === "" && (
-              <TextSkeleton lines={8} />
-            )}
+{/* AI TEXT AREA */}
+<div
+  className="
+    sm:bg-slate-50
+    sm:rounded-xl
+    sm:p-5
 
-            {/* Typing animation */}
-            {isTyping && displayText !== "" && (
-              <>
-                {displayText}
-                <span className="ml-1 animate-pulse">▍</span>
-              </>
-            )}
+    p-0
+    text-[15px] sm:text-base
+    leading-7
+    font-['Inter']
+    whitespace-pre-wrap
+    break-words
+    text-gray-800
+  "
+>
+  {/* Skeleton */}
+  {isTyping && displayText === "" && (
+    <TextSkeleton lines={6} />
+  )}
 
-            {/* Final text */}
-            {!isTyping && !isEditing && finalText && (
-              <pre className="whitespace-pre-wrap">{finalText}</pre>
-            )}
-          </div>
+  {/* Typing animation */}
+  {isTyping && displayText !== "" && (
+    <div className="block">
+      {displayText}
+      <span className="ml-1 animate-pulse">▍</span>
+    </div>
+  )}
 
+  {/* Final text */}
+  {!isTyping && !isEditing && finalText && (
+    <div className="whitespace-pre-wrap break-words">
+      {finalText}
+    </div>
+  )}
+</div>
 
 
 

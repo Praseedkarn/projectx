@@ -16,13 +16,24 @@ const AiFailPage = () => {
 
         <p className="text-gray-600">{random.message}</p>
 
-        <button
-          onClick={() => navigate("/")}
-          className="mt-4 rounded-full bg-[#5b7c67] px-6 py-3 text-white
-                     hover:bg-[#4a6a58] transition"
-        >
-          🔄 Try again
-        </button>
+        {/* ACTION BUTTONS */}
+        <div className="flex flex-col gap-3 pt-4">
+          <button
+            onClick={() => navigate("/")}
+            className="rounded-full bg-[#5b7c67] px-6 py-3 text-white
+                       hover:bg-[#4a6a58] transition"
+          >
+            🔄 Try again
+          </button>
+
+          <button
+            onClick={() => navigate("/help")}
+            className="rounded-full border px-6 py-3 text-gray-700
+                       hover:bg-gray-50 transition"
+          >
+            ❓ Get Help
+          </button>
+        </div>
       </div>
     </div>
   );

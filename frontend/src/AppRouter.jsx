@@ -17,7 +17,7 @@ import DistanceCalculator from "./components/DistanceCalculator";
 import QrTripPage from "./components/QrTripPage";
 import QuizPage from "./pages/QuizPage";
 import TokenHistoryPage from "./components/TokenHistoryPage";
-
+import HelpPage from "./pages/HelpPage";
 /* ADMIN */
 import AdminLayout from "./admin/AdminLayout";
 import AdminDashboard from "./admin/AdminDashboard";
@@ -73,7 +73,7 @@ const AppRouter = ({
       <Route path="/packing" element={<PackingList />} />
       <Route path="/quiz" element={<QuizPage />} />
       <Route path="/tokens" element={<TokenHistoryPage />} />
-
+      <Route path="/help" element={<HelpPage/>}/>
       {/* OTHERS */}
       <Route path="/blogs" element={<Blogs />} />
       <Route path="/distance" element={<DistanceCalculator />} />

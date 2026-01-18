@@ -13,7 +13,6 @@ const PackingList = () => {
   const [customItemCategory, setCustomItemCategory] = useState("other");
 
   const STORAGE_KEY = "packing_guest";
-
   const hasItems = items.length > 0;
 
   /* ================= CATEGORIES ================= */
@@ -28,28 +27,26 @@ const PackingList = () => {
     { id: "other", name: "Other", icon: "📦" }
   ];
 
-  /* ================= INIT ================= */
-  useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) setItems(JSON.parse(saved));
-  }, []);
-
-  /* ================= PERSIST ================= */
-  useEffect(() => {
-    if (items.length > 0) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-    }
-  }, [items]);
-
-  /* ================= GENERATE ================= */
-  const generatePackingList = () => {
-    setIsLoading(true);
-    setTimeout(() => {
-      setItems(generateItems());
-      setIsLoading(false);
-    }, 1200);
+  /* ================= SMART HELPERS ================= */
+  const keywords = {
+    cold: ["cold", "winter", "snow", "hill", "mountain"],
+    beach: ["beach", "sea", "ocean", "island", "coast"],
+    business: ["business", "office", "meeting", "conference"],
+    trekking: ["trek", "hike", "trekking", "camp", "adventure"]
   };
 
+  const extractDays = (text) => {
+    const match = text.match(/(\d+)\s*(day|days)/);
+    return match ? parseInt(match[1]) : 3;
+  };
+
+  const addItem = (list, name, category, essential = false) => {
+    if (!list.some(i => i.name === name)) {
+      list.push({ name, category, essential });
+    }
+  };
+
+  /* ================= BASE ITEMS ================= */
   const generateItems = () => {
     let id = 1;
     return [
@@ -66,6 +63,107 @@ const PackingList = () => {
       custom: false
     }));
   };
+
+  const tripTips = [
+  "5 days beach trip to Goa",
+  "Cold hill trip to Manali",
+  "3 days business trip",
+  "Trekking adventure in mountains",
+  "Weekend family vacation"
+];
+
+
+  /* ================= SMART GENERATOR ================= */
+  const smartGenerateItems = () => {
+    const desc = tripDescription.toLowerCase();
+    let list = generateItems();
+    const days = extractDays(desc);
+
+    if (keywords.cold.some(w => desc.includes(w))) {
+      addItem(list, "Winter Jacket", "clothing", true);
+      addItem(list, "Thermal Wear", "clothing");
+      addItem(list, "Gloves", "clothing");
+      addItem(list, "Woolen Cap", "clothing");
+    }
+
+    if (keywords.beach.some(w => desc.includes(w))) {
+      addItem(list, "Swimwear", "clothing", true);
+      addItem(list, "Sunscreen", "toiletries", true);
+      addItem(list, "Flip Flops", "clothing");
+      addItem(list, "Beach Towel", "essentials");
+    }
+
+    if (keywords.business.some(w => desc.includes(w))) {
+      addItem(list, "Formal Clothes", "clothing", true);
+      addItem(list, "Laptop", "electronics", true);
+      addItem(list, "Notebook & Pen", "documents");
+    }
+
+    if (keywords.trekking.some(w => desc.includes(w))) {
+      addItem(list, "Trekking Shoes", "clothing", true);
+      addItem(list, "Backpack", "essentials", true);
+      addItem(list, "Torch / Headlamp", "electronics");
+      addItem(list, "Power Bank", "electronics", true);
+    }
+
+    if (days >= 5) {
+      addItem(list, "Extra Clothes", "clothing");
+      addItem(list, "Laundry Bag", "essentials");
+    }
+
+    addItem(list, "Reusable Water Bottle", "essentials");
+    addItem(list, "Emergency Cash", "documents", true);
+
+    return list.map((item, index) => ({
+      id: Date.now() + index,
+      quantity: 1,
+      packed: false,
+      custom: false,
+      essential: item.essential || false,
+      ...item
+    }));
+  };
+
+  const resetPackingList = () => {
+  const confirmReset = window.confirm(
+    "Are you sure you want to start a new packing list?"
+  );
+
+  if (!confirmReset) return;
+
+  setItems([]);
+  setTripDescription("");
+  setShowCustomCard(false);
+  localStorage.removeItem(STORAGE_KEY);
+};
+
+  /* ================= GENERATE ACTION ================= */
+  const generatePackingList = () => {
+    if (!tripDescription.trim()) {
+      alert("Please describe your trip first 🙂");
+      return;
+    }
+
+    setIsLoading(true);
+    localStorage.removeItem(STORAGE_KEY);
+
+    setTimeout(() => {
+      setItems(smartGenerateItems());
+      setIsLoading(false);
+    }, 1200);
+  };
+
+  /* ================= STORAGE ================= */
+  useEffect(() => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) setItems(JSON.parse(saved));
+  }, []);
+
+  useEffect(() => {
+    if (items.length > 0) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    }
+  }, [items]);
 
   /* ================= ACTIONS ================= */
   const toggleItem = (id) =>
@@ -100,10 +198,34 @@ const PackingList = () => {
     ? Math.round((items.filter(i => i.packed).length / items.length) * 100)
     : 0;
 
+  const downloadPackingList = () => {
+    let content = "🧳 Packing List\n\n";
+
+    categories.forEach(cat => {
+      const list = items.filter(i => i.category === cat.id);
+      if (!list.length) return;
+
+      content += `${cat.icon} ${cat.name}\n`;
+      list.forEach(item => {
+        content += `- [${item.packed ? "x" : " "}] ${item.name}\n`;
+      });
+      content += "\n";
+    });
+
+    const blob = new Blob([content], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+
+    a.href = url;
+    a.download = "packing-list.txt";
+    a.click();
+
+    URL.revokeObjectURL(url);
+  };
+
   /* ================= UI ================= */
   return (
     <div className="min-h-screen bg-[#f7f7f7]">
-      {/* HEADER */}
       <div className="sticky top-0 z-20 bg-white shadow-sm flex items-center justify-between px-6 py-4">
         <button onClick={() => navigate(-1)} className="text-gray-600 hover:text-black">
           ← Back
@@ -111,7 +233,6 @@ const PackingList = () => {
         <h1 className="text-xl font-semibold">🧳 Packing List</h1>
       </div>
 
-      {/* CONTENT */}
       <div className="max-w-6xl mx-auto px-6 pt-20 pb-10">
         {!hasItems && (
           <div className="bg-white rounded-3xl p-6 shadow-lg">
@@ -128,12 +249,31 @@ const PackingList = () => {
             >
               {isLoading ? "Generating..." : "Create My Packing List"}
             </button>
+
+            {/* TIPS SECTION */}
+            <div className="mt-4">
+              <p className="text-sm text-gray-500 mb-2">
+                💡 Try searching like this:
+              </p>
+
+              <div className="flex flex-wrap gap-2">
+                {tripTips.map((tip, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setTripDescription(tip)}
+                    className="text-sm px-3 py-1 rounded-full border border-gray-300 text-gray-600 hover:border-black hover:text-black"
+                  >
+                    {tip}
+                  </button>
+                ))}
+              </div>
+            </div>
+
           </div>
         )}
 
         {hasItems && (
           <div className="space-y-6">
-            {/* PROGRESS */}
             <div className="bg-white p-5 rounded-2xl shadow">
               <div className="flex justify-between text-sm mb-2">
                 <span>Packing Progress</span>
@@ -144,7 +284,6 @@ const PackingList = () => {
               </div>
             </div>
 
-            {/* CATEGORIES */}
             {categories.map(cat => {
               const list = items.filter(i => i.category === cat.id);
               if (!list.length) return null;
@@ -164,10 +303,7 @@ const PackingList = () => {
                         />
                         {item.name}
                       </label>
-                      <button
-                        onClick={() => removeItem(item.id)}
-                        className="text-red-500"
-                      >
+                      <button onClick={() => removeItem(item.id)} className="text-red-500">
                         ×
                       </button>
                     </div>
@@ -176,58 +312,47 @@ const PackingList = () => {
               );
             })}
 
-            {/* ADD MORE ITEM */}
             <button
               onClick={() => setShowCustomCard(true)}
-              className="w-full bg-white border-2 border-dashed border-gray-300 py-4 rounded-2xl text-gray-600 hover:border-black hover:text-black"
+              className="w-full bg-white border-2 border-dashed py-4 rounded-2xl"
             >
               ➕ Add more items
             </button>
 
             {showCustomCard && (
-              <form
-                onSubmit={addCustomItem}
-                className="bg-white p-6 rounded-2xl shadow space-y-4"
-              >
-                <h3 className="font-semibold text-lg">Add Custom Item</h3>
-
+              <form onSubmit={addCustomItem} className="bg-white p-6 rounded-2xl shadow space-y-4">
                 <input
-                  type="text"
                   value={customItemName}
                   onChange={(e) => setCustomItemName(e.target.value)}
                   placeholder="Item name"
                   className="w-full border rounded-xl p-3"
                 />
-
                 <select
                   value={customItemCategory}
                   onChange={(e) => setCustomItemCategory(e.target.value)}
                   className="w-full border rounded-xl p-3"
                 >
                   {categories.map(cat => (
-                    <option key={cat.id} value={cat.id}>
-                      {cat.name}
-                    </option>
+                    <option key={cat.id} value={cat.id}>{cat.name}</option>
                   ))}
                 </select>
-
-                <div className="flex gap-3">
-                  <button
-                    type="submit"
-                    className="bg-black text-white px-5 py-2 rounded-xl"
-                  >
-                    Add Item
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setShowCustomCard(false)}
-                    className="border px-5 py-2 rounded-xl"
-                  >
-                    Cancel
-                  </button>
-                </div>
+                <button className="bg-black text-white py-2 rounded-xl">Add Item</button>
               </form>
             )}
+
+            <button
+              onClick={downloadPackingList}
+              className="w-full bg-black text-white py-3 rounded-2xl"
+            >
+              ⬇️ Download Packing List
+            </button>
+            <button
+  onClick={resetPackingList}
+  className="w-full border border-red-300 text-red-600 py-3 rounded-2xl hover:bg-red-50"
+>
+  🔄 Start New Packing List
+</button>
+
           </div>
         )}
       </div>
