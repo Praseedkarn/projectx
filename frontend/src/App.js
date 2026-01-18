@@ -55,13 +55,19 @@ function App() {
   /* ================= AI ================= */
   const [apiStatus, setApiStatus] = useState("checking");
   /* ================= USER ================= */
-  const [currentUser, setCurrentUser] = useState(() => {
-    try {
-      return JSON.parse(sessionStorage.getItem("user"));
-    } catch {
-      return null;
-    }
-  });
+const getStoredUser = () => {
+  try {
+    return (
+      JSON.parse(localStorage.getItem("user")) ||
+      JSON.parse(sessionStorage.getItem("user"))
+    );
+  } catch {
+    return null;
+  }
+};
+
+const [currentUser, setCurrentUser] = useState(getStoredUser);
+
 
   useEffect(() => {
     let isMounted = true;
@@ -154,17 +160,18 @@ function App() {
         ? { ...user, tokens: Infinity }
         : user;
 
-    sessionStorage.setItem("user", JSON.stringify(safeUser));
     setCurrentUser(safeUser);
   };
 
 
 
-  const handleLogout = () => {
-    sessionStorage.clear();
-    setCurrentUser(null);
-    navigate("/");
-  };
+const handleLogout = () => {
+  localStorage.clear();
+  sessionStorage.clear();
+  setCurrentUser(null);
+  navigate("/");
+};
+
 
   /* ================= NAV ================= */
 
@@ -219,7 +226,11 @@ function App() {
             tokens: aiResponse.remainingTokens,
           };
 
-          sessionStorage.setItem("user", JSON.stringify(updatedUser));
+         const storage =
+            localStorage.getItem("user") ? localStorage : sessionStorage;
+
+          storage.setItem("user", JSON.stringify(updatedUser));
+
           setCurrentUser(updatedUser);
         }
       }

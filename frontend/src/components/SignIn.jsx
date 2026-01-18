@@ -1,10 +1,14 @@
 import React, { useState } from "react";
+
+import ReCAPTCHA from "react-google-recaptcha";
 const API_URL = process.env.REACT_APP_API_URL;
 
 const SignIn = ({ onClose, onLoginSuccess }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const[ rememberMe , setRememberMe] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState(null);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -19,66 +23,77 @@ const SignIn = ({ onClose, onLoginSuccess }) => {
   };
 
   /* ================= LOGIN ================= */
-  const handleLogin = async () => {
-    const { email, password } = formData;
+const handleLogin = async () => {
+  const { email, password } = formData;
 
-    if (!email || !password) {
-      throw new Error("Email and password required");
-    }
+  if (!email || !password) {
+    throw new Error("Email and password required");
+  }
 
-    const res = await fetch(`${API_URL}/api/auth/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
+  if (!captchaToken) {
+    throw new Error("Please verify captcha");
+  }
 
-    if (!res.ok) {
-      const msg = await res.text();
-      throw new Error(msg);
-    }
+  const res = await fetch(`${API_URL}/api/auth/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password, captchaToken }),
+  });
 
-    const data = await res.json();
+  if (!res.ok) {
+    const msg = await res.text();
+    throw new Error(msg);
+  }
 
-    sessionStorage.setItem("token", data.token);
-    sessionStorage.setItem("user", JSON.stringify(data.user));
+  const data = await res.json();
+  const storage = rememberMe ? localStorage : sessionStorage;
 
-    onLoginSuccess(data.user);
-    onClose();
-  };
+  storage.setItem("token", data.token);
+  storage.setItem("user", JSON.stringify(data.user));
+
+  onLoginSuccess(data.user);
+  onClose();
+};
+
 
   /* ================= SIGN UP ================= */
   const handleRegister = async () => {
-    const { name, username, email, password, confirmPassword } = formData;
+  const { name, username, email, password, confirmPassword } = formData;
 
-    if (!name || !username || !email || !password) {
-      throw new Error("All fields required");
-    }
+  if (!name || !username || !email || !password) {
+    throw new Error("All fields required");
+  }
 
-    if (password !== confirmPassword) {
-      throw new Error("Passwords do not match");
-    }
+  if (password !== confirmPassword) {
+    throw new Error("Passwords do not match");
+  }
 
-    const res = await  fetch(`${API_URL}/api/auth/register`, 
- {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, username, email, password }),
-    });
+  if (!captchaToken) {
+    throw new Error("Please verify captcha");
+  }
 
-    if (!res.ok) {
-      const msg = await res.text();
-      throw new Error(msg);
-    }
-
-    setIsLogin(true);
-    setFormData({
-      name: "",
-      username: "",
+  const res = await fetch(`${API_URL}/api/auth/register`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      name,
+      username,
       email,
-      password: "",
-      confirmPassword: "",
-    });
-  };
+      password,
+      captchaToken,
+    }),
+  });
+
+  if (!res.ok) {
+    const msg = await res.text();
+    throw new Error(msg);
+  }
+
+  setIsLogin(true);
+  setCaptchaToken(null);
+  onClose();
+};
+
 
   /* ================= SUBMIT ================= */
   const handleSubmit = async (e) => {
@@ -186,12 +201,33 @@ const SignIn = ({ onClose, onLoginSuccess }) => {
             />
           )}
 
-          <button
+          {isLogin && (
+            <label className="flex items-center gap-2 text-sm text-gray-600">
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="accent-[#5b7c67]"
+              />
+              Remember me
+            </label>
+          )}
+
+       <ReCAPTCHA
+          sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
+          onChange={(token) => setCaptchaToken(token)}
+          onExpired={() => setCaptchaToken(null)}
+        />
+
+
+
+         <button
             type="submit"
-            disabled={loading}
+            disabled={loading || !captchaToken}
             className="w-full rounded-full bg-[#5b7c67] py-3 font-medium text-white
-                       hover:bg-[#4a6a58] transition disabled:opacity-60"
+                      hover:bg-[#4a6a58] transition disabled:opacity-60"
           >
+
             {loading
               ? "Processing..."
               : isLogin
@@ -206,6 +242,7 @@ const SignIn = ({ onClose, onLoginSuccess }) => {
           <button
             onClick={() => {
               setIsLogin(!isLogin);
+              setCaptchaToken(null);
               setError("");
             }}
             className="font-medium text-[#5b7c67] hover:underline"
