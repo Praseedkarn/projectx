@@ -1,7 +1,7 @@
 import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { verifyRecaptcha } from "../utils/verifyRecaptcha.js";
+// import { verifyRecaptcha } from "../utils/verifyRecaptcha.js";
 
 /* ================= REGISTER (CAPTCHA REQUIRED) ================= */
 export const register = async (req, res) => {
@@ -9,14 +9,14 @@ export const register = async (req, res) => {
     const { name, username, email, password, captchaToken } = req.body;
 
     /* ===== CAPTCHA CHECK ===== */
-    if (!captchaToken) {
-      return res.status(400).json({ message: "Captcha required" });
-    }
+    // if (!captchaToken) {
+    //   return res.status(400).json({ message: "Captcha required" });
+    // }
 
-    const isHuman = await verifyRecaptcha(captchaToken);
-    if (!isHuman) {
-      return res.status(403).json({ message: "Captcha verification failed" });
-    }
+    // const isHuman = await verifyRecaptcha(captchaToken);
+    // if (!isHuman) {
+    //   return res.status(403).json({ message: "Captcha verification failed" });
+    // }
 
     /* ===== BASIC VALIDATION ===== */
     if (!name || !username || !email || !password) {
