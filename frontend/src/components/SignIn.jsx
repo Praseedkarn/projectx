@@ -1,15 +1,16 @@
 import React, { useState } from "react";
+import {useRef} from "react";
 
 import ReCAPTCHA from "react-google-recaptcha";
 const API_URL = process.env.REACT_APP_API_URL;
-
+// const captchaRef= useRef(null);
 const SignIn = ({ onClose, onLoginSuccess }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const[ rememberMe , setRememberMe] = useState(false);
   const [captchaToken, setCaptchaToken] = useState(null);
-
+const captchaRef= useRef(null);
   const [formData, setFormData] = useState({
     name: "",
     username: "",
@@ -30,14 +31,10 @@ const handleLogin = async () => {
     throw new Error("Email and password required");
   }
 
-  if (!captchaToken) {
-    throw new Error("Please verify captcha");
-  }
-
   const res = await fetch(`${API_URL}/api/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password, captchaToken }),
+    body: JSON.stringify({ email, password }), // ✅ NO captcha
   });
 
   if (!res.ok) {
@@ -68,9 +65,7 @@ const handleLogin = async () => {
     throw new Error("Passwords do not match");
   }
 
-  if (!captchaToken) {
-    throw new Error("Please verify captcha");
-  }
+  
 
   const res = await fetch(`${API_URL}/api/auth/register`, {
     method: "POST",
@@ -111,6 +106,8 @@ const handleLogin = async () => {
       setError(err.message.replace(/["{}]/g, ""));
     } finally {
       setLoading(false);
+      setCaptchaToken(null);
+      captchaRef.current?.reset();
     }
   };
 
@@ -213,17 +210,26 @@ const handleLogin = async () => {
             </label>
           )}
 
-       <ReCAPTCHA
-          sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
-          onChange={(token) => setCaptchaToken(token)}
-          onExpired={() => setCaptchaToken(null)}
-        />
+       {!isLogin && (
+  <ReCAPTCHA
+    ref={captchaRef}
+    sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
+    onChange={(token) => setCaptchaToken(token)}
+    onExpired={() => setCaptchaToken(null)}
+    onErrored={() => {
+      setCaptchaToken(null);
+      setError("Captcha failed to load. Refresh and try again.");
+    }}
+  />
+)}
+
 
 
 
          <button
             type="submit"
-            disabled={loading || !captchaToken}
+            disabled={loading || (!isLogin && !captchaToken)}
+
             className="w-full rounded-full bg-[#5b7c67] py-3 font-medium text-white
                       hover:bg-[#4a6a58] transition disabled:opacity-60"
           >

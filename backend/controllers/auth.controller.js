@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { verifyRecaptcha } from "../utils/verifyRecaptcha.js";
 
-/* ================= REGISTER ================= */
+/* ================= REGISTER (CAPTCHA REQUIRED) ================= */
 export const register = async (req, res) => {
   try {
     const { name, username, email, password, captchaToken } = req.body;
@@ -64,19 +64,15 @@ export const register = async (req, res) => {
   }
 };
 
-/* ================= LOGIN ================= */
+
+/* ================= LOGIN (NO CAPTCHA) ================= */
 export const login = async (req, res) => {
   try {
-    const { email, password, captchaToken } = req.body;
+    const { email, password } = req.body;
 
-    /* ===== CAPTCHA CHECK ===== */
-    if (!captchaToken) {
-      return res.status(400).json({ message: "Captcha required" });
-    }
-
-    const isHuman = await verifyRecaptcha(captchaToken);
-    if (!isHuman) {
-      return res.status(403).json({ message: "Captcha verification failed" });
+    /* ===== BASIC VALIDATION ===== */
+    if (!email || !password) {
+      return res.status(400).json({ message: "Email and password required" });
     }
 
     /* ===== USER CHECK ===== */
