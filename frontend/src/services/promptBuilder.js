@@ -4,7 +4,7 @@ export const buildPrompt = ({
   days,
   hours,
   group,
-  suggestions = [],
+  suggestions,
 }) => {
   const durationText =
     tripType === "hours"
@@ -13,11 +13,18 @@ export const buildPrompt = ({
       ? "1 full day"
       : `${days} days`;
 
+  // ✅ Normalize suggestions safely
+  const safeSuggestions = Array.isArray(suggestions)
+    ? suggestions
+    : suggestions
+    ? [suggestions]
+    : [];
+
   let suggestionText = "";
-  if (suggestions.length > 0) {
+  if (safeSuggestions.length > 0) {
     suggestionText = `
-Include only these extras (bullet points):
-${suggestions.map((s) => `- ${s}`).join("\n")}
+Extras to include (bullet points only):
+${safeSuggestions.map((s) => `- ${s}`).join("\n")}
 `;
   }
 
@@ -31,14 +38,17 @@ Transport: local transport
 
 Rules:
 - Follow the exact duration
-- Keep travel time & cost realistic
+- Keep pacing realistic
 - Simple English only
-- No markdown, JSON, or emojis
+- No markdown, JSON, emojis, or extra sections
 ${tripType === "hours"
-  ? `- Use ONLY time slots like Hour 1, Hour 2, Hour 3
-- Do NOT use day-based headings`
-  : `- Use Day-wise headings (Morning / Afternoon / Evening)
-- Do NOT use hourly format`}
+  ? `- Output MUST be hourly
+- Use ONLY: Hour 1, Hour 2, Hour 3...
+- Total hours MUST equal ${hours}
+- NEVER use days or morning/afternoon`
+  : `- Output MUST be day-wise
+- Use Morning / Afternoon / Evening
+- NEVER use hour format`}
 ${suggestionText}
 If something is not requested, do not include it.
 End with: END OF ITINERARY

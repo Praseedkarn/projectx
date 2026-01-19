@@ -1,22 +1,20 @@
-import axios from "axios";
-
-const GROQ_MODEL = "llama-3.1-8b-instant";
-
-const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
-
 export const generateItinerary = async (prompt) => {
   try {
-
-
     const response = await axios.post(
       GROQ_API_URL,
       {
         model: GROQ_MODEL,
         messages: [
+          {
+            role: "system",
+            content:
+              "You are a travel itinerary generator. Follow instructions exactly. Do not add extra sections."
+          },
           { role: "user", content: prompt }
         ],
-        temperature: 0.7,
-        max_tokens: 800,
+        temperature: 0.6, // slightly lower = more obedient
+        max_tokens: 600,  // enough, but avoids rambling
+        stop: ["END OF ITINERARY"], // HARD STOP
       },
       {
         headers: {
@@ -38,10 +36,7 @@ export const generateItinerary = async (prompt) => {
       text: text.trim(),
     };
   } catch (err) {
-    console.error(
-      "❌ Groq error:",
-      err.response?.data || err.message
-    );
+    console.error("❌ Groq error:", err.response?.data || err.message);
     throw err;
   }
 };
