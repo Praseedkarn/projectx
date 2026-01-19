@@ -6,7 +6,7 @@ const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 
 export const generateItinerary = async (prompt) => {
   try {
-    console.log("🤖 Using Groq model:", GROQ_MODEL);
+
 
     const response = await axios.post(
       GROQ_API_URL,

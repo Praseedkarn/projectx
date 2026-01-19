@@ -51,13 +51,12 @@ const TripResults = () => {
 
   const [cityInfo, setCityInfo] = useState(null);
   const [cityLoading, setCityLoading] = useState(false);
-  const [otmData, setOtmData] = useState(null);
-  const [otmLoading, setOtmLoading] = useState(false);
-  const [otmError, setOtmError] = useState("");
+const [osmData, setOsmData] = useState(null);
+const [osmLoading, setOsmLoading] = useState(false);
+const [osmError, setOsmError] = useState("");
 
-  const [activeAttraction, setActiveAttraction] = useState(null);
-  const [attractionSummary, setAttractionSummary] = useState(null);
-  const [summaryLoading, setSummaryLoading] = useState(false);
+
+
 
 
   /* ================= HARD REDIRECT IF NOTHING ================= */
@@ -147,74 +146,40 @@ const TripResults = () => {
 useEffect(() => {
   if (!city) return;
 
-  const fetchOTMData = async () => {
+  const fetchOSMData = async () => {
     try {
-      setOtmLoading(true);
-      setOtmError("");
-      setOtmData(null);
+      setOsmLoading(true);
+      setOsmError("");
+      setOsmData(null);
 
       const res = await fetch(
-        `https://projectx-yzu3.onrender.com/api/otm?city=${encodeURIComponent(city)}`
+        `${API_BASE_URL}/api/osm?city=${encodeURIComponent(city)}`
       );
 
-      if (!res.ok) throw new Error("OTM request failed");
+      if (!res.ok) throw new Error("OSM request failed");
 
       const data = await res.json();
 
       if (data.available) {
-        setOtmData(data);
+        setOsmData(data);
       } else {
-        setOtmData(null);
+        setOsmData(null);
       }
     } catch (err) {
-      setOtmError("Failed to load sightseeing places");
-      setOtmData(null);
+      setOsmError("Failed to load attractions");
+      setOsmData(null);
     } finally {
-      setOtmLoading(false);
+      setOsmLoading(false);
     }
   };
 
-  fetchOTMData();
+  fetchOSMData();
 }, [city]);
 
 
-  const handleAttractionClick = async (place) => {
-    // Toggle close
-    if (activeAttraction === place.id) {
-      setActiveAttraction(null);
-      setAttractionSummary(null);
-      return;
-    }
 
-    setActiveAttraction(place.id);
-    setAttractionSummary(null);
-    setSummaryLoading(true);
 
-    try {
-      const query = `${place.name} ${city}`;
-      const res = await fetch(
-        `https://projectx-yzu3.onrender.com/api/wiki?query=${encodeURIComponent(query)}`
-      );
 
-      const data = await res.json();
-
-      if (data.available) {
-        setAttractionSummary(data);
-      } else {
-        setAttractionSummary({
-          title: place.name,
-          description: "No summary available for this place.",
-        });
-      }
-    } catch {
-      setAttractionSummary({
-        title: place.name,
-        description: "Failed to load information.",
-      });
-    } finally {
-      setSummaryLoading(false);
-    }
-  };
 
 
 
@@ -300,6 +265,40 @@ const res = await fetch(
       </div>
     );
   }
+
+const AttractionSection = ({ title, items }) => {
+  if (!items || items.length === 0) return null;
+
+  return (
+    <div className="space-y-3">
+      <h3 className="text-lg font-semibold text-gray-800">{title}</h3>
+
+      <ul className="list-disc ml-5 space-y-2 text-sm text-gray-700">
+        {items.map((place) => (
+          <li key={place.id}>
+            <span className="font-medium text-gray-800">
+              {place.name}
+            </span>
+
+            {place.mapsLink && (
+              <a
+                href={place.mapsLink}
+                target="_blank"
+                rel="noreferrer"
+                className="ml-2 text-indigo-600 underline text-xs"
+              >
+                View on map
+              </a>
+            )}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+
+
 
   /* ================= RESULT ================= */
   return (
@@ -527,82 +526,42 @@ const res = await fetch(
 
 
        {/* ================= LOCAL SIGHTSEEING (OTM) ================= */}
+{/* ================= LOCAL ATTRACTIONS (OSM) ================= */}
 {city && (
-  <div className="bg-white rounded-3xl shadow p-6 space-y-4">
+  <div className="bg-white rounded-3xl shadow p-6 space-y-6">
 
     <h2 className="text-xl font-semibold">
-      📍 Local Sightseeing in {city}
+      📍 Things to Explore in {city}
     </h2>
 
-    {otmLoading && (
+    {osmLoading && (
       <p className="text-sm text-gray-500">
-        Finding interesting places…
+        Finding attractions…
       </p>
     )}
 
-    {!otmLoading && otmError && (
-      <p className="text-sm text-red-500">{otmError}</p>
+    {!osmLoading && osmError && (
+      <p className="text-sm text-red-500">{osmError}</p>
     )}
 
-    {!otmLoading && otmData && (
-      <ul className="list-disc ml-5 space-y-2 text-sm text-gray-700">
-        {otmData.places.map((place) => (
-          <li key={place.id} className="space-y-1">
-            <button
-              onClick={() => handleAttractionClick(place)}
-              className="font-medium text-left text-gray-800 hover:underline"
-            >
-              {place.name}
-            </button>
-
-            {place.mapsLink && (
-              <a
-                href={place.mapsLink}
-                target="_blank"
-                rel="noreferrer"
-                className="ml-2 text-indigo-600 underline text-xs"
-              >
-                View on map
-              </a>
-            )}
-
-            {/* EXPANDABLE SUMMARY */}
-            {activeAttraction === place.id && (
-              <div className="mt-2 border rounded-xl p-4 bg-slate-50">
-                {summaryLoading ? (
-                  <p className="text-sm text-gray-500">
-                    Loading details…
-                  </p>
-                ) : (
-                  <>
-                    <h4 className="font-semibold text-gray-800">
-                      {attractionSummary?.title}
-                    </h4>
-
-                    <p className="text-sm text-gray-700 mt-1">
-                      {attractionSummary?.description}
-                    </p>
-
-                    {attractionSummary?.wikipediaUrl && (
-                      <a
-                        href={attractionSummary.wikipediaUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-xs text-indigo-600 underline mt-2 inline-block"
-                      >
-                        Read more on Wikipedia →
-                      </a>
-                    )}
-                  </>
-                )}
-              </div>
-            )}
-          </li>
-        ))}
-      </ul>
+    {!osmLoading && osmData?.attractions?.length > 0 && (
+      <AttractionSection
+        title="🏛️ Tourist Attractions"
+        items={osmData.attractions}
+        
+      />
     )}
+
+   {!osmLoading &&
+  (!osmData?.attractions || osmData.attractions.length === 0) && (
+    <p className="text-sm text-gray-500">
+      Showing limited attractions for {city}.
+    </p>
+)}
+
   </div>
 )}
+
 
 
 

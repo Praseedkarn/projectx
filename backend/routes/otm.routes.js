@@ -1,84 +1,61 @@
 import express from "express";
 import fetch from "node-fetch";
 import CITY_COORDS from "../config/cityCoords.js";
-import DEFAULT_ATTRACTIONS from "../config/defaultAttractions.js";
 
 const router = express.Router();
 
-console.log("🔥 OTM ROUTE LOADED");
-
 router.get("/", async (req, res) => {
   try {
-    console.log("🔥 /api/otm HIT", req.query);
-
     const { city } = req.query;
-    if (!city) {
-      return res.status(400).json({ available: false });
-    }
+    if (!city) return res.json({ available: false, sightseeing: [] });
 
     const cityKey = city.toLowerCase().split(",")[0].trim();
+    const coords = CITY_COORDS[cityKey];
 
-    if (!CITY_COORDS[cityKey]) {
-      return sendFallback(res, city, cityKey);
+    if (!coords) {
+      console.log("❌ City not found:", cityKey);
+      return res.json({ available: false, sightseeing: [] });
     }
 
-    const { lat, lng } = CITY_COORDS[cityKey];
+    const { lat, lng } = coords;
     const apiKey = process.env.OPENTRIPMAP_API_KEY;
 
-    if (!apiKey) {
-      throw new Error("OTM API KEY MISSING");
-    }
-
-    const radiusUrl =
-      `https://api.opentripmap.com/0.1/en/places/radius` +
-      `?radius=10000` +
-      `&lon=${lng}` +
-      `&lat=${lat}` +
-      `&kinds=interesting_places` +
-      `&limit=20` +
+    // small bounding box (~10km)
+    const url =
+      `https://api.opentripmap.com/0.1/en/places/bbox` +
+      `?lon_min=${lng - 0.1}` +
+      `&lon_max=${lng + 0.1}` +
+      `&lat_min=${lat - 0.1}` +
+      `&lat_max=${lat + 0.1}` +
+      `&limit=50` +
       `&apikey=${apiKey}`;
 
-    const radiusRes = await fetch(radiusUrl);
-    const radiusData = await radiusRes.json();
+    const response = await fetch(url);
+    const data = await response.json();
 
-    if (!radiusData.features?.length) {
-      return sendFallback(res, city, cityKey);
+    console.log("📍 BBOX COUNT:", Array.isArray(data) ? data.length : data);
+
+    if (!Array.isArray(data)) {
+      return res.json({ available: true, sightseeing: [] });
     }
 
-    const places = radiusData.features.map((f) => ({
-      id: f.properties.xid,
-      name: f.properties.name,
-      kinds: f.properties.kinds,
-      mapsLink: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-        f.properties.name + " " + city
-      )}`,
-    }));
+    // simple filter: name exists
+    const sightseeing = data
+      .filter(p => p.name)
+      .slice(0, 10)
+      .map(p => ({
+        id: p.xid,
+        name: p.name,
+        mapsLink: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+          p.name + " " + city
+        )}`,
+      }));
 
-    res.json({
-      available: true,
-      fallback: false,
-      places,
-    });
+    res.json({ available: true, sightseeing });
   } catch (err) {
     console.error("❌ OTM ERROR:", err.message);
-    sendFallback(res, req.query.city, req.query.city);
+    res.json({ available: false, sightseeing: [] });
   }
 });
-
-function sendFallback(res, city, cityKey) {
-  const fallback = DEFAULT_ATTRACTIONS[cityKey] || [];
-
-  res.json({
-    available: true,
-    fallback: true,
-    places: fallback.map((a, i) => ({
-      id: `fallback-${i}`,
-      name: a.name,
-      mapsLink: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-        a.name + " " + city
-      )}`,
-    })),
-  });
-}
 
 export default router;

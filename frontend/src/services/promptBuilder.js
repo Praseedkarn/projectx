@@ -4,38 +4,43 @@ export const buildPrompt = ({
   days,
   hours,
   group,
-  suggestions,
+  suggestions = [],
 }) => {
-  let durationText = "";
+  const durationText =
+    tripType === "hours"
+      ? `${hours} hours`
+      : tripType === "day"
+      ? "1 full day"
+      : `${days} days`;
 
-  if (tripType === "hours") {
-    durationText = `${hours} hours`;
-  } else if (tripType === "day") {
-    durationText = `1 full day`;
-  } else {
-    durationText = `${days} days`;
+  let suggestionText = "";
+  if (suggestions.length > 0) {
+    suggestionText = `
+Include only these extras (bullet points):
+${suggestions.map((s) => `- ${s}`).join("\n")}
+`;
   }
 
   return `
-Create a clear and realistic travel itinerary.
+Create a realistic travel itinerary.
 
 Destination: ${place}
 Duration: ${durationText}
-Travel group: ${group}
-Mode of transport: ${"local transport"}
-Special preferences: ${suggestions || "none"}
+Group: ${group}
+Transport: local transport
 
 Rules:
-- Strictly follow the given duration (${durationText})
-- Plan for the selected travel group
-- Choose routes and places based on transport mode
-  (walk, bike, car, bus, train, flight)
-- Mention approximate travel time and costs
-- Keep pacing realistic (no rushing)
-- Use simple English
-- Use headings like Day 1 Morning / Afternoon / Evening
-- Do not use markdown, JSON, or emojis
-- End after the final day with: END OF ITINERARY
-
+- Follow the exact duration
+- Keep travel time & cost realistic
+- Simple English only
+- No markdown, JSON, or emojis
+${tripType === "hours"
+  ? `- Use ONLY time slots like Hour 1, Hour 2, Hour 3
+- Do NOT use day-based headings`
+  : `- Use Day-wise headings (Morning / Afternoon / Evening)
+- Do NOT use hourly format`}
+${suggestionText}
+If something is not requested, do not include it.
+End with: END OF ITINERARY
 `;
 };
