@@ -2,7 +2,9 @@ import express from "express";
 import {
   saveOrGetQrTrip,
   getQrTripById,
+  getMyQrTrips,
 } from "../controllers/qrTrip.controller.js";
+import authMiddleware from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
@@ -10,10 +12,16 @@ const router = express.Router();
    QR TRIP ROUTES
 ================================ */
 
-// Save / reuse QR trip
-router.post("/", saveOrGetQrTrip);
+// 🔐 Save / reuse QR (LOGIN REQUIRED)
+router.post("/", authMiddleware, saveOrGetQrTrip);
 
-// Fetch QR trip
+// 🔐 Get my saved QRs
+router.get("/my", authMiddleware, getMyQrTrips);
+
+// 🔓 Fetch QR (PUBLIC – via QR scan)
 router.get("/:id", getQrTripById);
+
+
+
 
 export default router;

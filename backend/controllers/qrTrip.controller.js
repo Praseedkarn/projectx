@@ -9,18 +9,39 @@ const EXPIRY_DAYS = 7;
 
 export const saveOrGetQrTrip = async (req, res) => {
   try {
-    const { text } = req.body;
+    const { text, place } = req.body;
+    const userId = req.user.id; // 🔥 from authMiddleware
 
-    if (!text) {
-      return res.status(400).json({ message: "Trip text is required" });
+    if (!text || !place) {
+      return res.status(400).json({
+        message: "Trip text and place are required",
+      });
     }
 
+    /* ================================
+       🟡 DEMO MODE → DO NOT SAVE
+    ================================ */
+    if (place.toLowerCase().includes("demo")) {
+      return res.json({
+        qrTripId: `demo-${crypto.randomUUID()}`,
+        reused: true,
+        expiresAt: null,
+        demo: true,
+      });
+    }
+
+    /* ================================
+       REAL TRIP FLOW
+    ================================ */
+
+    // 🧠 Create hash from itinerary
     const hash = crypto
       .createHash("sha256")
       .update(text)
       .digest("hex");
 
-    const existing = await QrTrip.findOne({ hash });
+    // 🔍 Check if THIS USER already has this QR
+    const existing = await QrTrip.findOne({ hash, userId });
 
     if (existing) {
       return res.json({
@@ -30,9 +51,9 @@ export const saveOrGetQrTrip = async (req, res) => {
       });
     }
 
+    // 🆕 Create new QR
     const qrTripId = crypto.randomUUID();
 
-    // 🔥 expiry date
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + EXPIRY_DAYS);
 
@@ -40,6 +61,9 @@ export const saveOrGetQrTrip = async (req, res) => {
       qrTripId,
       hash,
       text,
+      userId,
+      place,
+      searchedAt: new Date(),
       expiresAt,
     });
 
@@ -53,7 +77,6 @@ export const saveOrGetQrTrip = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
-
 
 /* ================================
    GET QR TRIP BY ID
@@ -69,7 +92,7 @@ export const getQrTripById = async (req, res) => {
       return res.status(404).json({ message: "QR Trip not found" });
     }
 
-    // 🔥 STEP 4: EXPIRY CHECK
+    // ⏳ Expiry check
     if (qrTrip.expiresAt && qrTrip.expiresAt < new Date()) {
       await QrTrip.deleteOne({ _id: qrTrip._id });
 
@@ -85,3 +108,21 @@ export const getQrTripById = async (req, res) => {
   }
 };
 
+/* ================================
+   GET MY SAVED QR TRIPS
+================================ */
+export const getMyQrTrips = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const trips = await QrTrip.find({
+      userId,
+      expiresAt: { $gt: new Date() }, // only valid trips
+    }).sort({ createdAt: -1 });
+
+    res.json(trips);
+  } catch (error) {
+    console.error("Fetch my QR trips error:", error);
+    res.status(500).json({ message: "Failed to fetch saved trips" });
+  }
+};

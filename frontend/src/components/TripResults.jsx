@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { QRCodeCanvas } from "qrcode.react";
+import API_BASE_URL from "../services/apiClient";
 
 const TextSkeleton = ({ lines = 6 }) => (
   <div className="space-y-3 animate-pulse">
@@ -254,11 +255,23 @@ const TripResults = () => {
 
 
     try {
-      const res = await fetch("https://projectx-yzu3.onrender.com/api/qr-trips", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: finalText }),
-      });
+     const token =
+  sessionStorage.getItem("token") ||
+  localStorage.getItem("token");
+
+const res = await fetch(
+  `${API_BASE_URL}/api/qr-trips`,
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ text: finalText, place:city }),
+  }
+);
+
+
 
       const data = await res.json();
       if (!res.ok) throw new Error();
@@ -486,6 +499,30 @@ const TripResults = () => {
 
           </div>
         )}
+
+        {qrTripId && (
+  <div className="mt-4 w-full max-w-md mx-auto
+                  rounded-2xl border border-indigo-100
+                  bg-indigo-50/60 px-4 py-3
+                  text-sm text-gray-700">
+
+            <div className="flex items-start gap-3">
+              <span className="text-indigo-600 text-lg">ℹ️</span>
+
+              <div className="space-y-1">
+                <p className="font-medium text-gray-800">
+                  Trip saved successfully
+                </p>
+
+                <p className="text-xs text-gray-600 leading-relaxed">
+                  This itinerary is now available in your <strong>Saved Trips</strong>.
+                  You can revisit, share, or download it anytime using the QR.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
 
         {/* ================= HOTELS & ATTRACTIONS (OSM) ================= */}
         {city && (
