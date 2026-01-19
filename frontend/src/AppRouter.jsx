@@ -21,6 +21,7 @@ import HelpPage from "./pages/HelpPage";
 /* ADMIN */
 import AdminLayout from "./admin/AdminLayout";
 import AdminDashboard from "./admin/AdminDashboard";
+import AuthSuccess from "./pages/AuthSuccess";
 
 const AppRouter = ({
   currentUser,
@@ -55,6 +56,11 @@ const AppRouter = ({
             onCityClick={(slug) => navigate(`/cities/${slug}`)}
           />
         }
+      />
+
+      <Route
+        path="/auth-success"
+        element={<AuthSuccess setCurrentUser={setCurrentUser} />}
       />
       <Route path="/cities/:slug" element={<CityPage />} />
 

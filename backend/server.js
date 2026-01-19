@@ -3,6 +3,9 @@ import "./config/env.js";
 
 import express from "express";
 import cors from "cors";
+import passport from "passport";
+import "./config/passport.js";
+
 
 // 🔗 DB
 import connectDB from "./config/db.js";
@@ -22,6 +25,8 @@ import adminRoutes from "./routes/admin.routes.js";
 import osmRoutes from "./routes/osm.routes.js";
 import quizAdminRoutes from "./routes/quiz.admin.js";
 import historyRoutes from "./routes/history.routes.js";
+
+
 // import otmRoutes from "./routes/otm.routes.js";
 // import otmDetailsRoutes from "./routes/otm.details.routes.js";
 
@@ -41,6 +46,8 @@ connectDB();
 // 🧩 MIDDLEWARE
 app.use(cors());
 app.use(express.json());
+app.use(passport.initialize());
+
 
 // 🛣️ ROUTES
 app.use("/api/auth", authRoutes);

@@ -3,20 +3,10 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 // import { verifyRecaptcha } from "../utils/verifyRecaptcha.js";
 
-/* ================= REGISTER (CAPTCHA REQUIRED) ================= */
+/* ================= REGISTER ================= */
 export const register = async (req, res) => {
   try {
-    const { name, username, email, password, captchaToken } = req.body;
-
-    /* ===== CAPTCHA CHECK ===== */
-    // if (!captchaToken) {
-    //   return res.status(400).json({ message: "Captcha required" });
-    // }
-
-    // const isHuman = await verifyRecaptcha(captchaToken);
-    // if (!isHuman) {
-    //   return res.status(403).json({ message: "Captcha verification failed" });
-    // }
+    const { name, username, email, password } = req.body;
 
     /* ===== BASIC VALIDATION ===== */
     if (!name || !username || !email || !password) {
@@ -29,7 +19,15 @@ export const register = async (req, res) => {
 
     /* ===== CHECK EXISTING USER ===== */
     const existing = await User.findOne({ email });
+
     if (existing) {
+      // 🛑 If user signed up via Google
+      if (existing.provider === "google") {
+        return res.status(400).json({
+          message: "This email is registered using Google Sign-In",
+        });
+      }
+
       return res.status(400).json({ message: "Email already exists" });
     }
 
@@ -42,6 +40,7 @@ export const register = async (req, res) => {
       username,
       email,
       password: hashedPassword,
+      provider: "local",
       role: "user",
       tokens: 100,
     });
@@ -57,15 +56,13 @@ export const register = async (req, res) => {
         tokens: user.tokens,
       },
     });
-
   } catch (err) {
     console.error("REGISTER ERROR:", err);
     res.status(500).json({ message: "Signup failed" });
   }
 };
 
-
-/* ================= LOGIN (NO CAPTCHA) ================= */
+/* ================= LOGIN ================= */
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -81,6 +78,14 @@ export const login = async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
+    /* ===== GOOGLE ACCOUNT BLOCK ===== */
+    if (user.provider === "google") {
+      return res.status(400).json({
+        message: "Please sign in using Google",
+      });
+    }
+
+    /* ===== PASSWORD CHECK ===== */
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ message: "Invalid credentials" });
@@ -105,7 +110,6 @@ export const login = async (req, res) => {
         tokens: user.tokens,
       },
     });
-
   } catch (err) {
     console.error("LOGIN ERROR:", err);
     res.status(500).json({ message: "Login failed" });

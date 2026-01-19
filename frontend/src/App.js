@@ -46,6 +46,7 @@ function App() {
   // const [selectedBlogSlug, setSelectedBlogSlug] = useState(null);
   // const [selectedCity, setSelectedCity] = useState(null);
   // const [showBecomeGuide, setShowBecomeGuide] = useState(false);
+const [showLoginPopup, setShowLoginPopup] = useState(false);
 
 
   /* ================= REFS ================= */
@@ -55,18 +56,10 @@ function App() {
   /* ================= AI ================= */
   const [apiStatus, setApiStatus] = useState("checking");
   /* ================= USER ================= */
-const getStoredUser = () => {
-  try {
-    return (
-      JSON.parse(localStorage.getItem("user")) ||
-      JSON.parse(sessionStorage.getItem("user"))
-    );
-  } catch {
-    return null;
-  }
-};
 
-const [currentUser, setCurrentUser] = useState(getStoredUser);
+
+const [currentUser, setCurrentUser] = useState(null);
+const[authLoading , setAuthLoading]= useState(true);
 
 
   useEffect(() => {
@@ -90,6 +83,60 @@ const [currentUser, setCurrentUser] = useState(getStoredUser);
       isMounted = false;
     };
   }, []);
+
+  
+
+useEffect(() => {
+  const token =
+    localStorage.getItem("token") ||
+    sessionStorage.getItem("token");
+
+  // 🔹 No token → stop loading
+  if (!token) {
+    setAuthLoading(false);
+    return;
+  }
+
+  fetch(`${process.env.REACT_APP_API_URL}/api/auth/me`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+    .then((res) => {
+      if (!res.ok) throw new Error("Auth failed");
+      return res.json();
+    })
+    .then((user) => {
+      // ✅ Set user
+      setCurrentUser(user);
+      localStorage.setItem("user", JSON.stringify(user));
+
+      // ✅ Show login success popup ONCE
+      const loginFlag = sessionStorage.getItem("loginSuccess",true);
+      if (loginFlag) {
+        setShowLoginPopup(true);
+        sessionStorage.removeItem("loginSuccess");
+
+        setTimeout(() => {
+          setShowLoginPopup(false);
+        }, 2500);
+      }
+    })
+    .catch(() => {
+      // ❌ Invalid / expired token
+      localStorage.clear();
+      sessionStorage.clear();
+      setCurrentUser(null);
+    })
+    .finally(() => {
+      // 🔥 ALWAYS stop loader
+      setAuthLoading(false);
+    });
+}, []);
+
+
+
 
 
   /* ================= FORM ================= */
@@ -283,11 +330,39 @@ const handleLogout = () => {
 
 
 
+
+
   /* ================= RENDER PAGE ================= */
 
 
   return (
+
+    
     <div className="App">
+     
+
+    {/* ✅ LOGIN SUCCESS POPUP */}
+    {showLoginPopup && (
+      <div
+        style={{
+          position: "fixed",
+          top: "20px",
+          right: "20px",
+          background: "#2e7d32",
+          color: "#fff",
+          padding: "12px 18px",
+          borderRadius: "10px",
+          boxShadow: "0 10px 25px rgba(0,0,0,0.2)",
+          zIndex: 9999,
+          fontSize: "14px",
+        }}
+      >
+        ✅ Logged in successfully
+      </div>
+    )}
+{authLoading && <LogoLoader />}
+
+      
       {loading && <LogoLoader />}
       {/* ===== HEADER ===== */}
       {!isQrTrip && (

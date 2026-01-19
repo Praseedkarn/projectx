@@ -1,10 +1,16 @@
 import React, { useState } from "react";
 
 
-// import ReCAPTCHA from "react-google-recaptcha";
-const API_URL = process.env.REACT_APP_API_URL;
+
+
+
+
 // const captchaRef= useRef(null);
 const SignIn = ({ onClose, onLoginSuccess }) => {
+  const handleGoogleLogin = () => {
+  window.location.href = `${API_URL}/api/auth/google`;
+};
+const API_URL = process.env.REACT_APP_API_URL;
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -240,6 +246,15 @@ const handleLogin = async () => {
                 ? "Sign In"
                 : "Create Account"}
           </button>
+
+          <button
+            type="button"
+            onClick={handleGoogleLogin}
+            className="w-full rounded-full border py-3 font-medium text-gray-700 hover:bg-gray-100 transition"
+          >
+            Continue with Google
+          </button>
+
         </form>
 
         {/* Switch */}
