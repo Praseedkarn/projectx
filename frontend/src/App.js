@@ -127,6 +127,8 @@ const [currentUser, setCurrentUser] = useState(getStoredUser);
 
   // }, [location.pathname]);
 
+
+
   useEffect(() => {
     const timeout = setTimeout(async () => {
       if (!place || place.length < 3) {
@@ -148,6 +150,15 @@ const [currentUser, setCurrentUser] = useState(getStoredUser);
 
     return () => clearTimeout(timeout);
   }, [place]);
+
+  const addSuggestion = (text) => {
+  setSuggestions((prev) => {
+    if (!prev) return text;
+    if (prev.toLowerCase().includes(text.toLowerCase())) return prev;
+    return prev + ", " + text;
+  });
+};
+
 
 
 
@@ -449,15 +460,47 @@ const handleLogout = () => {
                       </div>
                     </div>
 
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-gray-700">Special preferences (optional)</label>
-                      <input
-                        value={suggestions}
-                        onChange={(e) => setSuggestions(e.target.value)}
-                        placeholder="Avoid crowds, cafes, photography spots..."
-                        className="w-full rounded-lg border px-3 py-2 text-sm"
-                      />
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700">
+                      Special preferences (optional)
+                    </label>
+                    <input
+                      value={suggestions}
+                      onChange={(e) => setSuggestions(e.target.value)}
+                      placeholder="Avoid crowds, cafes, photography spots..."
+                      className="w-full rounded-lg border px-3 py-2 text-sm"
+                    />
+                  </div>
+                        <div className="flex flex-wrap gap-2 mt-2">
+                      {[
+                        "Hotels",
+                        "Food spots",
+                        "Local sightseeing",
+                        "Nature places",
+                        // "Shopping areas",
+                        // "Photography spots",
+                      ].map((item) => (
+                        <button
+                          key={item}
+                          type="button"
+                          onClick={() => addSuggestion(item)}
+                          className="
+                            rounded-full border
+                            px-3 py-1.5
+                            text-xs font-medium
+                            text-gray-700
+                            hover:bg-gray-100
+                            hover:border-gray-400
+                            transition
+                          "
+                        >
+                          + {item}
+                        </button>
+                      ))}
                     </div>
+
+
+
 
                     <div className="pt-6 border-t border-gray-100">
                       <button

@@ -51,9 +51,10 @@ const TripResults = () => {
 
   const [cityInfo, setCityInfo] = useState(null);
   const [cityLoading, setCityLoading] = useState(false);
-  const [osmData, setOsmData] = useState(null);
-  const [osmLoading, setOsmLoading] = useState(false);
-  const [osmError, setOsmError] = useState("");
+  const [otmData, setOtmData] = useState(null);
+  const [otmLoading, setOtmLoading] = useState(false);
+  const [otmError, setOtmError] = useState("");
+
   const [activeAttraction, setActiveAttraction] = useState(null);
   const [attractionSummary, setAttractionSummary] = useState(null);
   const [summaryLoading, setSummaryLoading] = useState(false);
@@ -143,38 +144,39 @@ const TripResults = () => {
     fetchCityInfo();
   }, [city]);
 
-  useEffect(() => {
-    if (!city) return;
+useEffect(() => {
+  if (!city) return;
 
-    const fetchOSMData = async () => {
-      try {
-        setOsmLoading(true);
-        setOsmError("");
-        setOsmData(null);
+  const fetchOTMData = async () => {
+    try {
+      setOtmLoading(true);
+      setOtmError("");
+      setOtmData(null);
 
-        const res = await fetch(
-          `https://projectx-yzu3.onrender.com/api/osm?city=${encodeURIComponent(city)}`
-        );
+      const res = await fetch(
+        `https://projectx-yzu3.onrender.com/api/otm?city=${encodeURIComponent(city)}`
+      );
 
-        if (!res.ok) throw new Error("OSM request failed");
+      if (!res.ok) throw new Error("OTM request failed");
 
-        const data = await res.json();
+      const data = await res.json();
 
-        if (data.available) {
-          setOsmData(data);
-        } else {
-          setOsmData(null);
-        }
-      } catch (err) {
-        setOsmError("Failed to load nearby places");
-        setOsmData(null);
-      } finally {
-        setOsmLoading(false);
+      if (data.available) {
+        setOtmData(data);
+      } else {
+        setOtmData(null);
       }
-    };
+    } catch (err) {
+      setOtmError("Failed to load sightseeing places");
+      setOtmData(null);
+    } finally {
+      setOtmLoading(false);
+    }
+  };
 
-    fetchOSMData();
-  }, [city]);
+  fetchOTMData();
+}, [city]);
+
 
   const handleAttractionClick = async (place) => {
     // Toggle close
@@ -524,152 +526,84 @@ const res = await fetch(
         )}
 
 
-        {/* ================= HOTELS & ATTRACTIONS (OSM) ================= */}
-        {city && (
-          <div className="bg-white rounded-3xl shadow p-6 space-y-6">
+       {/* ================= LOCAL SIGHTSEEING (OTM) ================= */}
+{city && (
+  <div className="bg-white rounded-3xl shadow p-6 space-y-4">
 
-            <h2 className="text-xl font-semibold">
-              Hotels & Attractions in {city}
-            </h2>
+    <h2 className="text-xl font-semibold">
+      📍 Local Sightseeing in {city}
+    </h2>
 
+    {otmLoading && (
+      <p className="text-sm text-gray-500">
+        Finding interesting places…
+      </p>
+    )}
 
-            {osmData?.fallback && (
-              <div className="bg-yellow-50 border rounded-xl p-3 text-sm text-gray-700">
-                {osmData.fallbackReason === "UNSUPPORTED_CITY" && (
-                  <>🚧 Detailed hotel & attraction support for <strong>{city}</strong> is coming soon.</>
-                )}
+    {!otmLoading && otmError && (
+      <p className="text-sm text-red-500">{otmError}</p>
+    )}
 
-                {osmData.fallbackReason === "NO_DATA" && (
-                  <>ℹ️ Limited nearby hotel & attraction data available for <strong>{city}</strong>.</>
-                )}
+    {!otmLoading && otmData && (
+      <ul className="list-disc ml-5 space-y-2 text-sm text-gray-700">
+        {otmData.places.map((place) => (
+          <li key={place.id} className="space-y-1">
+            <button
+              onClick={() => handleAttractionClick(place)}
+              className="font-medium text-left text-gray-800 hover:underline"
+            >
+              {place.name}
+            </button>
 
-                {osmData.fallbackReason === "OVERPASS_ERROR" && (
-                  <>⚠️ Map services are busy right now. Showing limited results.</>
+            {place.mapsLink && (
+              <a
+                href={place.mapsLink}
+                target="_blank"
+                rel="noreferrer"
+                className="ml-2 text-indigo-600 underline text-xs"
+              >
+                View on map
+              </a>
+            )}
+
+            {/* EXPANDABLE SUMMARY */}
+            {activeAttraction === place.id && (
+              <div className="mt-2 border rounded-xl p-4 bg-slate-50">
+                {summaryLoading ? (
+                  <p className="text-sm text-gray-500">
+                    Loading details…
+                  </p>
+                ) : (
+                  <>
+                    <h4 className="font-semibold text-gray-800">
+                      {attractionSummary?.title}
+                    </h4>
+
+                    <p className="text-sm text-gray-700 mt-1">
+                      {attractionSummary?.description}
+                    </p>
+
+                    {attractionSummary?.wikipediaUrl && (
+                      <a
+                        href={attractionSummary.wikipediaUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-xs text-indigo-600 underline mt-2 inline-block"
+                      >
+                        Read more on Wikipedia →
+                      </a>
+                    )}
+                  </>
                 )}
               </div>
             )}
+          </li>
+        ))}
+      </ul>
+    )}
+  </div>
+)}
 
-
-
-
-            {/* Loading */}
-            {osmLoading && (
-              <p className="text-sm text-gray-500">
-                Finding nearby hotels & attractions…
-              </p>
-            )}
-
-            {/* Error */}
-            {!osmLoading && osmError && !osmData?.fallback && (
-              <p className="text-sm text-red-500">{osmError}</p>
-            )}
-
-
-            {/* Data */}
-            {!osmLoading && osmData && (
-              <>
-                {/* HOTELS */}
-                <div>
-                  <h3 className="text-lg font-medium mb-3">🏨 Hotels</h3>
-
-                  {osmData.hotels.length === 0 ? (
-                    <p className="text-sm text-gray-500">
-                      No hotels found nearby
-                    </p>
-                  ) : (
-                    <div className="grid md:grid-cols-2 gap-4">
-                      {osmData.hotels.slice(0, 8).map((hotel) => (
-                        <div
-                          key={hotel.id}
-                          className="border rounded-xl p-4 hover:shadow transition"
-                        >
-                          <p className="font-medium text-gray-800">
-                            {hotel.name}
-                          </p>
-
-                          {hotel.stars && (
-                            <p className="text-sm text-gray-600">
-                              ⭐ {hotel.stars} star
-                            </p>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                {/* ATTRACTIONS */}
-                <div>
-                  <h3 className="text-lg font-medium mb-3">
-                    📍 Tourist Attractions
-                  </h3>
-
-                  {osmData.attractions.length === 0 ? (
-                    <p className="text-sm text-gray-500">
-                      No attractions found nearby
-                    </p>
-                  ) : (
-                    <ul className="list-disc ml-5 space-y-1 text-sm text-gray-700">
-                      {osmData.attractions.slice(0, 10).map((place) => (
-                        <li key={place.id} className="space-y-2">
-                          <button
-                            onClick={() => handleAttractionClick(place)}
-                            className="font-medium text-left text-gray-800 hover:underline"
-                          >
-                            {place.name}
-                          </button>
-
-                          {place.mapsLink && (
-                            <a
-                              href={place.mapsLink}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="ml-2 text-indigo-600 underline text-xs"
-                            >
-                              View on map
-                            </a>
-                          )}
-
-                          {/* EXPANDABLE SUMMARY CARD */}
-                          {activeAttraction === place.id && (
-                            <div className="mt-2 border rounded-xl p-4 bg-slate-50">
-                              {summaryLoading ? (
-                                <p className="text-sm text-gray-500">Loading details…</p>
-                              ) : (
-                                <>
-                                  <h4 className="font-semibold text-gray-800">
-                                    {attractionSummary?.title}
-                                  </h4>
-
-                                  <p className="text-sm text-gray-700 mt-1">
-                                    {attractionSummary?.description}
-                                  </p>
-
-                                  {attractionSummary?.wikipediaUrl && (
-                                    <a
-                                      href={attractionSummary.wikipediaUrl}
-                                      target="_blank"
-                                      rel="noreferrer"
-                                      className="text-xs text-indigo-600 underline mt-2 inline-block"
-                                    >
-                                      Read more on Wikipedia →
-                                    </a>
-                                  )}
-                                </>
-                              )}
-                            </div>
-                          )}
-                        </li>
-
-
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              </>
-            )}
-          </div>
-        )}
 
 
         {/* ================= LOCAL GUIDE CARD ================= */}
