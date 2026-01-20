@@ -13,14 +13,18 @@ const AuthSuccess = () => {
       return;
     }
 
-    // ✅ Save token
+    // ✅ SAVE TOKEN IN BOTH PLACES
     localStorage.setItem("token", token);
+    sessionStorage.setItem("token", token);
 
-    // ✅ Just redirect
+    // ✅ Mark login success (for popup)
+    sessionStorage.setItem("loginSuccess", "true");
+
+    // ✅ Redirect home
     navigate("/");
   }, [navigate]);
 
-  return <p style={{ textAlign: "center" }}>Logging you in...</p>;
+  return <p style={{ textAlign: "center" }}>Logging you in…</p>;
 };
 
 export default AuthSuccess;

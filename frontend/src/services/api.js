@@ -1,11 +1,30 @@
 import API_BASE_URL from "./apiClient";
 
+/* ================= HELPERS ================= */
+
+const getToken = () =>
+  sessionStorage.getItem("token") ||
+  localStorage.getItem("token");
+
+const throwApiError = async (response) => {
+  let message = "Something went wrong";
+
+  try {
+    const data = await response.json();
+    message = data?.message || message;
+  } catch {
+    // ignore JSON parse errors
+  }
+
+  throw new Error(message); // ✅ always throw Error
+};
+
 /* =====================================================
    AI APIs
    ===================================================== */
 
 export const generateTravelItinerary = async (description, detailLevel) => {
-  const token = sessionStorage.getItem("token");
+  const token = getToken();
 
   const response = await fetch(`${API_BASE_URL}/api/ai/itinerary`, {
     method: "POST",
@@ -17,8 +36,7 @@ export const generateTravelItinerary = async (description, detailLevel) => {
   });
 
   if (!response.ok) {
-    const err = await response.json();
-    throw err;
+    await throwApiError(response);
   }
 
   return response.json();
@@ -32,22 +50,22 @@ export const fetchAllItineraries = async () => {
   const response = await fetch(`${API_BASE_URL}/api/itineraries`);
 
   if (!response.ok) {
-    throw new Error("Failed to fetch itineraries");
+    await throwApiError(response);
   }
 
   return response.json();
 };
 
 export const fetchItineraryBySlug = async (slug) => {
-  const res = await fetch(
+  const response = await fetch(
     `${API_BASE_URL}/api/itineraries/${slug}`
   );
 
-  if (!res.ok) {
-    throw new Error("Itinerary not found");
+  if (!response.ok) {
+    await throwApiError(response);
   }
 
-  return res.json();
+  return response.json();
 };
 
 export const fetchItineraryByMongoId = async (mongoId) => {
@@ -56,7 +74,7 @@ export const fetchItineraryByMongoId = async (mongoId) => {
   );
 
   if (!response.ok) {
-    throw new Error("Failed to fetch itinerary");
+    await throwApiError(response);
   }
 
   return response.json();
@@ -70,7 +88,7 @@ export const saveItineraryToDB = async (itineraryData) => {
   });
 
   if (!response.ok) {
-    throw new Error("Failed to save itinerary");
+    await throwApiError(response);
   }
 
   return response.json();
@@ -88,7 +106,7 @@ export const loginUser = async (email, password) => {
   });
 
   if (!response.ok) {
-    throw new Error("Login failed");
+    await throwApiError(response);
   }
 
   return response.json();
@@ -102,7 +120,7 @@ export const registerUser = async (userData) => {
   });
 
   if (!response.ok) {
-    throw new Error("Registration failed");
+    await throwApiError(response);
   }
 
   return response.json();
@@ -113,26 +131,25 @@ export const registerUser = async (userData) => {
    ===================================================== */
 
 export const fetchQuiz = async () => {
-  const token = sessionStorage.getItem("token");
+  const token = getToken();
 
-  const res = await fetch(`${API_BASE_URL}/api/quiz`, {
+  const response = await fetch(`${API_BASE_URL}/api/quiz`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
   });
 
-  if (!res.ok) {
-    const err = await res.json();
-    throw err;
+  if (!response.ok) {
+    await throwApiError(response);
   }
 
-  return res.json();
+  return response.json();
 };
 
 export const submitQuiz = async (data) => {
-  const token = sessionStorage.getItem("token");
+  const token = getToken();
 
-  const res = await fetch(`${API_BASE_URL}/api/quiz/submit`, {
+  const response = await fetch(`${API_BASE_URL}/api/quiz/submit`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -141,10 +158,9 @@ export const submitQuiz = async (data) => {
     body: JSON.stringify(data),
   });
 
-  if (!res.ok) {
-    const err = await res.json();
-    throw err;
+  if (!response.ok) {
+    await throwApiError(response);
   }
 
-  return res.json();
+  return response.json();
 };

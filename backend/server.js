@@ -44,7 +44,18 @@ const app = express();
 connectDB();
 
 // 🧩 MIDDLEWARE
-app.use(cors());
+app.use(
+  cors({
+    origin: [
+      "https://projectx-one-pearl.vercel.app", // Vercel frontend
+      "http://localhost:3000"                 // Local frontend
+    ],
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+app.options("*",cors());
 app.use(express.json());
 app.use(passport.initialize());
 
