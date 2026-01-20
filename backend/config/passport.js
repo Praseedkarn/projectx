@@ -7,9 +7,9 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL:  process.env.GOOGLE_CALLBACK_URL, 
+      callbackURL: process.env.GOOGLE_CALLBACK_URL, // ✅ FIX
     },
-    async (_, __, profile, done) => {
+    async (accessToken, refreshToken, profile, done) => {
       try {
         const email = profile.emails[0].value;
 
@@ -18,10 +18,9 @@ passport.use(
         if (!user) {
           user = await User.create({
             name: profile.displayName,
-           username: `${email.split("@")[0]}_${Date.now()}`,
-
+            username: `${email.split("@")[0]}_${Date.now()}`,
             email,
-            password: null,          // 👈 important
+            password: null,
             provider: "google",
             tokens: 100,
             role: "user",
@@ -35,3 +34,5 @@ passport.use(
     }
   )
 );
+
+export default passport;
