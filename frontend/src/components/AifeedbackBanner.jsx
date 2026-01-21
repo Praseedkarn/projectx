@@ -1,5 +1,5 @@
 import { useState } from "react";
-
+import { Link } from "react-router-dom";
 const API_URL = process.env.REACT_APP_API_URL;
 
 export default function AiFeedbackBanner({ source = "AI Planner" }) {
@@ -89,11 +89,25 @@ export default function AiFeedbackBanner({ source = "AI Planner" }) {
             </p>
           )}
 
-          <p className="mt-4 text-xs text-black/70">
-            By contacting us, you agree to our
-            <span className="underline ml-1">Privacy Policy</span> &amp;
-            <span className="underline ml-1">Terms of Use</span>.
+         <p className="mt-4 text-xs text-black/70 text-center">
+            By continuing, you agree to our{" "}
+            <Link
+              to="/privacy"
+              target="_blank"
+              className="underline ml-1 text-blue-600 hover:text-blue-800"
+            >
+              Privacy Policy
+            </Link>{" "}
+            &{" "}
+            <Link
+              to="/terms"
+              target="_blank"
+              className="underline ml-1 text-blue-600 hover:text-blue-800"
+            >
+              Terms of Use
+            </Link>.
           </p>
+
         </div>
       </div>
     </section>

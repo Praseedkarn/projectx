@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 
-
+import { Link } from "react-router-dom";
 
 
 
@@ -248,12 +248,37 @@ const handleLogin = async () => {
           </button>
 
           <button
-            type="button"
-            onClick={handleGoogleLogin}
-            className="w-full rounded-full border py-3 font-medium text-gray-700 hover:bg-gray-100 transition"
+          type="button"
+          onClick={handleGoogleLogin}
+          className="w-full rounded-full border py-3 font-medium text-gray-700
+                    hover:bg-gray-100 transition flex items-center justify-center gap-3"
+        >
+          <img
+            src="https://developers.google.com/identity/images/g-logo.png"
+            alt="Google"
+            className="w-5 h-5"
+          />
+          Continue with Google
+        </button>
+        <p className="text-xs text-gray-500 text-center mt-4 leading-relaxed">
+          By continuing, you agree to our{" "}
+          <Link
+            to="/terms"
+            target="_blank"
+            className="text-blue-600 hover:underline"
           >
-            Continue with Google
-          </button>
+            Terms & Conditions
+          </Link>{" "}
+          and{" "}
+          <Link
+            to="/privacy"
+            target="_blank"
+            className="text-blue-600 hover:underline"
+          >
+            Privacy Policy
+          </Link>.
+        </p>
+
 
         </form>
 

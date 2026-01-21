@@ -22,6 +22,9 @@ import HelpPage from "./pages/HelpPage";
 import AdminLayout from "./admin/AdminLayout";
 import AdminDashboard from "./admin/AdminDashboard";
 import AuthSuccess from "./pages/AuthSuccess";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
+
 
 const AppRouter = ({
   currentUser,
@@ -86,7 +89,8 @@ const AppRouter = ({
       <Route path="/become-guide" element={<BecomeGuide />} />
       <Route path="/ai-failed" element={<AiFailPage />} />
       <Route path="/qr-trip/:id" element={<QrTripPage />} />
-
+      <Route path="/terms" element={<Terms />} />
+      <Route path="/privacy" element={<Privacy />} />
       {/* ADMIN */}
       <Route path="/admin" element={<AdminLayout />}>
         <Route index element={<AdminDashboard />} />

@@ -25,7 +25,7 @@ import adminRoutes from "./routes/admin.routes.js";
 import osmRoutes from "./routes/osm.routes.js";
 import quizAdminRoutes from "./routes/quiz.admin.js";
 import historyRoutes from "./routes/history.routes.js";
-
+import cityMetaRoutes from "./routes/cityMeta.routes.js";
 
 // import otmRoutes from "./routes/otm.routes.js";
 // import otmDetailsRoutes from "./routes/otm.details.routes.js";
@@ -77,6 +77,8 @@ app.use("/api/admin/quiz", quizAdminRoutes);
 app.use("/api/history", historyRoutes);
 // app.use("/api/otm",otmRoutes);
 // app.use("/api/otm/details",otmDetailsRoutes);
+app.use("/api/city-meta", cityMetaRoutes);
+
 
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok" });

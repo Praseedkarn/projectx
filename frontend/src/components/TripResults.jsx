@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { QRCodeCanvas } from "qrcode.react";
 import API_BASE_URL from "../services/apiClient";
-
 const TextSkeleton = ({ lines = 6 }) => (
   <div className="space-y-3 animate-pulse">
     {Array.from({ length: lines }).map((_, i) => (
@@ -28,16 +27,9 @@ const TripResults = () => {
     location.state?.suggestions ||
     JSON.parse(localStorage.getItem("lastTripResult"));
 
-  const messages = [
-    "Understanding your preferences…",
-    "Analyzing routes & distances…",
-    "Finding food & local spots…",
-    "Balancing time and budget…",
-    "Finalizing your itinerary…",
-  ];
+ 
 
-  const [step, setStep] = useState(0);
-  const [loading, setLoading] = useState(true);
+
 
   const [isTyping, setIsTyping] = useState(false);
   const [displayText, setDisplayText] = useState("");
@@ -59,6 +51,8 @@ const [osmError, setOsmError] = useState("");
 
 
 
+
+
   /* ================= HARD REDIRECT IF NOTHING ================= */
   useEffect(() => {
     if (!suggestions) {
@@ -66,25 +60,11 @@ const [osmError, setOsmError] = useState("");
     }
   }, [suggestions, navigate]);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 3000);
 
-    return () => clearTimeout(timer);
-  }, []);
 
 
   /* ================= LOADING TEXT ================= */
-  useEffect(() => {
-    if (!loading) return;
-
-    const interval = setInterval(() => {
-      setStep((prev) => (prev + 1) % messages.length);
-    }, 2500);
-
-    return () => clearInterval(interval);
-  }, [loading ,messages.length]);
+ 
 
   /* ================= GUIDE (STAGE 1 - MANUAL) ================= */
 
@@ -117,64 +97,55 @@ const [osmError, setOsmError] = useState("");
     fetchGuide();
   }, [city]);
 
-  useEffect(() => {
-    if (!city) return;
-
-    const fetchCityInfo = async () => {
-      try {
-        setCityLoading(true);
-        const res = await fetch(
-          `https://projectx-yzu3.onrender.com/api/wiki?query=${encodeURIComponent(city)}`
-        );
-        const data = await res.json();
-
-        if (data.available) {
-          setCityInfo(data);
-        } else {
-          setCityInfo(null);
-        }
-      } catch {
-        setCityInfo(null);
-      } finally {
-        setCityLoading(false);
-      }
-    };
-
-    fetchCityInfo();
-  }, [city]);
 
 useEffect(() => {
   if (!city) return;
 
-  const fetchOSMData = async () => {
+  const fetchCityData = async () => {
+    setCityLoading(true);
+    setOsmLoading(true);
+    
+    setOsmError("");
+
     try {
-      setOsmLoading(true);
-      setOsmError("");
-      setOsmData(null);
+      const [wikiRes, osmRes] = await Promise.allSettled([
+        fetch(
+          `${API_BASE_URL}/api/wiki?query=${encodeURIComponent(city)}`
+        ).then(r => r.json()),
 
-      const res = await fetch(
-        `${API_BASE_URL}/api/osm?city=${encodeURIComponent(city)}`
-      );
+        fetch(
+          `${API_BASE_URL}/api/osm?city=${encodeURIComponent(city)}`
+        ).then(r => r.json()),
+      ]);
 
-      if (!res.ok) throw new Error("OSM request failed");
+      // ✅ WIKI (independent)
+      if (
+        wikiRes.status === "fulfilled" &&
+        wikiRes.value?.available
+      ) {
+        setCityInfo(wikiRes.value);
+      }
 
-      const data = await res.json();
-
-      if (data.available) {
-        setOsmData(data);
-      } else {
-        setOsmData(null);
+      // ✅ OSM (independent)
+      if (
+        osmRes.status === "fulfilled" &&
+        osmRes.value?.available &&
+        osmRes.value?.attractions?.length > 0
+      ) {
+        setOsmData(osmRes.value);
       }
     } catch (err) {
-      setOsmError("Failed to load attractions");
-      setOsmData(null);
+      console.error("City data load failed", err);
+      setOsmError("Attractions service temporarily unavailable");
     } finally {
+      setCityLoading(false);
       setOsmLoading(false);
     }
   };
 
-  fetchOSMData();
+  fetchCityData();
 }, [city]);
+
 
 
 
@@ -190,7 +161,7 @@ useEffect(() => {
   useEffect(() => {
     if (!suggestions?.text) return;
 
-    setLoading(false);
+   
     setIsTyping(true);
     setFinalText("");
     setDisplayText("");
@@ -252,19 +223,7 @@ const res = await fetch(
   };
 
   /* ================= LOADING SCREEN ================= */
-  if (loading) {
-    return (
-      <div className="min-h-screen pt-24 flex items-center justify-center">
-        <div className="bg-white p-8 rounded-3xl shadow-xl text-center space-y-4">
-          <div className="w-14 h-14 border-4 border-[#5b7c67]/30
-                          border-t-[#5b7c67]
-                          rounded-full animate-spin mx-auto" />
-          <p className="font-semibold">✨ Planning your trip</p>
-          <p className="text-sm text-gray-500">{messages[step]}</p>
-        </div>
-      </div>
-    );
-  }
+
 
 const AttractionSection = ({ title, items }) => {
   if (!items || items.length === 0) return null;
@@ -301,334 +260,284 @@ const AttractionSection = ({ title, items }) => {
 
 
   /* ================= RESULT ================= */
-  return (
-    <div className=" pt-16 sm:pt-20 px-4 animate-fade-in">
-      <div className="max-w-4xl mx-auto space-y-6">
+ return (
+  <div className="pt-16 sm:pt-20 px-4 animate-fade-in">
+    <div className="max-w-4xl mx-auto space-y-8">
 
-        {/* HEADER */}
-        <div className="bg-white p-4  sm:p-6 rounded-3xl shadow flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <h2 className="text-lg sm:text-x font-semibold">
+      {/* ================= HEADER ================= */}
+      <div className="bg-white p-4 sm:p-6 rounded-3xl shadow flex items-start sm:items-center justify-between gap-3">
+        <div>
+          <h2 className="text-lg sm:text-xl font-semibold">
             Your AI Travel Plan
           </h2>
 
-
-          {isDemo && (
-            <div className="inline-flex items-center gap-2 text-xs
-                            bg-yellow-100 text-yellow-800
-                            px-3 py-1 rounded-full w-fit">
-              ⚠ Demo result
-            </div>
-          )}
-
           {isDemo && demoReason && (
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-gray-500 mt-1">
               {demoReason}
             </p>
           )}
-          <button onClick={() => navigate("/")}>✕</button>
-
         </div>
 
-        {/* ================= CITY INFO (WIKIPEDIA) ================= */}
-        {city && (
-          <div className="bg-white rounded-3xl shadow p-6 space-y-4">
-            {cityLoading ? (
-              <p className="text-gray-500 text-sm">
-                Loading information about {city}…
-              </p>
-            ) : cityInfo ? (
-              <>
-                <h2 className="text-2xl font-semibold">
-                  About {cityInfo.title}
-                </h2>
+        <div className="flex items-center gap-2">
+          {isDemo && (
+            <span className="text-xs bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full">
+              ⚠ Demo
+            </span>
+          )}
+          <button onClick={() => navigate("/")}>✕</button>
+        </div>
+      </div>
 
-                {cityInfo.image && (
-                  <img
-                    src={cityInfo.image}
-                    alt={cityInfo.title}
-                    className="w-full max-h-64 object-cover rounded-xl"
-                  />
-                )}
-
-                <p className="text-gray-700 leading-relaxed">
-                  {cityInfo.description}
-                </p>
-
-                <a
-                  href={cityInfo.wikipediaUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-indigo-600 text-sm font-medium"
-                >
-                  Read more on Wikipedia →
-                </a>
-              </>
-            ) : (
-              <p className="text-gray-500 text-sm">
-                No information found for {city}.
-              </p>
-            )}
-          </div>
-        )}
-
-        {city && (
-          <div className="bg-white rounded-3xl shadow p-6 space-y-3">
-            <h3 className="text-lg font-semibold text-gray-800">
-              Explore {city}
-            </h3>
-
+      {/* ================= CITY INFO (WIKI) ================= */}
+      {city && (
+        <div className="bg-white rounded-3xl shadow p-6 space-y-4">
+          {cityLoading ? (
             <p className="text-sm text-gray-500">
-              Zoom in to see famous places, attractions, and landmarks
+              Loading information about {city}…
             </p>
+          ) : cityInfo ? (
+            <>
+              <h2 className="text-2xl font-semibold">
+                About {cityInfo.title}
+              </h2>
 
-            <iframe
-              title="city-attractions-map"
-              className="w-full h-96 rounded-xl"
-              loading="lazy"
-              src={`https://www.google.com/maps?q=top+tourist+attractions+in+${encodeURIComponent(
-                city
-              )}&z=13&output=embed`}
-            />
-          </div>
-        )}
+              {cityInfo.image && (
+              <div className="relative">
+                <img
+                  src={cityInfo.image}
+                  alt={cityInfo.title}
+                  className="w-full max-h-64 object-cover rounded-xl"
+                />
 
-
-
-
-        {/* CONTENT */}
-        <div className="bg-white p-6 rounded-3xl shadow space-y-4">
-          <div className="flex justify-end">
-            {!isEditing ? (
-              <button
-                disabled={isTyping}
-                onClick={() => setIsEditing(true)}
-                className="bg-slate-800 text-white px-4 py-2 rounded"
-              >
-                ✏️ Edit
-              </button>
-            ) : (
-              <button
-                onClick={() => setIsEditing(false)}
-                className="bg-emerald-600 text-white px-4 py-2 rounded"
-              >
-                ✅ Save
-              </button>
-            )}
-          </div>
-
-{/* AI TEXT AREA */}
-<div
-  className="
-    sm:bg-slate-50
-    sm:rounded-xl
-    sm:p-5
-
-    p-0
-    text-[15px] sm:text-base
-    leading-7
-    font-['Inter']
-    whitespace-pre-wrap
-    break-words
-    text-gray-800
-  "
->
-  {/* Skeleton */}
-  {isTyping && displayText === "" && (
-    <TextSkeleton lines={6} />
-  )}
-
-  {/* Typing animation */}
-  {isTyping && displayText !== "" && (
-    <div className="block">
-      {displayText}
-      <span className="ml-1 animate-pulse">▍</span>
-    </div>
-  )}
-
-  {/* Final text */}
-  {!isTyping && !isEditing && finalText && (
-    <div className="whitespace-pre-wrap break-words">
-      {finalText}
-    </div>
-  )}
+                {/* CITY TAG (LIKE CITY PAGE) */}
+               <div className="absolute bottom-4 left-4
+                bg-white
+                rounded-full px-5 py-2
+                shadow-md">
+  <span className="text-sm font-medium text-gray-900">
+    📍 {city}
+  </span>
 </div>
 
+              </div>
+            )}
 
+              <p className="text-gray-700 leading-relaxed">
+                {cityInfo.description}
+              </p>
 
-          {isEditing && (
-            <textarea
-              value={finalText}
-              onChange={(e) => setFinalText(e.target.value)}
-              className="w-full min-h-[300px] border rounded-xl p-4"
-            />
+              <a
+                href={cityInfo.wikipediaUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="text-indigo-600 text-sm font-medium"
+              >
+                Read more on Wikipedia →
+              </a>
+            </>
+          ) : (
+            <p className="text-sm text-gray-500">
+              No information found for {city}.
+            </p>
+          )}
+        </div>
+      )}
+
+      {/* ================= MAP ================= */}
+      {city && (
+        <div className="bg-white rounded-3xl shadow p-6 space-y-3">
+          <h3 className="text-lg font-semibold text-gray-800">
+            Explore {city}
+          </h3>
+
+          <p className="text-sm text-gray-500">
+            Zoom in to see famous places, attractions, and landmarks
+          </p>
+
+          <iframe
+            title="city-map"
+            className="w-full h-96 rounded-xl"
+            loading="lazy"
+            src={`https://www.google.com/maps?q=top+tourist+attractions+in+${encodeURIComponent(
+              city
+            )}&z=13&output=embed`}
+          />
+        </div>
+      )}
+
+      {/* ================= AI TEXT (DO NOT TOUCH LOGIC) ================= */}
+      <div className="bg-white p-6 rounded-3xl shadow space-y-4">
+        <div className="flex justify-end">
+          {!isEditing ? (
+            <button
+              disabled={isTyping}
+              onClick={() => setIsEditing(true)}
+              className="bg-slate-800 text-white px-4 py-2 rounded"
+            >
+              ✏️ Edit
+            </button>
+          ) : (
+            <button
+              onClick={() => setIsEditing(false)}
+              className="bg-emerald-600 text-white px-4 py-2 rounded"
+            >
+              ✅ Save
+            </button>
           )}
         </div>
 
-
-
-        {/* QR */}
-        <button
-          onClick={handleGenerateQR}
-          disabled={!finalText || isEditing || qrLoading}
-          className="bg-indigo-600 text-white px-4 py-2 rounded"
+        <div
+          className="
+            sm:bg-slate-50 sm:rounded-xl sm:p-5
+            text-[15px] sm:text-base leading-7
+            whitespace-pre-wrap break-words text-gray-800
+          "
         >
-          {qrLoading ? "Generating QR..." : "📱 Generate QR"}
-        </button>
+          {isTyping && displayText === "" && (
+            <TextSkeleton lines={6} />
+          )}
 
-        {qrTripId && (
-          <div className="flex flex-col items-center gap-3 mt-4">
-
-            <QRCodeCanvas
-              value={`${window.location.origin}/qr-trip/${qrTripId}`}
-              size={220}
-            />
-
-            {/* Clickable link */}
-            <a
-              href={`${window.location.origin}/qr-trip/${qrTripId}`}
-              target="_blank"
-              rel="noreferrer"
-              className="text-sm text-indigo-600 underline break-all"
-            >
-              {window.location.origin}/qr-trip/{qrTripId}
-            </a>
-
-            {/* Expiry note */}
-            <p className="text-xs text-gray-500">
-              ⏳ This QR link will expire in <strong>7 days</strong>
-            </p>
-
-          </div>
-        )}
-
-        {qrTripId && (
-  <div className="mt-4 w-full max-w-md mx-auto
-                  rounded-2xl border border-indigo-100
-                  bg-indigo-50/60 px-4 py-3
-                  text-sm text-gray-700">
-
-            <div className="flex items-start gap-3">
-              <span className="text-indigo-600 text-lg">ℹ️</span>
-
-              <div className="space-y-1">
-                <p className="font-medium text-gray-800">
-                  Trip saved successfully
-                </p>
-
-                <p className="text-xs text-gray-600 leading-relaxed">
-                  This itinerary is now available in your <strong>Saved Trips</strong>.
-                  You can revisit, share, or download it anytime using the QR.
-                </p>
-              </div>
+          {isTyping && displayText !== "" && (
+            <div>
+              {displayText}
+              <span className="ml-1 animate-pulse">▍</span>
             </div>
-          </div>
-        )}
+          )}
 
-
-       {/* ================= LOCAL SIGHTSEEING (OTM) ================= */}
-{/* ================= LOCAL ATTRACTIONS (OSM) ================= */}
-{city && (
-  <div className="bg-white rounded-3xl shadow p-6 space-y-6">
-
-    <h2 className="text-xl font-semibold">
-      📍 Things to Explore in {city}
-    </h2>
-
-    {osmLoading && (
-      <p className="text-sm text-gray-500">
-        Finding attractions…
-      </p>
-    )}
-
-    {!osmLoading && osmError && (
-      <p className="text-sm text-red-500">{osmError}</p>
-    )}
-
-    {!osmLoading && osmData?.attractions?.length > 0 && (
-      <AttractionSection
-        title="🏛️ Tourist Attractions"
-        items={osmData.attractions}
-        
-      />
-    )}
-
-   {!osmLoading &&
-  (!osmData?.attractions || osmData.attractions.length === 0) && (
-    <p className="text-sm text-gray-500">
-      Showing limited attractions for {city}.
-    </p>
-)}
-
-  </div>
-)}
-
-
-
-
-        {/* ================= LOCAL GUIDE CARD ================= */}
-        <div className="mt-10">
-          {city && guide ? (
-            <div className="bg-green-50 border border-green-200
-                            rounded-3xl p-6 shadow-sm">
-              <h3 className="text-xl font-semibold text-gray-800">
-                Local Guide Available in {city}
-              </h3>
-
-              <p className="mt-2 text-gray-600">
-                Explore {city} with a verified local expert.
-              </p>
-
-              <div className="mt-4 space-y-1 text-sm text-gray-700">
-                <p><strong>Name:</strong> {guide.name}</p>
-                <p><strong>Languages:</strong> {guide.languages}</p>
-              </div>
-
-              <a
-                href={`https://wa.me/${guide.phone}`}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-block mt-5 rounded-full
-                          bg-green-600 px-6 py-3 text-white
-                          font-medium hover:bg-green-700 transition"
-              >
-                💬 Contact Guide on WhatsApp
-              </a>
-            </div>
-          ) : city ? (
-            <div className="bg-gray-50 border rounded-3xl p-6 text-center">
-              <h3 className="text-lg font-semibold text-gray-800">
-                No Local Guide Available Yet
-              </h3>
-
-              <p className="mt-2 text-gray-600">
-                Want a local expert for {city}?
-              </p>
-
-              <div className="mt-4 flex justify-center gap-4">
-                <a
-                  href="mailto:l@gmail.com"
-                  className="rounded-full border px-5 py-2 text-sm"
-                >
-                  Email Us
-                </a>
-
-                <a
-                  href="https://instagram.com/praseed_karn"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="rounded-full border px-5 py-2 text-sm"
-                >
-                  Instagram
-                </a>
-              </div>
-            </div>
-          ) : null}
+          {!isTyping && !isEditing && finalText && (
+            <div>{finalText}</div>
+          )}
         </div>
 
-
+        {isEditing && (
+          <textarea
+            value={finalText}
+            onChange={(e) => setFinalText(e.target.value)}
+            className="w-full min-h-[300px] border rounded-xl p-4"
+          />
+        )}
       </div>
+
+      {/* ================= QR ================= */}
+      <button
+        onClick={handleGenerateQR}
+        disabled={!finalText || isEditing || qrLoading}
+        className="bg-indigo-600 text-white px-4 py-2 rounded"
+      >
+        {qrLoading ? "Generating QR..." : "📱 Generate QR"}
+      </button>
+
+      {qrTripId && (
+        <div className="flex flex-col items-center gap-3">
+          <QRCodeCanvas
+            value={`${window.location.origin}/qr-trip/${qrTripId}`}
+            size={220}
+          />
+
+          <a
+            href={`${window.location.origin}/qr-trip/${qrTripId}`}
+            target="_blank"
+            rel="noreferrer"
+            className="text-sm text-indigo-600 underline break-all"
+          >
+            {window.location.origin}/qr-trip/{qrTripId}
+          </a>
+
+          <p className="text-xs text-gray-500">
+            ⏳ Expires in <strong>7 days</strong>
+          </p>
+        </div>
+      )}
+
+      {qrTripId && (
+        <div className="rounded-2xl border border-indigo-100 bg-indigo-50/60 px-4 py-3 text-sm">
+          <p className="font-medium text-gray-800">
+            Trip saved successfully
+          </p>
+          <p className="text-xs text-gray-600">
+            Available in <strong>Saved Trips</strong>
+          </p>
+        </div>
+      )}
+
+      {/* ================= OSM ATTRACTIONS ================= */}
+      {city && (
+        <div className="bg-white rounded-3xl shadow p-6 space-y-4">
+          <h2 className="text-xl font-semibold">
+            📍 Things to Explore in {city}
+          </h2>
+
+          {osmLoading && (
+            <p className="text-sm text-gray-500">
+              Finding attractions…
+            </p>
+          )}
+
+          {!osmLoading && osmError && (
+            <p className="text-sm text-red-500">{osmError}</p>
+          )}
+
+          {!osmLoading && osmData?.attractions?.length > 0 && (
+            <AttractionSection
+              title="🏛️ Tourist Attractions"
+              items={osmData.attractions}
+            />
+          )}
+
+          {!osmLoading &&
+            osmData &&
+            osmData.attractions?.length === 0 && (
+              <p className="text-sm text-gray-500">
+                Showing limited attractions for {city}.
+              </p>
+            )}
+        </div>
+      )}
+
+      {/* ================= LOCAL GUIDE ================= */}
+      <div>
+        {city && guide ? (
+          <div className="bg-green-50 border border-green-200 rounded-3xl p-6 shadow-sm">
+            <h3 className="text-xl font-semibold">
+              Local Guide Available in {city}
+            </h3>
+
+            <p className="mt-2 text-gray-600">
+              Explore {city} with a verified local expert.
+            </p>
+
+            <p className="text-sm mt-3">
+              <strong>Name:</strong> {guide.name}
+            </p>
+            <p className="text-sm">
+              <strong>Languages:</strong> {guide.languages}
+            </p>
+
+            <a
+              href={`https://wa.me/${guide.phone}`}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-block mt-4 rounded-full bg-green-600 px-6 py-3 text-white"
+            >
+              💬 Contact Guide
+            </a>
+          </div>
+        ) : city ? (
+          <div className="bg-gray-50 border rounded-3xl p-6 text-center">
+            <h3 className="text-lg font-semibold">
+              No Local Guide Available Yet
+            </h3>
+            <p className="text-sm text-gray-600 mt-1">
+              Want a local expert for {city}?
+            </p>
+          </div>
+        ) : null}
+      </div>
+
     </div>
-  );
+  </div>
+);
+
 };
 
 export default TripResults;

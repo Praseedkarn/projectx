@@ -1,5 +1,5 @@
 import { useState } from "react";
-
+import { Link } from "react-router-dom";
 const faqs = [
   {
     q: "Why yet another trip planning tool?",
@@ -100,8 +100,8 @@ export default function FaqFooterSection() {
               <h4 className="font-semibold mb-3">Support</h4>
               <ul className="space-y-2 text-gray-700">
                 <li>FAQ</li>
-                <li>Terms</li>
-                <li>Privacy</li>
+               <li><Link to="/terms">Terms & Conditions</Link></li>
+               <li> <Link to="/privacy">Privacy Policy</Link></li>
                 <li>Refunds</li>
               </ul>
             </div>
