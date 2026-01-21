@@ -24,6 +24,21 @@ export default function ExploreCities() {
     currentPage * ITEMS_PER_PAGE
   );
 
+
+const isMobile = window.innerWidth < 640;
+
+const getMobilePages = () => {
+  if (totalPages <= 3) {
+    return [...Array(totalPages)].map((_, i) => i + 1);
+  }
+
+  if (currentPage === 1) return [1, 2, 3];
+  if (currentPage === totalPages)
+    return [totalPages - 2, totalPages - 1, totalPages];
+
+  return [currentPage - 1, currentPage, currentPage + 1];
+};
+
   const handleSearch = (e) => {
     setQuery(e.target.value);
     setCurrentPage(1);
@@ -130,39 +145,54 @@ if (loading) {
         )}
 
         {/* PAGINATION */}
-        {totalPages > 1 && (
-          <div className="flex justify-center gap-2 pt-6">
-            <button
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage((p) => p - 1)}
-              className="px-4 py-2 rounded-full border text-sm disabled:opacity-40"
-            >
-              ← Prev
-            </button>
+       {/* PAGINATION */}
+{totalPages > 1 && (
+  <div className="flex justify-center items-center gap-3 pt-6">
 
-            {[...Array(totalPages)].map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setCurrentPage(i + 1)}
-                className={`w-9 h-9 rounded-full text-sm
-                  ${currentPage === i + 1
-                    ? "bg-[#5b7c67] text-white"
-                    : "border hover:bg-gray-100"}
-                `}
-              >
-                {i + 1}
-              </button>
-            ))}
+    {/* Prev */}
+    <button
+      disabled={currentPage === 1}
+      onClick={() => setCurrentPage(p => p - 1)}
+      className="px-5 py-3 sm:px-4 sm:py-2
+                 rounded-full border text-base sm:text-sm
+                 disabled:opacity-40"
+    >
+      ← Prev
+    </button>
 
-            <button
-              disabled={currentPage === totalPages}
-              onClick={() => setCurrentPage((p) => p + 1)}
-              className="px-4 py-2 rounded-full border text-sm disabled:opacity-40"
-            >
-              Next →
-            </button>
-          </div>
-        )}
+    {/* Page numbers */}
+    {(isMobile
+      ? getMobilePages()
+      : [...Array(totalPages)].map((_, i) => i + 1)
+    ).map(page => (
+      <button
+        key={page}
+        onClick={() => setCurrentPage(page)}
+        className={`w-11 h-11 sm:w-9 sm:h-9
+          rounded-full font-medium text-base sm:text-sm
+          ${currentPage === page
+            ? "bg-[#5b7c67] text-white"
+            : "border hover:bg-gray-100"}
+        `}
+      >
+        {page}
+      </button>
+    ))}
+
+    {/* Next */}
+    <button
+      disabled={currentPage === totalPages}
+      onClick={() => setCurrentPage(p => p + 1)}
+      className="px-5 py-3 sm:px-4 sm:py-2
+                 rounded-full border text-base sm:text-sm
+                 disabled:opacity-40"
+    >
+      Next →
+    </button>
+
+  </div>
+)}
+
 
       </div>
     </section>
