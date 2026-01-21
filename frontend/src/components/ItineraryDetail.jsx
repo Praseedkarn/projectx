@@ -180,6 +180,7 @@ useEffect(() => {
          <div className="relative">
           <img
             src={itineraryDetails.image}
+            alt={itineraryDetails.title}
             className="w-full h-[380px] object-cover rounded-[36px]"
           />
 
