@@ -15,7 +15,7 @@ const ItineraryDetail = () => {
   const [selected360Place, setSelected360Place] = useState("");
   const [guide, setGuide] = useState(null);
   const [guideLoading, setGuideLoading] = useState(true);
-  const [openDay, setOpenDay] = useState(1);
+ 
 const [activeDay, setActiveDay] = useState(1);
 
 useEffect(() => {
