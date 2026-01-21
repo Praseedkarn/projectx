@@ -1238,7 +1238,7 @@ const getMobilePages = () => {
 
 
   return (
-    <section className="bg-[#f6f8f5] px-4 pt-4 pb-20 overflow-hidden ">
+    <section className="bg-white px-4 pt-4 pb-20 overflow-hidden ">
       <div className=" relative x-10 max-w-5xl mx-auto space-y-10">
 
         {/* ===== HEADER BAR ===== */}

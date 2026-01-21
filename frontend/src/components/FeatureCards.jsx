@@ -8,7 +8,7 @@ const highlights = [
     desc: "Carefully crafted itineraries for cities, weekends, and long trips.",
     action: "Explore itineraries",
     image:
-      "https://plus.unsplash.com/premium_vector-1711987817831-55bfbf7200a6?w=352&auto=format&fit=crop&q=60",
+      "https://images.unsplash.com/photo-1640179840059-ffb51b831e06?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8aXRpbmVyYXJ5fGVufDB8fDB8fHww",
   },
   {
     id: "distance",

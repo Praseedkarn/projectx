@@ -6,28 +6,28 @@ const itineraries = [
     title: "Goa Beach Escape",
     duration: "5 days",
     location: "Goa, India",
-    image: "/goa.jpg",
+    image: "https://images.unsplash.com/photo-1614082242765-7c98ca0f3df3?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Z29hfGVufDB8fDB8fHww",
   },
   {
     slug: "sikkim-gangtok",
     title: "Sikkim Explorer",
     duration: "6 days",
     location: "Sikkim, India",
-    image: "manali2.webp",
+    image: "https://images.unsplash.com/photo-1634400001131-d04275db2076?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fHNpa2tpbXxlbnwwfHwwfHx8MA%3D%3D",
   },
   {
     slug: "rajastan-royal",
     title: "Jaipur Heritage",
     duration: "3 days",
     location: "Rajasthan",
-    image: "/jaipur.webp",
+    image: "https://images.unsplash.com/photo-1619014452346-dc868be175cb?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8cmFqc3RoYW58ZW58MHx8MHx8fDA%3D",
   },
   {
     slug: "kerala-backwater",
     title: "Kerala Backwaters",
     duration: "4 days",
     location: "Kerala",
-    image: "kerala.webp",
+    image: "https://plus.unsplash.com/premium_photo-1697729600773-5b039ef17f3b?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8a2VyYWxhfGVufDB8fDB8fHww",
   },
 ];
 

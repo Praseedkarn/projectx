@@ -435,7 +435,7 @@ const handleLogout = () => {
               </div>
 
               {/* AI FORM CARD */}
-              <div className="w-full bg-white rounded-[80px] shadow-[0_10px_30px_rgba(0,0,0,0.12)]">
+              <div className="w-full bg-white rounded-[50px] shadow-[0_10px_30px_rgba(0,0,0,0.12)]">
                 <div ref={formCardRef} className="max-w-[1400px] mx-auto px-8 md:px-20 py-10">
                   <div className="text-center space-y-2 mb-10">
                     <h2 className="text-2xl md:text-3xl font-semibold text-gray-800">
@@ -453,35 +453,67 @@ const handleLogout = () => {
                     )}
                   </div>
 
-                  <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="flex flex-wrap gap-6 items-center">
-                      {[{ key: "hours", label: "Few Hours" }, { key: "day", label: "One Day" }, { key: "multi", label: "Multiple days" }].map((t) => (
-                        <button
-                          key={t.key}
-                          type="button"
-                          onClick={() => setTripType(t.key)}
-                          className={`flex items-center gap-3 px-5 py-3 rounded-full border transition-all duration-200 text-sm font-medium ${tripType === t.key ? "border-blue-600 bg-blue-50 text-blue-700" : "border-gray-300 text-gray-700 hover:border-blue-400"}`}
-                        >
-                          <span className={`w-4 h-4 rounded-full border flex items-center justify-center ${tripType === t.key ? "border-blue-600" : "border-gray-400"}`}>
-                            {tripType === t.key && <span className="w-2 h-2 rounded-full bg-blue-600" />}
-                          </span>
-                          {t.label}
-                        </button>
-                      ))}
-                    </div>
+                <form onSubmit={handleSubmit} className="space-y-5">
 
-                    {tripType === "hours" && (
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium text-gray-700">Number of hours</label>
-                        <input type="number" min={1} max={12} value={hours} onChange={(e) => setHours(Number(e.target.value))} className="w-full rounded-xl border border-gray-300 px-4 py-3" />
-                      </div>
-                    )}
-                    {tripType === "multi" && (
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium text-gray-700">Number of days</label>
-                        <input type="number" min={2} value={days} onChange={(e) => setDays(Number(e.target.value))} className="w-full rounded-xl border border-gray-300 px-4 py-3" />
-                      </div>
-                    )}
+  {/* SEGMENTED CONTROL */}
+  <div className="w-full sm:max-w-md mx-auto">
+  <div className="relative flex w-full rounded-xl border border-gray-300 bg-gray-100 p-1">
+    {[
+      { key: "hours", label: "Few hours" },
+      { key: "day", label: "One day" },
+      { key: "multi", label: "Multi-day" },
+    ].map((t) => (
+      <button
+        key={t.key}
+        type="button"
+        onClick={() => setTripType(t.key)}
+        className={`flex-1 rounded-lg px-3 py-2 text-sm font-medium
+          transition-all duration-200 ease-out
+          ${
+            tripType === t.key
+              ? "bg-white text-blue-700 shadow-sm"
+              : "text-gray-600 hover:text-gray-900"
+          }`}
+      >
+        {t.label}
+      </button>
+    ))}
+  </div>
+</div>
+
+
+  {/* CONDITIONAL INPUTS */}
+  {tripType === "hours" && (
+    <div className="space-y-2">
+      <label className="text-sm font-medium text-gray-700">
+        Number of hours
+      </label>
+      <input
+        type="number"
+        min={1}
+        max={12}
+        value={hours}
+        onChange={(e) => setHours(Number(e.target.value))}
+        className="w-full rounded-xl border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+      />
+    </div>
+  )}
+
+  {tripType === "multi" && (
+    <div className="space-y-2">
+      <label className="text-sm font-medium text-gray-700">
+        Number of days
+      </label>
+      <input
+        type="number"
+        min={2}
+        value={days}
+        onChange={(e) => setDays(Number(e.target.value))}
+        className="w-full rounded-xl border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+      />
+    </div>
+  )}
+
 
                     <div className="relative space-y-2">
                       <label className="text-sm font-medium text-gray-700">Destination</label>

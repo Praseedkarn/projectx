@@ -443,9 +443,10 @@ const AttractionSection = ({ title, items }) => {
             {window.location.origin}/qr-trip/{qrTripId}
           </a>
 
-          <p className="text-xs text-gray-500">
-            ⏳ Expires in <strong>7 days</strong>
-          </p>
+        <p className="text-xs text-gray-500 text-center">
+          ⏳ Expires in <strong>7 days</strong> · This itinerary is safely saved in
+          <strong> Saved Trips</strong>
+        </p>
         </div>
       )}
 

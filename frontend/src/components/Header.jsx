@@ -121,6 +121,8 @@ const go = (path) => {
                     {/* TOKEN BADGE */}
                   {user && (
                     <div
+                    onClick={()=>go("/tokens")}
+                    title="view token history"
                       className="
                         hidden md:flex
                         items-center gap-1
@@ -210,15 +212,15 @@ const go = (path) => {
               ☰
             </button>
            {isMenuOpen && (
-  <div className="
-    absolute right-0 top-12 w-64
-    rounded-xl
-    bg-white
-    p-4
-    shadow-2xl
-    border border-gray-200
-    z-50
-  ">
+            <div className="
+              absolute right-0 top-12 w-64
+              rounded-xl
+              bg-white
+              p-4
+              shadow-2xl
+              border border-gray-200
+              z-50
+            ">
 
     {/* USER INFO */}
     {user && (
@@ -226,7 +228,10 @@ const go = (path) => {
         <p className="font-semibold">{user.name}</p>
         <p className="text-xs text-gray-500">{user.email}</p>
 
-        <div className="mt-2 inline-flex items-center gap-2 text-sm
+        <div 
+       onClick={() => go("/tokens")}
+        title="View token history"
+        className="mt-2 inline-flex items-center gap-2 text-sm
                         bg-[#5b6f00]/10 text-[#5b6f00]
                         px-3 py-1.5 rounded-full">
           🪙 {user.role === "admin" ? "∞" : user.tokens}

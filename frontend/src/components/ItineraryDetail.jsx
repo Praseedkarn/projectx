@@ -16,6 +16,26 @@ const ItineraryDetail = () => {
   const [guide, setGuide] = useState(null);
   const [guideLoading, setGuideLoading] = useState(true);
   const [openDay, setOpenDay] = useState(1);
+const [activeDay, setActiveDay] = useState(1);
+
+useEffect(() => {
+  const onScroll = () => {
+    const sections = document.querySelectorAll("[data-day]");
+    let current = 1;
+
+    sections.forEach((section) => {
+      const rect = section.getBoundingClientRect();
+      if (rect.top <= window.innerHeight * 0.4) {
+        current = Number(section.dataset.day);
+      }
+    });
+
+    setActiveDay(current);
+  };
+
+  window.addEventListener("scroll", onScroll, { passive: true });
+  return () => window.removeEventListener("scroll", onScroll);
+}, []);
 
   /* ===== LOAD ITINERARY ===== */
   useEffect(() => {
@@ -141,7 +161,7 @@ const ItineraryDetail = () => {
 
 
   return (
-    <section className="bg-[#f4f6f4] px-4 pt-24 pb-32">
+    <section className="bg-white px-4 pt-24 pb-32">
       <div className="max-w-5xl mx-auto space-y-24">
 
         {/* ================= HERO ================= */}
@@ -157,78 +177,91 @@ const ItineraryDetail = () => {
             Complete Travel Guide
           </p>
 
-          <h1 className="text-4xl font-semibold leading-tight">
-            {itineraryDetails.title}
-          </h1>
-
-          <p className="text-lg text-gray-600 max-w-3xl leading-relaxed">
-            {itineraryDetails.description}
-          </p>
-
+         <div className="relative">
           <img
             src={itineraryDetails.image}
-            alt={itineraryDetails.title}
-            className="w-full rounded-3xl max-h-[480px] object-cover"
+            className="w-full h-[380px] object-cover rounded-[36px]"
           />
 
-          {/* FACT STRIP */}
-          <div className="flex flex-wrap gap-x-10 gap-y-4 text-sm text-gray-600 pt-6">
-            <p><strong>📍 Location:</strong> {itineraryDetails.location}</p>
-            <p><strong>⏳ Duration:</strong> {itineraryDetails.duration}</p>
-            <p><strong>⚡ Difficulty:</strong> {itineraryDetails.difficulty}</p>
-            <p><strong>💰 Budget:</strong> {itineraryDetails.priceRange}</p>
+          <div className="absolute bottom-6 left-6 bg-white/90 backdrop-blur
+                          rounded-2xl px-6 py-4 shadow-lg max-w-xl">
+            <h1 className="text-2xl font-semibold">
+              {itineraryDetails.title}
+            </h1>
+            <p className="text-sm text-gray-600 mt-1">
+              {itineraryDetails.description}
+            </p>
           </div>
+        </div>
+
+
+          {/* FACT STRIP */}
+         
+
         </header>
 
         {/* ================= OVERVIEW ================= */}
-        <section className="bg-[#fdfcf7] py-16 -mx-4 px-4">
+        <section className="bg-white py-16 -mx-4 px-4">
           <div className="max-w-5xl mx-auto space-y-8">
             <h2 className="text-2xl font-semibold">Overview</h2>
 
-            <div className="grid sm:grid-cols-2 gap-8 text-gray-600">
-              <p>
-                <strong className="text-gray-800">Best time to visit:</strong><br />
-                {itineraryDetails.bestTime}
-              </p>
-              <p>
-                <strong className="text-gray-800">Expected budget:</strong><br />
-                {itineraryDetails.priceRange}
-              </p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <Fact
+                label="Best time"
+                value={itineraryDetails.bestTime}
+              />
+              <Fact
+                label="Duration"
+                value={itineraryDetails.duration}
+              />
+              <Fact
+                label="Difficulty"
+                value={itineraryDetails.difficulty}
+              />
+              <Fact
+                label="Budget"
+                value={itineraryDetails.priceRange}
+              />
             </div>
           </div>
         </section>
 
+
         {/* ================= HIGHLIGHTS ================= */}
-        <section className="space-y-8">
-          <h2 className="text-2xl font-semibold">Why this trip is special</h2>
+     <section className="space-y-8">
+        <h2 className="text-2xl font-semibold">Why this trip is special</h2>
 
-          <ul className="grid sm:grid-cols-2 gap-4 text-gray-600">
-            {itineraryDetails.highlights?.map((h, i) => (
-              <li key={i} className="leading-relaxed">
-                • {h}
-              </li>
-            ))}
-          </ul>
-        </section>
+        <div className="grid sm:grid-cols-2 gap-4">
+          {itineraryDetails.highlights?.map((h, i) => (
+            <div
+              key={i}
+              className="bg-white rounded-2xl p-4 shadow-sm flex gap-3"
+            >
+              <span className="text-[#5b7c67] text-lg"></span>
+              <p className="text-sm text-gray-700 leading-relaxed">
+                {h}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
 
-        {/* ================= 360 EXPERIENCE (MAP STAYS) ================= */}
+
         {/* ================= 360 MAP EXPERIENCE ================= */}
         {highlight360Places.length > 0 && (
-          <section className="bg-[#eef3f0] py-24 -mx-4 px-4">
+          <section className="bg-transprent py-24 -mx-4 px-4">
             <div className="max-w-6xl mx-auto space-y-12">
 
-              {/* Section Header */}
-              <div className="text-center space-y-4">
-                <p className="text-xs uppercase tracking-[0.35em] text-gray-400">
-                  Explore in 360°
-                </p>
-                <h2 className="text-3xl md:text-4xl font-semibold">
-                  Experience the destination
+             
+              <div className="space-y-2 text-center">
+                <h2 className="text-3xl md:text-3xl font-semibold">
+                   Explore on Map (360°)
                 </h2>
-                <p className="text-gray-600 max-w-2xl mx-auto">
-                  Take a virtual look at the key places included in your itinerary.
+                <p className="text-sm text-gray-500 max-w-xl mx-auto">
+                  Preview the key locations from your itinerary before you go.
                 </p>
               </div>
+
 
               {/* Location Selector */}
               <div className="flex flex-wrap justify-center gap-3">
@@ -271,164 +304,195 @@ const ItineraryDetail = () => {
           </section>
         )}
 
-        {/* ================= DAY WISE ITINERARY (CLEAN ACCORDION) ================= */}
-        <section className="bg-transprent py-16 -mx-4 px-4">
-          <div className="max-w-4xl mx-auto space-y-8">
+{/* ================= DAY WISE ITINERARY (SCROLL TIMELINE) ================= */}
+<section className="bg-transparent py-16 -mx-4 px-4">
+  <div className="max-w-4xl mx-auto space-y-10">
 
-            {/* Section Title */}
+    {/* Title */}
+    <div>
+      <h2 className="text-4xl font-semibold">Itinerary</h2>
+      <p className="text-sm text-gray-500 mt-1">
+        Follow your journey day by day
+      </p>
+    </div>
+
+    <div className="relative">
+
+      {/* Vertical Line */}
+      <div className="absolute left-4 top-0 bottom-0 w-px bg-gray-200" />
+
+      {safe.days.map((day) => (
+        <div
+          key={day.day}
+          data-day={day.day}
+          className="relative pl-12 pb-10"
+        >
+
+          {/* Moving Green Dot */}
+          <div
+            className={`absolute left-2 top-6 w-4 h-4 rounded-full border-2
+              transition-all duration-300
+              ${
+                activeDay === day.day
+                  ? "bg-[#5b7c67] border-[#5b7c67] scale-110"
+                  : "bg-white border-gray-300"
+              }`}
+          />
+
+          {/* Day Card */}
+          <div className="bg-white rounded-xl border border-gray-200 p-5 space-y-3">
+
             <div>
-              <h2 className="text-4xl font-semibold">Itinerary</h2>
-              <p className="text-sm text-gray-500 mt-1">
-                Day-wise plan for your journey
+              <p className="text-lg font-semibold text-gray-800">
+                Day {day.day}
               </p>
+              {day.title && (
+                <p className="text-sm text-gray-500">
+                  {day.title}
+                </p>
+              )}
             </div>
 
-            {safe.days.map((day) => {
-              const isOpen = openDay === day.day;
+            {/* Activities */}
+            <ul className="space-y-2 text-sm text-gray-700 leading-relaxed">
+              {(day.activities || []).map((a, i) => (
+                <li key={i} className="flex gap-2">
+                  <span className="text-[#5b7c67]">•</span>
+                  <span>{a}</span>
+                </li>
+              ))}
+            </ul>
 
-              return (
-                <div
-                  key={day.day}
-                  className="rounded-xl border border-gray-200 overflow-hidden"
-                >
-                  {/* ===== Day Header ===== */}
-                  <button
-                    onClick={() => setOpenDay(isOpen ? null : day.day)}
-                    className="w-full flex items-center justify-between
-                       px-5 py-4 bg-gray-50 hover:bg-gray-100
-                       transition text-left"
-                  >
-                    <div>
-                      <p className="text-lg font-semibold text-gray-800">
-                        Day {day.day}
-                      </p>
-                      {day.title && (
-                        <p className="text-sm text-gray-500">
-                          {day.title}
-                        </p>
-                      )}
-                    </div>
-
-                    <span
-                      className={`text-2xl font-light transition-transform
-                ${isOpen ? "rotate-180" : ""}`}
-                    >
-                      ⌄
-                    </span>
-                  </button>
-
-                  {/* ===== Day Content ===== */}
-                  {isOpen && (
-                    <div className="px-5 py-5 space-y-4 bg-white">
-
-                      {/* Activities */}
-                      {(day.activities || []).length > 0 ? (
-                        <ul className="space-y-2 text-sm text-gray-700 leading-relaxed">
-                          {day.activities.map((a, i) => (
-                            <li key={i} className="flex gap-2">
-                              <span className="text-[#5b7c67]">•</span>
-                              <span>{a}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <p className="text-sm text-gray-400 italic">
-                          No activities planned for this day.
-                        </p>
-                      )}
-
-                      {/* Map Button */}
-                      {day.places?.length > 1 && (
-                        <div>
-                          <button
-                            onClick={() => openDayInMaps(day)}
-                            className="inline-flex items-center gap-2
-                               text-sm font-medium
-                               text-[#5b7c67]
-                               hover:text-[#4a6a58]"
-                          >
-                            🗺 View route on Google Maps
-                            <span>→</span>
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-
-          </div>
-        </section>
-
-
-
-
-        {/* ================= LOCAL GUIDE ================= */}
-        <section className="space-y-6">
-          <h2 className="text-2xl font-semibold">Local guide</h2>
-
-          {guideLoading ? (
-            <p className="text-gray-500 text-sm">Checking availability…</p>
-          ) : guide ? (
-            <p className="text-gray-700 leading-relaxed">
-              <strong>{guide.name}</strong> is a verified local expert in{" "}
-              {guide.city}.
-              {guide.languages?.length > 0 && (
-                <> Languages spoken: {guide.languages.join(", ")}.</>
-              )}{" "}
-              <a
-                href={`https://wa.me/${guide.phone}`}
-                target="_blank"
-                rel="noreferrer"
-                className="text-[#5b7c67] hover:underline ml-1"
+            {/* Map */}
+            {day.places?.length > 1 && (
+              <button
+                onClick={() => openDayInMaps(day)}
+                className="text-sm font-medium text-[#5b7c67] hover:text-[#4a6a58]"
               >
-                Contact on WhatsApp →
-              </a>
-            </p>
-          ) : (
-            <p className="text-gray-600">
-              No local guide available yet.
-              <a href="mailto:your@email.com" className="text-[#5b7c67] hover:underline ml-1">
-                Contact us
-              </a>
-            </p>
-          )}
-        </section>
+                🗺 View route →
+              </button>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+
+  </div>
+</section>
+
+
+
+
+
+
+     <section className="space-y-6">
+  <h2 className="text-2xl font-semibold">Local guide</h2>
+
+  {guideLoading ? (
+    <div className="bg-white rounded-2xl border border-gray-200 p-5">
+      <p className="text-gray-500 text-sm">
+        Checking availability…
+      </p>
+    </div>
+  ) : guide ? (
+    <div className="bg-white rounded-2xl border border-gray-200 p-5 space-y-3">
+
+      {/* Name */}
+      <p className="text-lg font-semibold text-gray-800">
+        {guide.name}
+      </p>
+
+      {/* Info */}
+      <p className="text-sm text-gray-700 leading-relaxed">
+        Verified local expert in <strong>{guide.city}</strong>.
+        {guide.languages?.length > 0 && (
+          <> Languages spoken: {guide.languages.join(", ")}.</>
+        )}
+      </p>
+
+      {/* Action */}
+      <a
+        href={`https://wa.me/${guide.phone}`}
+        target="_blank"
+        rel="noreferrer"
+        className="
+          inline-flex items-center gap-2
+          text-sm font-medium
+          text-[#5b7c67]
+          hover:text-[#4a6a58]
+        "
+      >
+        💬 Contact on WhatsApp →
+      </a>
+    </div>
+  ) : (
+    <div className="bg-white rounded-2xl border border-gray-200 p-5 space-y-2">
+      <p className="text-sm text-gray-600">
+        No local guide available yet.
+      </p>
+      <a
+        href="mailto:your@email.com"
+        className="text-sm font-medium text-[#5b7c67] hover:underline"
+      >
+        Contact us →
+      </a>
+    </div>
+  )}
+</section>
+
 
         {/* ================= PRACTICAL INFO ================= */}
-        <section className="bg-[#fdfcf7] py-20 -mx-4 px-4">
-          <div className="max-w-5xl mx-auto grid sm:grid-cols-3 gap-12 text-sm text-gray-700">
+        <section className="bg-white  py-20 -mx-4 px-4">
+  <div className="max-w-5xl mx-auto grid sm:grid-cols-3 gap-6 text-sm text-gray-700">
 
-            <div>
-              <h3 className="font-semibold mb-4">Included</h3>
-              <ul className="space-y-2">
-                {safe.inclusions.map((i, idx) => (
-                  <li key={idx}>✓ {i}</li>
-                ))}
-              </ul>
-            </div>
+    {/* INCLUDED */}
+    <div className="bg-white rounded-2xl border border-gray-200 p-6">
+      <h3 className="font-semibold mb-4 text-gray-800">
+        Included
+      </h3>
+      <ul className="space-y-2">
+        {safe.inclusions.map((i, idx) => (
+          <li key={idx} className="flex gap-2">
+            <span className="text-[#5b7c67]">✓</span>
+            <span>{i}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
 
-            <div>
-              <h3 className="font-semibold mb-4">Not included</h3>
-              <ul className="space-y-2">
-                {safe.exclusions.map((i, idx) => (
-                  <li key={idx}>– {i}</li>
-                ))}
-              </ul>
-            </div>
+    {/* NOT INCLUDED */}
+    <div className="bg-white rounded-2xl border border-gray-200 p-6">
+      <h3 className="font-semibold mb-4 text-gray-800">
+        Not included
+      </h3>
+      <ul className="space-y-2">
+        {safe.exclusions.map((i, idx) => (
+          <li key={idx} className="flex gap-2">
+            <span className="text-gray-400">–</span>
+            <span>{i}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
 
-            <div>
-              <h3 className="font-semibold mb-4">Travel tips</h3>
-              <ul className="space-y-2">
-                {safe.tips.map((t, idx) => (
-                  <li key={idx}>• {t}</li>
-                ))}
-              </ul>
-            </div>
+    {/* TRAVEL TIPS */}
+    <div className="bg-white rounded-2xl border border-gray-200 p-6">
+      <h3 className="font-semibold mb-4 text-gray-800">
+        Travel tips
+      </h3>
+      <ul className="space-y-2">
+        {safe.tips.map((t, idx) => (
+          <li key={idx} className="flex gap-2">
+            <span className="text-[#5b7c67]">•</span>
+            <span>{t}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
 
-          </div>
-        </section>
+  </div>
+</section>
+
 
         {/* ================= BUDGET ================= */}
         <section className="space-y-6">
@@ -452,3 +516,15 @@ const ItineraryDetail = () => {
 };
 
 export default ItineraryDetail;
+
+
+function Fact({ label, value }) {
+  return (
+    <div className="bg-white rounded-2xl p-4 shadow-sm">
+      <div className="text-xs text-gray-500">{label}</div>
+      <div className="font-medium text-sm mt-1">
+        {value || "—"}
+      </div>
+    </div>
+  );
+}
