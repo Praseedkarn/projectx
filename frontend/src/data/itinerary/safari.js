@@ -24,7 +24,7 @@ const safari = {
 ],
 
   image:
-    'https://th.bing.com/th/id/OIP.14Uj6lRQtwbzZp0xRFPp1gHaEG?w=284&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3',
+    'https://images.unsplash.com/photo-1577971132997-c10be9372519?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8c2FmYXJpfGVufDB8fDB8fHww',
 
   days: [
     {

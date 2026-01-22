@@ -22,7 +22,7 @@ const baliItinerary= {
   { label: "Kelingking Beach", place: "Kelingking Beach, Nusa Penida" }
 ],
 
-      image: 'https://www.pigsflycheap.com/wp-content/uploads/2021/02/Bali-Travel-Guide.jpg', // You can add actual images
+      image: 'https://plus.unsplash.com/premium_photo-1677829177642-30def98b0963?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8YmFsaXxlbnwwfHwwfHx8MA%3D%3D', // You can add actual images
       days: [
         {
           day: 1,

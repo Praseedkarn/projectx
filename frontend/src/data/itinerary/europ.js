@@ -22,7 +22,7 @@ const European={
   { label: "Louvre Museum", place: "Louvre Museum, Paris" }
 ],
 
-      image: 'https://th.bing.com/th/id/OIP.UaeRxMvk3LZjTRNpFuFGwwHaEK?w=335&h=187&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3',
+      image: 'https://images.unsplash.com/photo-1585308772854-d6e58b04a767?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTR8fGV1cm9wfGVufDB8fDB8fHww',
   days: [
         {
         day: 1,

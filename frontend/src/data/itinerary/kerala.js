@@ -25,7 +25,7 @@ const Kerala = {
 ],
 
   image:
-    'https://th.bing.com/th/id/OIP.qo6WJ1xZzNnY6Kz7m9aX5AHaE7?w=177&h=150&c=6&o=7&pid=1.7',
+    'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8a2VyYWxhfGVufDB8fDB8fHww',
 
   days: [
     {

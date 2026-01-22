@@ -23,7 +23,7 @@
   { label: "Khumbu Glacier", place: "Khumbu Glacier, Nepal" }
 ],
 
-  image: 'https://th.bing.com/th/id/OIP.5U_1A4n3u5g6B8A3gEbc7AHaE8?w=177&h=150&c=6&o=7&pid=1.7',
+  image: 'https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8ZXZlcmVzdHxlbnwwfHwwfHx8MA%3D%3D',
   days: [
     {
       day: 1,

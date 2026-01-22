@@ -24,7 +24,7 @@ const Australia = {
 ],
 
   image:
-    'https://tse3.mm.bing.net/th/id/OIP.ouD3b4m-r_RtaWXEaGYobQHaHY?rs=1&pid=ImgDetMain&o=7&rm=3',
+    'https://images.unsplash.com/photo-1529108190281-9a4f620bc2d8?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8YXVzdHJhbGlhfGVufDB8fDB8fHww',
 
   days: [
     {

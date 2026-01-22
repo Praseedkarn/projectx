@@ -162,10 +162,10 @@ useEffect(() => {
 
   return (
     <section className="bg-white px-4 pt-24 pb-32">
-      <div className="max-w-5xl mx-auto space-y-24">
+      <div className="max-w-5xl mx-auto space-y-14 md:space-y-16 ">
 
         {/* ================= HERO ================= */}
-        <header className="space-y-8">
+        <header className="space-y-5">
           <button
             onClick={() => navigate(-1)}
             className="text-sm text-gray-500 hover:underline"
@@ -181,7 +181,7 @@ useEffect(() => {
           <img
             src={itineraryDetails.image}
             alt={itineraryDetails.title}
-            className="w-full h-[380px] object-cover rounded-[36px]"
+            className="w-full h-[380px] md:h-[360px] object-cover rounded-[36px]"
           />
 
           <div className="absolute bottom-6 left-6 bg-white/90 backdrop-blur
@@ -202,7 +202,7 @@ useEffect(() => {
         </header>
 
         {/* ================= OVERVIEW ================= */}
-        <section className="bg-white py-16 -mx-4 px-4">
+        <section className="bg-white py-10 -mx-4 px-4">
           <div className="max-w-5xl mx-auto space-y-8">
             <h2 className="text-2xl font-semibold">Overview</h2>
 
@@ -229,28 +229,26 @@ useEffect(() => {
 
 
         {/* ================= HIGHLIGHTS ================= */}
-     <section className="space-y-8">
-        <h2 className="text-2xl font-semibold">Why this trip is special</h2>
+    <section>
+  <h2 className="text-2xl font-semibold mb-4">Why this trip is special</h2>
 
-        <div className="grid sm:grid-cols-2 gap-4">
-          {itineraryDetails.highlights?.map((h, i) => (
-            <div
-              key={i}
-              className="bg-white rounded-2xl p-4 shadow-sm flex gap-3"
-            >
-              <span className="text-[#5b7c67] text-lg"></span>
-              <p className="text-sm text-gray-700 leading-relaxed">
-                {h}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
+  <ul className="space-y-4">
+    {itineraryDetails.highlights?.map((h, i) => (
+      <li key={i} className="flex gap-3">
+        <span className="text-[#5b7c67] text-lg">✦</span>
+        <p className="text-sm text-gray-700 leading-relaxed">
+          {h}
+        </p>
+      </li>
+    ))}
+  </ul>
+</section>
+
 
 
         {/* ================= 360 MAP EXPERIENCE ================= */}
         {highlight360Places.length > 0 && (
-          <section className="bg-transprent py-24 -mx-4 px-4">
+          <section className="bg-transprent py-14 -mx-4 px-4">
             <div className="max-w-6xl mx-auto space-y-12">
 
              
@@ -326,7 +324,7 @@ useEffect(() => {
         <div
           key={day.day}
           data-day={day.day}
-          className="relative pl-12 pb-10"
+          className="relative pl-12 pb-6"
         >
 
           {/* Moving Green Dot */}
@@ -443,7 +441,7 @@ useEffect(() => {
 
 
         {/* ================= PRACTICAL INFO ================= */}
-        <section className="bg-white  py-20 -mx-4 px-4">
+        <section className="bg-white  py-12 -mx-4 px-4">
   <div className="max-w-5xl mx-auto grid sm:grid-cols-3 gap-6 text-sm text-gray-700">
 
     {/* INCLUDED */}

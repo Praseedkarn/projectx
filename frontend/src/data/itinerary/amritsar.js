@@ -41,8 +41,7 @@ const amritsarItinerary = {
  
 
   image:
-    "https://images.unsplash.com/photo-1609943241842-8e26d0e57e32",
-
+"https://images.unsplash.com/photo-1609947017136-9daf32a5eb16?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8YW1yaXRzYXJ8ZW58MHx8MHx8fDA%3D",
   days: [
     {
       day: 1,

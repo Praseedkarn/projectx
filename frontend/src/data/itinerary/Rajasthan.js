@@ -25,7 +25,7 @@ const Rajasthan = {
 ],
 
   image:
-    'https://th.bing.com/th/id/OIP.07U1zvyRX_KBE_gc1oDpiwHaE7?w=177&h=150&c=6&o=7&dpr=1.3&pid=1.7&rm=3',
+    'https://images.unsplash.com/photo-1587295656906-b06dca8f2340?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8cmFqYXN0aGFufGVufDB8fDB8fHww',
 
   days: [
     {

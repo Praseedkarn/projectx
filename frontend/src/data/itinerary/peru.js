@@ -24,7 +24,7 @@ const peru = {
 ],
 
   image:
-    'https://th.bing.com/th/id/OIP.mpxO9V6mGlMghTh2RxHmTQHaDt?w=297&h=174&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3',
+    'https://images.unsplash.com/photo-1532996152552-eaffc4edfc1a?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8cGVydXxlbnwwfHwwfHx8MA%3D%3D',
 
   days: [
     {
