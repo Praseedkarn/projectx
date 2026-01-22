@@ -30,6 +30,10 @@ import { buildPrompt } from "./services/promptBuilder";
 // import QuizPage from "./pages/QuizPage";
 // import { logTokenChange } from "./services/api";
 import LogoLoader from "./components/LogoLoader";
+import { buildHoursPrompt } from "./services/prompts/buildHoursPrompt";
+import { buildOneDayPrompt } from "./services/prompts/buildOneDayPrompt";
+import { buildMultiDayPrompt } from "./services/prompts/buildMultiDayPrompt";
+
 
 function App() {
   /* ================= ROUTER ================= */
@@ -235,92 +239,118 @@ const handleLogout = () => {
 
 
   /* ================= SUBMIT ================= */
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    if (!currentUser) {
-      setShowSignIn(true);
-      return;
-    }
+  if (!currentUser) {
+    setShowSignIn(true);
+    return;
+  }
 
-    if (!place.trim()) {
-      alert("Please enter a destination");
-      return;
-    }
+  if (!place.trim()) {
+    alert("Please enter a destination");
+    return;
+  }
 
-    setLoading(true);
+  setLoading(true);
 
-    const cleanedPlace = place.trim();
-    const isDemoRequest = cleanedPlace.toLowerCase() === "demo";
+  const cleanedPlace = place.trim();
+  const isDemoRequest = cleanedPlace.toLowerCase() === "demo";
 
-    try {
-      let result;
-      let aiResponse;
+  try {
+    let result;
+    let aiResponse;
+    let prompt;
 
-      if (isDemoRequest) {
-        result = { text: demoItinerary.text };
-      } else {
-        const prompt = buildPrompt({
+    /* ================= DEMO ================= */
+    if (isDemoRequest) {
+      result = { text: demoItinerary.text };
+    } 
+    /* ================= AI ================= */
+    else {
+      // 🔥 STEP 2 — SELECT PROMPT BASED ON TRIP TYPE
+      if (tripType === "hours") {
+        prompt = buildHoursPrompt({
           place: cleanedPlace,
-          tripType,
-          days,
           hours,
           group,
           suggestions,
         });
-
-        aiResponse = await generateTravelItinerary(prompt);
-
-        if (!aiResponse?.text) throw new Error("AI_EMPTY");
-
-        result = { text: aiResponse.text };
-
-        if (
-          currentUser.role !== "admin" &&
-          typeof aiResponse.remainingTokens === "number"
-        ) {
-          const updatedUser = {
-            ...currentUser,
-            tokens: aiResponse.remainingTokens,
-          };
-
-         const storage =
-            localStorage.getItem("user") ? localStorage : sessionStorage;
-
-          storage.setItem("user", JSON.stringify(updatedUser));
-
-          setCurrentUser(updatedUser);
-        }
       }
 
-      localStorage.setItem("lastTripResult", JSON.stringify(result));
-
-      // ⏱️ KEEP LOADER FOR 5 SECONDS
-      setTimeout(() => {
-        navigate("/results", {
-          state: {
-            suggestions: result,
-            city: isDemoRequest ? "Demo City" : cleanedPlace,
-            isDemo: isDemoRequest,
-          },
+      if (tripType === "day") {
+        prompt = buildOneDayPrompt({
+          place: cleanedPlace,
+          group,
+          suggestions,
         });
-        setLoading(false);
-      }, 5000);
-
-    } catch (err) {
-      console.error("AI ERROR:", err);
-      setLoading(false);
-
-      if (err.code === "NO_TOKENS") {
-        navigate("/quiz");
-        return;
       }
 
-      navigate("/ai-failed", {
-        state: { reason: "AI service temporarily unavailable" },
-      });
+      if (tripType === "multi") {
+        prompt = buildMultiDayPrompt({
+          place: cleanedPlace,
+          days,
+          group,
+          suggestions,
+        });
+      }
+
+      aiResponse = await generateTravelItinerary(prompt);
+
+      if (!aiResponse?.text) {
+        throw new Error("AI_EMPTY");
+      }
+
+      result = { text: aiResponse.text };
+
+      /* ================= TOKENS ================= */
+      if (
+        currentUser.role !== "admin" &&
+        typeof aiResponse.remainingTokens === "number"
+      ) {
+        const updatedUser = {
+          ...currentUser,
+          tokens: aiResponse.remainingTokens,
+        };
+
+        const storage =
+          localStorage.getItem("user") ? localStorage : sessionStorage;
+
+        storage.setItem("user", JSON.stringify(updatedUser));
+        setCurrentUser(updatedUser);
+      }
     }
-  };
+
+    /* ================= SAVE ================= */
+    localStorage.setItem("lastTripResult", JSON.stringify(result));
+
+    /* ================= NAVIGATE ================= */
+    setTimeout(() => {
+      navigate("/results", {
+        state: {
+          suggestions: result,
+          city: isDemoRequest ? "Demo City" : cleanedPlace,
+          tripType, // ✅ IMPORTANT
+          isDemo: isDemoRequest,
+        },
+      });
+      setLoading(false);
+    }, 5000);
+
+  } catch (err) {
+    console.error("AI ERROR:", err);
+    setLoading(false);
+
+    if (err.code === "NO_TOKENS") {
+      navigate("/quiz");
+      return;
+    }
+
+    navigate("/ai-failed", {
+      state: { reason: "AI service temporarily unavailable" },
+    });
+  }
+};
 
 
 

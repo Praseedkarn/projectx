@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { QRCodeCanvas } from "qrcode.react";
+// import DayWiseItinerary from "./DayWiseItinerary";
+import HoursItinerary from "./itinerary/HoursItinerary";
+import OneDayItinerary from "./itinerary/OneDayItinerary";
+import MultiDayItinerary from "./itinerary/MultiDayItinerary";
 import API_BASE_URL from "../services/apiClient";
 const TextSkeleton = ({ lines = 6 }) => (
   <div className="space-y-3 animate-pulse">
@@ -21,6 +25,7 @@ const TripResults = () => {
   const city = location.state?.city;
   const isDemo = location.state?.isDemo;
   const demoReason = location.state?.reason;
+const tripType = location.state?.tripType || "multi";
 
   /* ================= GET DATA SAFELY ================= */
   const suggestions =
@@ -29,6 +34,7 @@ const TripResults = () => {
 
  
 
+const [buildingDays, setBuildingDays] = useState(false);
 
 
   const [isTyping, setIsTyping] = useState(false);
@@ -46,6 +52,189 @@ const TripResults = () => {
 const [osmData, setOsmData] = useState(null);
 const [osmLoading, setOsmLoading] = useState(false);
 const [osmError, setOsmError] = useState("");
+
+const [viewMode, setViewMode] = useState("days"); // text | json|Days
+const [jsonData, setJsonData] = useState(null);
+const [dayWiseData, setDayWiseData] = useState(null);
+
+const [jsonError, setJsonError] = useState("");
+const [oneDayData, setOneDayData] = useState(null);
+const [hoursData, setHoursData] = useState(null);
+
+
+const convertTextToJSON = (text, suggestions) => {
+  if (!text) return null;
+
+  text = text.replace(/–|—/g, "-");
+
+  const lines = text
+    .split("\n")
+    .map(l => l.trim())
+    .filter(Boolean);
+
+  const result = {
+    title: "",
+    preferences:
+      typeof suggestions === "string"
+        ? suggestions.split(",").map(s => s.trim())
+        : Array.isArray(suggestions)
+        ? suggestions
+        : [],
+    days: [],
+  };
+
+  let currentDay = null;
+  let currentSection = null;
+
+  for (let line of lines) {
+    // TITLE
+    if (line.startsWith("TITLE:")) {
+      result.title = line.replace("TITLE:", "").trim();
+      continue;
+    }
+
+    // DAY (only when DAY X exists)
+    if (/^day\s+\d+/i.test(line)) {
+      currentDay = {
+        day: line.toUpperCase(),
+        sections: [],
+      };
+      result.days.push(currentDay);
+      currentSection = null;
+      continue;
+    }
+
+    // SECTION
+    if (line.startsWith("##")) {
+      // ⛑️ fallback DAY 1 (for hours / one-day)
+      if (!currentDay) {
+        currentDay = { day: "DAY 1", sections: [] };
+        result.days.push(currentDay);
+      }
+
+      currentSection = {
+        period: line.replace("##", "").trim(),
+        activities: [],
+      };
+      currentDay.sections.push(currentSection);
+      continue;
+    }
+
+    // ACTIVITY
+    if (line.startsWith("-") && currentSection) {
+      const match = line.match(/\[(.*?)\]\s*:\s*(.*)/);
+
+      currentSection.activities.push({
+        time: match?.[1] || null,
+        description: match?.[2] || line.replace("-", "").trim(),
+      });
+    }
+  }
+
+  return result.days.length ? result : null;
+};
+
+
+
+const transformAIJsonToDayWise = (aiJson) => {
+  if (!aiJson || !aiJson.days) return null;
+
+  return {
+    title: aiJson.title,
+    preferences: aiJson.preferences || [],
+    days: aiJson.days.map((dayObj, index) => {
+      const activities = [];
+
+      dayObj.sections.forEach(section => {
+        section.activities.forEach(act => {
+          activities.push(
+            `${section.period}: ${act.description}`
+          );
+        });
+      });
+
+      return {
+        day: index + 1,
+        title: `Day ${index + 1}`,
+        activities,
+      };
+    }),
+  };
+};
+
+const transformAIJsonToHours = (aiJson) => {
+  if (!aiJson || !aiJson.days?.length) return null;
+
+  const hours = [];
+
+  aiJson.days.forEach((day) => {
+    day.sections.forEach((section) => {
+      section.activities.forEach((act) => {
+        hours.push(
+          `${section.period}: ${act.description}`
+        );
+      });
+    });
+  });
+
+  return {
+    title: aiJson.title,
+    hours,
+  };
+};
+
+
+
+/* ⬆️ END HERE ⬆️ */
+
+
+const handleViewChange = (mode) => {
+  setViewMode(mode);
+
+  if (mode === "text") {
+    setJsonError("");
+    return;
+  }
+
+  if (!finalText) {
+    setJsonError("Text not ready");
+    return;
+  }
+
+  const parsed = convertTextToJSON(finalText, suggestions);
+
+  if (!parsed) {
+    setJsonError("Failed to create JSON");
+    return;
+  }
+
+  if (mode === "json") {
+    setJsonData(parsed);
+    setJsonError("");
+    return;
+  }
+
+  if (mode === "days") {
+    if (tripType === "multi") {
+      setDayWiseData(transformAIJsonToDayWise(parsed));
+    }
+
+    if (tripType === "day") {
+      setOneDayData(transformAIJsonToDayWise(parsed));
+    }
+
+   if (tripType === "hours") {
+  setHoursData(transformAIJsonToHours(parsed));
+}
+
+  }
+};
+
+
+
+
+
+
 
 
 
@@ -180,7 +369,7 @@ useEffect(() => {
         setDisplayText("");
         setIsTyping(false);
       }
-    }, 110 + Math.random() * 40);
+    }, 220 + Math.random() * 80);
 
     return () => clearInterval(typingInterval);
   }, [suggestions]);
@@ -221,6 +410,45 @@ const res = await fetch(
       setQrLoading(false);
     }
   };
+
+useEffect(() => {
+  if (!finalText) return;
+
+  const parsed = convertTextToJSON(finalText, suggestions);
+
+  // ❌ JSON failed → fallback immediately
+  if (!parsed) {
+    setViewMode("text");
+    setJsonError("Failed to convert itinerary");
+    return;
+  }
+
+  // ✅ JSON success → show loader first
+  setBuildingDays(true);
+  setViewMode("days");
+
+  const timer = setTimeout(() => {
+    if (tripType === "multi") {
+      setDayWiseData(transformAIJsonToDayWise(parsed));
+    }
+
+    if (tripType === "day") {
+      setOneDayData(transformAIJsonToDayWise(parsed));
+    }
+
+    if (tripType === "hours") {
+      setHoursData(transformAIJsonToHours(parsed));
+    }
+
+    setJsonData(parsed);
+    setBuildingDays(false);
+  }, 5000); // ⏱️ 2 seconds buffer
+
+  return () => clearTimeout(timer);
+
+}, [finalText, tripType, suggestions]);
+
+
 
   /* ================= LOADING SCREEN ================= */
 
@@ -386,6 +614,37 @@ const AttractionSection = ({ title, items }) => {
           )}
         </div>
 
+       <div className="flex gap-2 mb-3">
+        <button
+          onClick={() => handleViewChange("text")}
+          className={`px-4 py-2 rounded ${
+            viewMode === "text" ? "bg-slate-800 text-white" : "bg-gray-100"
+          }`}
+        >
+          Text
+        </button>
+
+        <button
+          onClick={() => handleViewChange("json")}
+          className={`px-4 py-2 rounded ${
+            viewMode === "json" ? "bg-slate-800 text-white" : "bg-gray-100"
+          }`}
+        >
+          JSON
+        </button>
+
+        <button
+          onClick={() => handleViewChange("days")}
+          className={`px-4 py-2 rounded ${
+            viewMode === "days" ? "bg-slate-800 text-white" : "bg-gray-100"
+          }`}
+        >
+          Day-wise
+        </button>
+      </div>
+
+
+
         <div
           className="
             sm:bg-slate-50 sm:rounded-xl sm:p-5
@@ -404,9 +663,45 @@ const AttractionSection = ({ title, items }) => {
             </div>
           )}
 
-          {!isTyping && !isEditing && finalText && (
-            <div>{finalText}</div>
-          )}
+         {!isTyping && !isEditing && viewMode === "text" && finalText && (
+  <div>{finalText}</div>
+)}
+
+{!isTyping && viewMode === "json" && (
+  <pre className="bg-black text-green-400 text-xs p-4 rounded-xl overflow-auto">
+    {jsonError
+      ? jsonError
+      : JSON.stringify(jsonData, null, 2)}
+  </pre>
+)}
+
+{/* ⏳ Day-wise loading buffer */}
+{viewMode === "days" && buildingDays && (
+  <div className="py-12 text-center space-y-3 animate-fade-in">
+    <div className="w-10 h-10 mx-auto rounded-full border-4 border-[#5b7c67] border-t-transparent animate-spin" />
+    <p className="text-sm text-gray-500">
+      Building your itinerary…
+    </p>
+  </div>
+)}
+
+{viewMode === "days" && tripType === "multi" && (
+  <MultiDayItinerary data={dayWiseData} />
+)}
+
+{viewMode === "days" && tripType === "day" && (
+  <OneDayItinerary data={oneDayData} />
+)}
+
+{viewMode === "days" && tripType === "hours" && (
+  <HoursItinerary data={hoursData} />
+)}
+
+
+
+
+
+
         </div>
 
         {isEditing && (

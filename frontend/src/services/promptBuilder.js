@@ -13,44 +13,53 @@ export const buildPrompt = ({
       ? "1 full day"
       : `${days} days`;
 
-  // ✅ Normalize suggestions safely
-  const safeSuggestions = Array.isArray(suggestions)
-    ? suggestions
-    : suggestions
-    ? [suggestions]
-    : [];
-
-  let suggestionText = "";
-  if (safeSuggestions.length > 0) {
-    suggestionText = `
-Extras to include (bullet points only):
-${safeSuggestions.map((s) => `- ${s}`).join("\n")}
-`;
-  }
+  const prefs = suggestions
+    ? `Preferences to include naturally:\n${Array.isArray(suggestions)
+        ? suggestions.map(s => `- ${s}`).join("\n")
+        : `- ${suggestions}`}`
+    : "";
 
   return `
-Create a realistic travel itinerary.
+Create a travel itinerary.
 
 Destination: ${place}
 Duration: ${durationText}
 Group: ${group}
-Transport: local transport
 
-Rules:
-- Follow the exact duration
-- Keep pacing realistic
-- Simple English only
-- No markdown, JSON, emojis, or extra sections
+FORMAT (STRICT):
+
+TITLE: ${place} itinerary
+
 ${tripType === "hours"
-  ? `- Output MUST be hourly
-- Use ONLY: Hour 1, Hour 2, Hour 3...
-- Total hours MUST equal ${hours}
-- NEVER use days or morning/afternoon`
-  : `- Output MUST be day-wise
-- Use Morning / Afternoon / Evening
-- NEVER use hour format`}
-${suggestionText}
-If something is not requested, do not include it.
-End with: END OF ITINERARY
+  ? Array.from({ length: hours }, (_, i) => `
+## Hour ${i + 1}
+- [ ] : 1–2 short sentences. End with "Location: <place>".
+`).join("")
+  : Array.from({ length: days }, (_, i) => `
+DAY ${i + 1}
+
+## Morning
+- [ ] : 2 short sentences. End with "Location: <place>".
+
+## Afternoon
+- [ ] : 2 short sentences. End with "Location: <place>".
+
+## Evening
+- [ ] : 2 short sentences. End with "Location: <place>".
+`).join("")}
+
+RULES:
+- Use TITLE exactly once 
+- Use DAY 1, DAY 2 for multi-day trips 
+- Use ## only for Morning / Afternoon / Evening or Hour 
+- Use exactly ONE bullet per section 
+- Each bullet must be 2–3 short sentences 
+- Place name MUST appear at the END of description 
+- Integrate user preferences naturally, do NOT create extra sections
+- No emojis, no extra text
+
+${prefs}
+
+END OF ITINERARY
 `;
 };
