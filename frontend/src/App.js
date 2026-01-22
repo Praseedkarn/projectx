@@ -26,7 +26,6 @@ import { demoItinerary } from "./data/demoItineraries";
 import { generateTravelItinerary } from "./services/api";
 // import AiFailPage from "./components/AiFaliPage";
 import AppRouter from "./AppRouter";
-import { buildPrompt } from "./services/promptBuilder";
 // import QuizPage from "./pages/QuizPage";
 // import { logTokenChange } from "./services/api";
 import LogoLoader from "./components/LogoLoader";
