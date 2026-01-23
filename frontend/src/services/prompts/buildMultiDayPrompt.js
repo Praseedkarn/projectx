@@ -26,24 +26,20 @@ DAY ${i + 1}
 
 ## Morning
 - [ ] : 2 short sentences.
-Include estimated cost using "Cost: ₹min–₹max".
 End with "Location: <place>".
 
 ## Afternoon
 - [ ] : 2 short sentences.
-Include estimated cost using "Cost: ₹min–₹max".
 End with "Location: <place>".
 
 ## Evening
 - [ ] : 2 short sentences.
-Include estimated cost using "Cost: ₹min–₹max".
 End with "Location: <place>".
 `).join("")}
 
 RULES:
 - Use DAY 1, DAY 2, etc.
 - Exactly ONE bullet per section
-- Cost before Location
 - Location last
 - No emojis
 - No extra text

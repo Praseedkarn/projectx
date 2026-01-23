@@ -23,24 +23,20 @@ TITLE: ${place} one-day itinerary
 DAY 1
 
 ## Morning
-- [ ] : 2 short sentences.
-Include estimated cost using "Cost: ₹min–₹max".
+- [ ] : 3 short sentences.
 End with "Location: <place>".
 
 ## Afternoon
-- [ ] : 2 short sentences.
-Include estimated cost using "Cost: ₹min–₹max".
+- [ ] : 3 short sentences.
 End with "Location: <place>".
 
 ## Evening
-- [ ] : 2 short sentences.
-Include estimated cost using "Cost: ₹min–₹max".
+- [ ] : 3 short sentences.
 End with "Location: <place>".
 
 RULES:
 - Only DAY 1
 - Exactly ONE bullet per section
-- Cost before Location
 - Location last
 - No extra sections
 - No emojis

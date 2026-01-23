@@ -23,8 +23,7 @@ TITLE: ${place} hourly itinerary
 
 ${Array.from({ length: hours }, (_, i) => `
 ## Hour ${i + 1}
-- [ ] : 1–2 short sentences describing the activity.
-Include estimated cost using "Cost: ₹min–₹max".
+- [ ] : 2–3 short sentences describing the activity.
 End with "Location: <place>".
 `).join("")}
 
@@ -32,7 +31,6 @@ RULES:
 - Use TITLE once
 - Use only "## Hour X"
 - Exactly ONE bullet per hour
-- Cost MUST appear before Location
 - Location MUST be last
 - No emojis
 - No extra text

@@ -27,6 +27,84 @@ const TripResults = () => {
   const demoReason = location.state?.reason;
 const tripType = location.state?.tripType || "multi";
 
+const [placeImages, setPlaceImages] = useState([]);
+const [imageLoading, setImageLoading] = useState(false);
+
+
+const fetchPlaceImages = async (place, osmAttractions = []) => {
+  const queries = [
+    `${place} city`,
+    `${place} skyline`,
+    `${place} landmarks`,
+    `${place} tourism`,
+    `${place} travel`,
+  ];
+
+  const isGoodImage = (img) => {
+    const text =
+      `${img.alt_description || ""} ${img.description || ""}`.toLowerCase();
+
+    const banned = [
+      "person",
+      "people",
+      "portrait",
+      "model",
+      "food",
+      "dish",
+      "drink",
+      "selfie",
+      "face",
+    ];
+
+    if (banned.some((w) => text.includes(w))) return false;
+
+    return (
+      text.includes(place.toLowerCase()) ||
+      text.includes("city") ||
+      text.includes("street") ||
+      text.includes("landscape")
+    );
+  };
+
+  const search = async (q) => {
+    const res = await fetch(
+      `https://api.unsplash.com/search/photos?query=${encodeURIComponent(
+        q
+      )}&per_page=9&orientation=landscape&content_filter=high`,
+      {
+        headers: {
+          Authorization: `Client-ID S8jFr1b4DhFXDDhlt4amvJLAvqjl4apOlPzDvej5BgI`,
+        },
+      }
+    );
+
+    if (!res.ok) return [];
+
+    const data = await res.json();
+    if (!data.results) return [];
+
+    return data.results.filter(isGoodImage);
+  };
+
+  // 1️⃣ Try city queries
+  for (const q of queries) {
+    const imgs = await search(q);
+    if (imgs.length >= 3) return imgs.slice(0, 6);
+  }
+
+  // 2️⃣ Try OSM attraction names
+  for (const a of osmAttractions) {
+    const imgs = await search(`${a.name} ${place}`);
+    if (imgs.length >= 3) return imgs.slice(0, 6);
+  }
+
+  // 3️⃣ Fail cleanly
+  return [];
+};
+
+
+
+
   /* ================= GET DATA SAFELY ================= */
   const suggestions =
     location.state?.suggestions ||
@@ -55,11 +133,22 @@ const [osmError, setOsmError] = useState("");
 
 const [viewMode, setViewMode] = useState("days"); // text | json|Days
 const [jsonData, setJsonData] = useState(null);
-const [dayWiseData, setDayWiseData] = useState(null);
+
 
 const [jsonError, setJsonError] = useState("");
-const [oneDayData, setOneDayData] = useState(null);
-const [hoursData, setHoursData] = useState(null);
+
+
+useEffect(() => {
+  if (!city) return;
+
+  setImageLoading(true);
+
+  fetchPlaceImages(city , osmData?.attractions||[])
+    .then((imgs) => setPlaceImages(imgs))
+    .catch(() => setPlaceImages([]))
+    .finally(() => setImageLoading(false));
+
+}, [city , osmData]);
 
 
 const convertTextToJSON = (text, suggestions) => {
@@ -86,14 +175,17 @@ const convertTextToJSON = (text, suggestions) => {
   let currentDay = null;
   let currentSection = null;
 
+  const fallbackPeriods = ["Morning", "Afternoon", "Evening"];
+  let fallbackIndex = 0;
+
   for (let line of lines) {
-    // TITLE
+    /* ===== TITLE ===== */
     if (line.startsWith("TITLE:")) {
       result.title = line.replace("TITLE:", "").trim();
       continue;
     }
 
-    // DAY (only when DAY X exists)
+    /* ===== DAY ===== */
     if (/^day\s+\d+/i.test(line)) {
       currentDay = {
         day: line.toUpperCase(),
@@ -101,12 +193,12 @@ const convertTextToJSON = (text, suggestions) => {
       };
       result.days.push(currentDay);
       currentSection = null;
+      fallbackIndex = 0;
       continue;
     }
 
-    // SECTION
+    /* ===== SECTION (## Morning / ## Hour 1) ===== */
     if (line.startsWith("##")) {
-      // ⛑️ fallback DAY 1 (for hours / one-day)
       if (!currentDay) {
         currentDay = { day: "DAY 1", sections: [] };
         result.days.push(currentDay);
@@ -116,17 +208,44 @@ const convertTextToJSON = (text, suggestions) => {
         period: line.replace("##", "").trim(),
         activities: [],
       };
+
       currentDay.sections.push(currentSection);
       continue;
     }
 
-    // ACTIVITY
-    if (line.startsWith("-") && currentSection) {
+    /* ===== ACTIVITY ===== */
+    if (line.startsWith("-")) {
+      // ⛑ fallback if section is missing
+      if (!currentSection) {
+        const period =
+          fallbackPeriods[fallbackIndex] || `Part ${fallbackIndex + 1}`;
+
+        currentSection = {
+          period,
+          activities: [],
+        };
+
+        currentDay.sections.push(currentSection);
+        fallbackIndex++;
+      }
+
       const match = line.match(/\[(.*?)\]\s*:\s*(.*)/);
+      const raw = match?.[2] || line.replace("-", "").trim();
+
+      const costMatch = raw.match(/Cost:\s*([^.]+)/i);
+      const locationMatch = raw.match(/Location:\s*(.+)$/i);
+
+      const description = raw
+        .replace(/Cost:\s*[^.]+\.?/i, "")
+        .replace(/Location:\s*.+$/i, "")
+        .trim();
 
       currentSection.activities.push({
         time: match?.[1] || null,
-        description: match?.[2] || line.replace("-", "").trim(),
+        description,
+        cost: costMatch ? costMatch[1].trim() : null,
+        location: locationMatch ? locationMatch[1].trim() : null,
+        raw,
       });
     }
   }
@@ -136,52 +255,54 @@ const convertTextToJSON = (text, suggestions) => {
 
 
 
-const transformAIJsonToDayWise = (aiJson) => {
-  if (!aiJson || !aiJson.days) return null;
 
-  return {
-    title: aiJson.title,
-    preferences: aiJson.preferences || [],
-    days: aiJson.days.map((dayObj, index) => {
-      const activities = [];
 
-      dayObj.sections.forEach(section => {
-        section.activities.forEach(act => {
-          activities.push(
-            `${section.period}: ${act.description}`
-          );
-        });
-      });
+// const transformAIJsonToDayWise = (aiJson) => {
+//   if (!aiJson || !aiJson.days) return null;
 
-      return {
-        day: index + 1,
-        title: `Day ${index + 1}`,
-        activities,
-      };
-    }),
-  };
-};
+//   return {
+//     title: aiJson.title,
+//     preferences: aiJson.preferences || [],
+//     days: aiJson.days.map((dayObj, index) => {
+//       const activities = [];
 
-const transformAIJsonToHours = (aiJson) => {
-  if (!aiJson || !aiJson.days?.length) return null;
+//       dayObj.sections.forEach(section => {
+//         section.activities.forEach(act => {
+//           activities.push(
+//             `${section.period}: ${act.description}`
+//           );
+//         });
+//       });
 
-  const hours = [];
+//       return {
+//         day: index + 1,
+//         title: `Day ${index + 1}`,
+//         activities,
+//       };
+//     }),
+//   };
+// };
 
-  aiJson.days.forEach((day) => {
-    day.sections.forEach((section) => {
-      section.activities.forEach((act) => {
-        hours.push(
-          `${section.period}: ${act.description}`
-        );
-      });
-    });
-  });
+// const transformAIJsonToHours = (aiJson) => {
+//   if (!aiJson || !aiJson.days?.length) return null;
 
-  return {
-    title: aiJson.title,
-    hours,
-  };
-};
+//   const hours = [];
+
+//   aiJson.days.forEach((day) => {
+//     day.sections.forEach((section) => {
+//       section.activities.forEach((act) => {
+//         hours.push(
+//           `${section.period}: ${act.description}`
+//         );
+//       });
+//     });
+//   });
+
+//   return {
+//     title: aiJson.title,
+//     hours,
+//   };
+// };
 
 
 
@@ -214,20 +335,6 @@ const handleViewChange = (mode) => {
     return;
   }
 
-  if (mode === "days") {
-    if (tripType === "multi") {
-      setDayWiseData(transformAIJsonToDayWise(parsed));
-    }
-
-    if (tripType === "day") {
-      setOneDayData(transformAIJsonToDayWise(parsed));
-    }
-
-   if (tripType === "hours") {
-  setHoursData(transformAIJsonToHours(parsed));
-}
-
-  }
 };
 
 
@@ -428,17 +535,7 @@ useEffect(() => {
   setViewMode("days");
 
   const timer = setTimeout(() => {
-    if (tripType === "multi") {
-      setDayWiseData(transformAIJsonToDayWise(parsed));
-    }
-
-    if (tripType === "day") {
-      setOneDayData(transformAIJsonToDayWise(parsed));
-    }
-
-    if (tripType === "hours") {
-      setHoursData(transformAIJsonToHours(parsed));
-    }
+    
 
     setJsonData(parsed);
     setBuildingDays(false);
@@ -571,6 +668,47 @@ const AttractionSection = ({ title, items }) => {
         </div>
       )}
 
+      {city && (
+  <div className="bg-white rounded-3xl shadow p-6 space-y-4">
+    <h2 className="text-xl font-semibold">
+      📸 Views of {city}
+    </h2>
+
+    {imageLoading && (
+      <p className="text-sm text-gray-500">
+        Loading images…
+      </p>
+    )}
+
+    {!imageLoading && placeImages.length > 0 && (
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        {placeImages.map((img) => (
+          <img
+            key={img.id}
+            src={img.urls.regular}
+            alt={img.alt_description || city}
+            className="rounded-xl object-cover h-40 w-full hover:scale-[1.02] transition"
+            loading="lazy"
+          />
+        ))}
+      </div>
+    )}
+
+    {!imageLoading && placeImages.length === 0 && (
+  <div className="text-sm text-gray-500 text-center py-6">
+    📷 No images found for <strong>{city}</strong>.<br />
+    This destination may be less photographed — still worth exploring!
+  </div>
+)}
+
+
+    <p className="text-[11px] text-gray-400">
+      Images powered by Unsplash
+    </p>
+  </div>
+)}
+
+
       {/* ================= MAP ================= */}
       {city && (
         <div className="bg-white rounded-3xl shadow p-6 space-y-3">
@@ -686,15 +824,15 @@ const AttractionSection = ({ title, items }) => {
 )}
 
 {viewMode === "days" && tripType === "multi" && (
-  <MultiDayItinerary data={dayWiseData} />
+  <MultiDayItinerary data={jsonData} city={city}/>
 )}
 
 {viewMode === "days" && tripType === "day" && (
-  <OneDayItinerary data={oneDayData} />
+  <OneDayItinerary data={jsonData}  city={city}/>
 )}
 
 {viewMode === "days" && tripType === "hours" && (
-  <HoursItinerary data={hoursData} />
+  <HoursItinerary data={jsonData} city={city}/>
 )}
 
 
@@ -712,6 +850,14 @@ const AttractionSection = ({ title, items }) => {
           />
         )}
       </div>
+
+      {!isEditing && finalText && (
+  <div className="mt-4 rounded-xl bg-indigo-50 px-4 py-2 text-xs text-indigo-700">
+    ℹ️ Generating the QR will <strong>save</strong> this trip and make it
+    <strong> shareable & downloadable</strong>.
+  </div>
+)}
+
 
       {/* ================= QR ================= */}
       <button
