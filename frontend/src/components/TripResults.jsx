@@ -73,7 +73,7 @@ const fetchPlaceImages = async (place, osmAttractions = []) => {
       )}&per_page=9&orientation=landscape&content_filter=high`,
       {
         headers: {
-          Authorization: `Client-ID S8jFr1b4DhFXDDhlt4amvJLAvqjl4apOlPzDvej5BgI`,
+          Authorization: `Client-ID ${process.env.REACT_APP_UNSPLASH_KEY}`,
         },
       }
     );
