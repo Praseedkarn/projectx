@@ -1,6 +1,31 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { QRCodeCanvas } from "qrcode.react";
+
+
+
+import {
+  DndContext,
+  closestCenter
+} from "@dnd-kit/core";
+
+import {
+  rectSortingStrategy,
+  SortableContext,
+  useSortable,
+  
+} from "@dnd-kit/sortable";
+
+import { CSS } from "@dnd-kit/utilities";
+
+import {
+  useSensor,
+  useSensors,
+  PointerSensor,
+  TouchSensor,
+} from "@dnd-kit/core";
+
+
 // import DayWiseItinerary from "./DayWiseItinerary";
 import HoursItinerary from "./itinerary/HoursItinerary";
 import OneDayItinerary from "./itinerary/OneDayItinerary";
@@ -25,10 +50,12 @@ const TripResults = () => {
   const city = location.state?.city;
   const isDemo = location.state?.isDemo;
   const demoReason = location.state?.reason;
-const tripType = location.state?.tripType || "multi";
+  const tripType = location.state?.tripType || "multi";
 
-const [placeImages, setPlaceImages] = useState([]);
-const [imageLoading, setImageLoading] = useState(false);
+  const [placeImages, setPlaceImages] = useState([]);
+  const [imageLoading, setImageLoading] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [startDate, setStartDate] = useState(null); // yyyy-mm-dd
 
 
 const fetchPlaceImages = async (place, osmAttractions = []) => {
@@ -102,6 +129,59 @@ const fetchPlaceImages = async (place, osmAttractions = []) => {
   return [];
 };
 
+const DraggableDayCard = ({ id, day }) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+  } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="border rounded-xl p-4 bg-gray-50 shadow-sm"
+    >
+      <p className="font-medium text-center">Day {day.displayDay}</p>
+
+      <div
+  {...attributes}
+  {...listeners}
+  className="
+    mt-2 text-xs text-gray-400 cursor-grab
+    text-center select-none
+    touch-none
+    active:cursor-grabbing
+  "
+>
+  ⠿ Hold & Drag
+</div>
+
+    </div>
+  );
+};
+
+
+const sensors = useSensors(
+  useSensor(PointerSensor, {
+    activationConstraint: {
+      distance: 8, // desktop drag threshold
+    },
+  }),
+  useSensor(TouchSensor, {
+    activationConstraint: {
+      delay: 150, // ⏱️ long press for mobile
+      tolerance: 5,
+    },
+  })
+);
 
 
 
@@ -133,9 +213,13 @@ const [osmError, setOsmError] = useState("");
 
 const [viewMode, setViewMode] = useState("days"); // text | json|Days
 const [jsonData, setJsonData] = useState(null);
+const [showReorderModal, setShowReorderModal] = useState(false);
+const [tempDays, setTempDays] = useState([]);
 
 
 const [jsonError, setJsonError] = useState("");
+const [savingOrder, setSavingOrder] = useState(false);
+
 
 
 useEffect(() => {
@@ -154,6 +238,7 @@ useEffect(() => {
 const convertTextToJSON = (text, suggestions) => {
   if (!text) return null;
 
+  // normalize dashes
   text = text.replace(/–|—/g, "-");
 
   const lines = text
@@ -197,7 +282,7 @@ const convertTextToJSON = (text, suggestions) => {
       continue;
     }
 
-    /* ===== SECTION (## Morning / ## Hour 1) ===== */
+    /* ===== SECTION ===== */
     if (line.startsWith("##")) {
       if (!currentDay) {
         currentDay = { day: "DAY 1", sections: [] };
@@ -213,9 +298,8 @@ const convertTextToJSON = (text, suggestions) => {
       continue;
     }
 
-    /* ===== ACTIVITY ===== */
+    /* ===== BULLET ACTIVITY (OLD FORMAT SUPPORT) ===== */
     if (line.startsWith("-")) {
-      // ⛑ fallback if section is missing
       if (!currentSection) {
         const period =
           fallbackPeriods[fallbackIndex] || `Part ${fallbackIndex + 1}`;
@@ -229,8 +313,7 @@ const convertTextToJSON = (text, suggestions) => {
         fallbackIndex++;
       }
 
-      const match = line.match(/\[(.*?)\]\s*:\s*(.*)/);
-      const raw = match?.[2] || line.replace("-", "").trim();
+      const raw = line.replace(/^-+\s*/, "").trim();
 
       const costMatch = raw.match(/Cost:\s*([^.]+)/i);
       const locationMatch = raw.match(/Location:\s*(.+)$/i);
@@ -241,17 +324,60 @@ const convertTextToJSON = (text, suggestions) => {
         .trim();
 
       currentSection.activities.push({
-        time: match?.[1] || null,
+        time: null,
         description,
         cost: costMatch ? costMatch[1].trim() : null,
         location: locationMatch ? locationMatch[1].trim() : null,
         raw,
       });
+
+      continue;
+    }
+
+    /* ===== PARAGRAPH ACTIVITY (NEW FORMAT) ===== */
+    if (currentSection) {
+      const costMatch = line.match(/Cost:\s*([^.]+)/i);
+      const locationMatch = line.match(/Location:\s*(.+)$/i);
+
+      const description = line
+        .replace(/Cost:\s*[^.]+\.?/i, "")
+        .replace(/Location:\s*.+$/i, "")
+        .trim();
+
+      currentSection.activities.push({
+        time: null,
+        description,
+        cost: costMatch ? costMatch[1].trim() : null,
+        location: locationMatch ? locationMatch[1].trim() : null,
+        raw: line,
+      });
+
+      continue;
     }
   }
 
   return result.days.length ? result : null;
 };
+
+
+
+
+const handleExportToGoogleCalendar = () => {
+  if (!startDate || !jsonData?.days?.length) {
+    alert("Please select a start date first");
+    return;
+  }
+
+  const urls = buildGoogleCalendarUrl({
+    startDate,
+    days: jsonData.days.length,
+    city,
+    tripType, // 🔥 IMPORTANT
+  });
+
+  urls.forEach((url) => window.open(url, "_blank"));
+};
+
 
 
 
@@ -448,6 +574,61 @@ useEffect(() => {
 
 
 
+const buildGoogleCalendarUrl = ({
+  startDate,
+  days,
+  city,
+  tripType,
+}) => {
+  const base =
+    "https://calendar.google.com/calendar/render?action=TEMPLATE";
+
+  const events = [];
+
+  // 🔹 Title logic
+  const title =
+    tripType === "day"
+      ? `${city} One Day Trip`
+      : `${city} ${days} Days Trip`;
+
+  // 🔹 One-day → ONE event
+  if (tripType === "day") {
+    const date = new Date(startDate);
+    const start = date.toISOString().slice(0, 10).replace(/-/g, "");
+
+    events.push(
+      `${base}` +
+        `&text=${encodeURIComponent(title)}` +
+        `&dates=${start}/${start}` +
+        `&details=${encodeURIComponent(`Travel itinerary for ${city}`)}` +
+        `&location=${encodeURIComponent(city)}`
+    );
+
+    return events;
+  }
+
+  // 🔹 Multi-day → ONE event per day (same title)
+  for (let i = 0; i < days; i++) {
+    const date = new Date(startDate);
+    date.setDate(date.getDate() + i);
+
+    const start = date.toISOString().slice(0, 10).replace(/-/g, "");
+
+    events.push(
+      `${base}` +
+        `&text=${encodeURIComponent(title)}` +
+        `&dates=${start}/${start}` +
+        `&details=${encodeURIComponent(`Travel itinerary for ${city}`)}` +
+        `&location=${encodeURIComponent(city)}`
+    );
+  }
+
+  return events;
+};
+
+
+
+
 
 
 
@@ -639,10 +820,10 @@ const AttractionSection = ({ title, items }) => {
                 bg-white
                 rounded-full px-5 py-2
                 shadow-md">
-  <span className="text-sm font-medium text-gray-900">
-    📍 {city}
-  </span>
-</div>
+                  <span className="text-sm font-medium text-gray-900">
+                    📍 {city}
+                  </span>
+                </div>
 
               </div>
             )}
@@ -734,22 +915,196 @@ const AttractionSection = ({ title, items }) => {
       {/* ================= AI TEXT (DO NOT TOUCH LOGIC) ================= */}
       <div className="bg-white p-6 rounded-3xl shadow space-y-4">
         <div className="flex justify-end">
-          {!isEditing ? (
+          <div className="relative">
             <button
-              disabled={isTyping}
-              onClick={() => setIsEditing(true)}
+              onClick={() => setMenuOpen(!menuOpen)}
               className="bg-slate-800 text-white px-4 py-2 rounded"
             >
-              ✏️ Edit
+              ☰
             </button>
-          ) : (
-            <button
-              onClick={() => setIsEditing(false)}
-              className="bg-emerald-600 text-white px-4 py-2 rounded"
-            >
-              ✅ Save
-            </button>
-          )}
+
+            {menuOpen && (
+              <div className="absolute right-0 mt-2 w-56 bg-white border rounded-xl shadow-lg z-50 p-4 space-y-3">
+                
+                {/* Date Picker */}
+                <div className="space-y-1">
+                  <label className="text-xs text-gray-500">
+                    Start date
+                  </label>
+                  <input
+                    type="date"
+                    value={startDate || ""}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    className="w-full border rounded px-2 py-1 text-sm"
+                  />
+                </div>
+
+                <button
+                  onClick={() => {
+                    handleExportToGoogleCalendar();
+                    setMenuOpen(false);
+                  }}
+                  disabled={!startDate}
+                  className={`w-full text-left text-sm px-2 py-1 rounded
+                    ${!startDate
+                      ? "text-gray-400 cursor-not-allowed"
+                      : "hover:bg-gray-100"}
+                  `}
+                >
+                  📆 Export to Google Calendar
+                </button>
+
+                
+
+
+                {/* Edit toggle */}
+               
+              <button
+                onClick={() => {
+                  setTempDays(
+                      jsonData.days.map((day, i) => ({
+                        ...day,
+                        _id: `day-${i}`,
+                        displayDay: i +1 , // 🔥 stable drag id
+                      }))
+                    );
+              
+ // snapshot
+                  setShowReorderModal(true);
+                  setMenuOpen(false);
+                }}
+                className="w-full text-left text-sm hover:bg-gray-100 px-2 py-1 rounded"
+              >
+                ✏️ Reorder days
+              </button>
+
+
+              <button
+                onClick={() => {
+                  setIsEditing(false);
+                  
+                }}
+                className="w-full text-left text-sm hover:bg-gray-100 px-2 py-1 rounded"
+              >
+                ✅ Save itinerary
+              </button>
+
+
+                {/* Clear date */}
+                {startDate && (
+                  <button
+                    onClick={() => {
+                      setStartDate(null);
+                      setMenuOpen(false);
+                    }}
+                    className="w-full text-left text-sm text-red-600 hover:bg-red-50 px-2 py-1 rounded"
+                  >
+                    ❌ Clear date
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+
+{showReorderModal && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+    <div className="bg-white rounded-3xl w-full max-w-lg p-6 shadow-xl animate-fade-in">
+
+      <h3 className="text-lg font-semibold text-gray-800">
+        Reorder your trip days
+      </h3>
+      <p className="text-sm text-gray-500 mt-1">
+        Drag days to change the order. Names will update after saving.
+      </p>
+
+      <DndContext
+  sensors={sensors}
+  collisionDetection={closestCenter}
+  onDragEnd={({ active, over }) => {
+    if (!over || active.id === over.id) return;
+
+    setTempDays((items) => {
+      const oldIndex = items.findIndex(d => d._id === active.id);
+      const newIndex = items.findIndex(d => d._id === over.id);
+
+      const updated = [...items];
+      const [moved] = updated.splice(oldIndex, 1);
+      updated.splice(newIndex, 0, moved);
+
+      return updated;
+    });
+  }}
+>
+
+        <SortableContext
+          items={tempDays.map(day => day._id)}
+          strategy={rectSortingStrategy}
+        >
+          <div className="grid grid-cols-3 gap-3 mt-5">
+            {tempDays.map((day) => (
+              <DraggableDayCard
+                key={day._id}
+                id={day._id}
+                day={day}   // 🔥 pass whole day
+              />
+            ))}
+
+          </div>
+        </SortableContext>
+      </DndContext>
+
+      {/* ACTIONS */}
+      <div className="flex justify-end gap-3 mt-6">
+        <button
+          onClick={() => setShowReorderModal(false)}
+          className="px-4 py-2 rounded border hover:bg-gray-50"
+        >
+          Cancel
+        </button>
+
+        <button
+  disabled={savingOrder}
+  onClick={() => {
+    setSavingOrder(true);
+
+    setTimeout(() => {
+      setJsonData(prev => ({
+        ...prev,
+        days: tempDays.map((day, index) => ({
+          ...day,
+          day: `DAY ${index + 1}`, // rename only after save
+        })),
+      }));
+
+      setSavingOrder(false);
+      setShowReorderModal(false);
+    }, 2000);
+  }}
+  className={`px-4 py-2 rounded text-white flex items-center gap-2
+    ${savingOrder
+      ? "bg-gray-400 cursor-not-allowed"
+      : "bg-slate-800 hover:bg-slate-700"}
+  `}
+>
+  {savingOrder ? (
+    <>
+      <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+      Saving
+    </>
+  ) : (
+    "Save changes"
+  )}
+</button>
+
+      </div>
+
+    </div>
+  </div>
+)}
+
+
+
+
         </div>
 
        <div className="flex gap-2 mb-3">
@@ -824,11 +1179,11 @@ const AttractionSection = ({ title, items }) => {
 )}
 
 {viewMode === "days" && tripType === "multi" && (
-  <MultiDayItinerary data={jsonData} city={city}/>
+  <MultiDayItinerary data={jsonData} city={city} startDate={startDate}/>
 )}
 
 {viewMode === "days" && tripType === "day" && (
-  <OneDayItinerary data={jsonData}  city={city}/>
+  <OneDayItinerary data={jsonData}  city={city} startDate={startDate}/>
 )}
 
 {viewMode === "days" && tripType === "hours" && (

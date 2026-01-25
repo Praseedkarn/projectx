@@ -11,10 +11,10 @@ Duration: ${hours} hours
 Group: ${group}
 
 ${suggestions ? `
-User preferences (apply naturally inside activities, do NOT create new sections):
+User preferences (blend naturally into the paragraphs, do NOT list separately):
 ${Array.isArray(suggestions)
-  ? suggestions.map(s => `- ${s}`).join("\n")
-  : `- ${suggestions}`}
+  ? suggestions.join(", ")
+  : suggestions}
 ` : ""}
 
 STRICT FORMAT — FOLLOW EXACTLY:
@@ -23,19 +23,19 @@ TITLE: ${place} hourly itinerary
 
 ${Array.from({ length: hours }, (_, i) => `
 ## Hour ${i + 1}
-- [ ] : 2–3 short sentences describing the activity.
-End with "Location: <place>".
+Write ONE paragraph (2–3 sentences) describing what to do during this hour.
+End with: Location: <place>.
 `).join("")}
 
 ## Transportation
-- [ ] : Explain the best ways to move around ${place} for this trip (public transport, walking, taxis, passes). Keep it practical.
+Write ONE concise paragraph explaining the best ways to move around ${place}
+(public transport, walking, taxis, passes).
+
 
 RULES:
-- Use TITLE once
+- Paragraphs ONLY (no bullets)
 - Use only "## Hour X"
-- Exactly ONE bullet per hour
-- Transportation must be LAST section
-- Exactly ONE bullet in Transportation
+- Transportation must be LAST
 - No emojis
 - No extra text
 

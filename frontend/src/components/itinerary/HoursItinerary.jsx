@@ -17,6 +17,7 @@ const HoursItinerary = ({ data, city }) => {
       section.activities.map(act => ({
         period: section.period,
         description: act.description,
+        location: act.location,
       }))
     );
 
@@ -33,14 +34,21 @@ const HoursItinerary = ({ data, city }) => {
         {hours.map((item, index) => (
           <div
             key={index}
-            className="bg-white border rounded-xl p-4 space-y-1"
+            className="bg-white border rounded-xl p-4 space-y-2"
           >
             <p className="text-xs font-semibold text-[#5b7c67]">
-              Hour {index + 1} · {item.period}
+              Hour {index + 1}
             </p>
-            <p className="text-sm text-gray-700 leading-relaxed">
+
+            <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
               {item.description}
             </p>
+
+            {item.location && (
+              <p className="text-xs text-gray-500">
+                📍 {item.location}
+              </p>
+            )}
           </div>
         ))}
 
@@ -49,7 +57,10 @@ const HoursItinerary = ({ data, city }) => {
           <div className="mt-6 bg-blue-50 border border-blue-200 rounded-xl p-5">
             <h4 className="font-semibold text-blue-800">🚍 Transportation</h4>
             {transportSection.activities.map((act, i) => (
-              <p key={i} className="mt-2 text-sm text-blue-700">
+              <p
+                key={i}
+                className="mt-3 text-sm text-blue-700 leading-relaxed whitespace-pre-line"
+              >
                 {act.description}
               </p>
             ))}

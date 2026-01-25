@@ -10,10 +10,10 @@ Duration: 1 day
 Group: ${group}
 
 ${suggestions ? `
-User preferences (apply naturally inside activities, do NOT create new sections):
+User preferences (blend naturally into the paragraphs, do NOT list separately):
 ${Array.isArray(suggestions)
-  ? suggestions.map(s => `- ${s}`).join("\n")
-  : `- ${suggestions}`}
+  ? suggestions.join(", ")
+  : suggestions}
 ` : ""}
 
 STRICT FORMAT — FOLLOW EXACTLY:
@@ -23,27 +23,28 @@ TITLE: ${place} one-day itinerary
 DAY 1
 
 ## Morning
-- [ ] : 3 short sentences.
-End with "Location: <place>".
+Write ONE paragraph (3–4 sentences).
+End with: Location: <place>.
 
 ## Afternoon
-- [ ] : 3 short sentences.
-End with "Location: <place>".
+Write ONE paragraph (3–4 sentences).
+End with: Location: <place>.
 
 ## Evening
-- [ ] : 3 short sentences.
-End with "Location: <place>".
+Write ONE paragraph (3–4 sentences).
+End with: Location: <place>.
 
 ## Transportation
-- [ ] : Describe the best way to get around ${place} in one day (public transport, walking routes, taxis).
+Write ONE short paragraph explaining how to get around ${place} in one day
+(public transport, walking routes, taxis).
 
 RULES:
+- Use paragraphs ONLY
 - Only DAY 1
-- Exactly ONE bullet per section
 - Transportation must be LAST
-- Exactly ONE bullet in Transportation
-- No extra sections
 - No emojis
+- No extra sections
+- No bullet points
 
 END
 `;

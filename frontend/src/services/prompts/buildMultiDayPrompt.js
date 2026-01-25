@@ -4,17 +4,17 @@ export const buildMultiDayPrompt = ({
   group,
   suggestions,
 }) => `
-Create a multi-day travel itinerary.
+Create a detailed multi-day travel itinerary.
 
 Destination: ${place}
 Duration: ${days} days
 Group: ${group}
 
 ${suggestions ? `
-User preferences (apply naturally inside activities, do NOT create new sections):
+User preferences (blend naturally into the paragraphs, do NOT list separately):
 ${Array.isArray(suggestions)
-  ? suggestions.map(s => `- ${s}`).join("\n")
-  : `- ${suggestions}`}
+  ? suggestions.join(", ")
+  : suggestions}
 ` : ""}
 
 STRICT FORMAT — FOLLOW EXACTLY:
@@ -25,27 +25,27 @@ ${Array.from({ length: days }, (_, i) => `
 DAY ${i + 1}
 
 ## Morning
-- [ ] : 2 short sentences.
-End with "Location: <place>".
+Write ONE paragraph (3–4 sentences) describing morning activities.
+End with: Location: <place>.
 
 ## Afternoon
-- [ ] : 2 short sentences.
-End with "Location: <place>".
+Write ONE paragraph (3–4 sentences) describing afternoon activities.
+End with: Location: <place>.
 
 ## Evening
-- [ ] : 2 short sentences.
-End with "Location: <place>".
+Write ONE paragraph (3–4 sentences) describing evening activities.
+End with: Location: <place>.
 `).join("")}
 
 ## Transportation
-- [ ] : Explain how to travel within ${place} across these days (local transport, taxis, walking, passes, airport/rail connectivity).
+Write ONE concise paragraph explaining how to travel within ${place} across all days
+(public transport, taxis, walking, passes, airport/rail connectivity).
 
 RULES:
+- Use paragraphs ONLY (no bullets, no hyphens)
 - Use DAY 1, DAY 2, etc.
-- Exactly ONE bullet per section
-- Transportation must be LAST section
-- Exactly ONE bullet in Transportation
-- Location last only for activity sections
+- Transportation must be LAST
+- Do NOT shorten content
 - No emojis
 - No extra text
 
