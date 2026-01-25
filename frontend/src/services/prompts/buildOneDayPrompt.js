@@ -34,10 +34,14 @@ End with "Location: <place>".
 - [ ] : 3 short sentences.
 End with "Location: <place>".
 
+## Transportation
+- [ ] : Describe the best way to get around ${place} in one day (public transport, walking routes, taxis).
+
 RULES:
 - Only DAY 1
 - Exactly ONE bullet per section
-- Location last
+- Transportation must be LAST
+- Exactly ONE bullet in Transportation
 - No extra sections
 - No emojis
 

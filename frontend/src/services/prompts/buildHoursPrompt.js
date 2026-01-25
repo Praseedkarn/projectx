@@ -27,11 +27,15 @@ ${Array.from({ length: hours }, (_, i) => `
 End with "Location: <place>".
 `).join("")}
 
+## Transportation
+- [ ] : Explain the best ways to move around ${place} for this trip (public transport, walking, taxis, passes). Keep it practical.
+
 RULES:
 - Use TITLE once
 - Use only "## Hour X"
 - Exactly ONE bullet per hour
-- Location MUST be last
+- Transportation must be LAST section
+- Exactly ONE bullet in Transportation
 - No emojis
 - No extra text
 

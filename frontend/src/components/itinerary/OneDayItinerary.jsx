@@ -7,50 +7,60 @@ const OneDayItinerary = ({ data, city }) => {
 
   const day = data.days[0];
 
+  const transportSection = day.sections?.find(
+    s => s.period.toLowerCase() === "transportation"
+  );
+
+  const normalSections = day.sections?.filter(
+    s => s.period.toLowerCase() !== "transportation"
+  );
+
   return (
-    <section className="py-12">
-      <div className="max-w-3xl mx-auto space-y-8">
+    <section className="py-8">
+      <div className="max-w-3xl mx-auto px-3 sm:px-0 space-y-6 relative">
 
         {city && (
-          <h2 className="text-2xl font-semibold text-gray-800">
+          <h2 className="text-xl sm:text-2xl font-semibold text-gray-800">
             📍 {city} One-Day Itinerary
           </h2>
         )}
 
-        <div className="bg-white border rounded-2xl p-6 space-y-8">
+        {/* Timeline line */}
+        <div className="absolute left-3 sm:left-5 top-16 bottom-0 w-px bg-gray-200" />
 
-          <h3 className="text-xl font-semibold text-gray-800">
-            Day Plan
-          </h3>
+        <div className="space-y-8">
+          {normalSections.map((section, idx) => (
+            <div key={idx} className="relative pl-10 sm:pl-14">
 
-          {(day.sections || []).map((section, idx) => (
-            <div key={idx} className="space-y-3">
+              {/* Green dot */}
+              <span className="absolute left-[10px] sm:left-[18px] top-2 w-3 h-3 rounded-full bg-[#5b7c67]" />
 
-              <h4 className="text-sm font-semibold text-[#5b7c67] uppercase tracking-wide">
+              <h4 className="text-xs font-semibold uppercase tracking-wide text-[#5b7c67]">
                 {section.period}
               </h4>
 
-              <div className="space-y-3">
-                {(section.activities || []).map((act, aIdx) => (
-                  <div
-                    key={aIdx}
-                    className="border-l-4 border-[#5b7c67] pl-4 text-sm text-gray-700 space-y-1"
-                  >
-                    <p>{act.description}</p>
-
-                    {(act.cost || act.location) && (
-                      <p className="text-xs text-gray-500">
-                        {act.cost && <>💰 {act.cost}</>}
-                        {act.cost && act.location && " · "}
-                        {act.location && <>📍 {act.location}</>}
-                      </p>
-                    )}
-                  </div>
+              <div className="mt-3 space-y-3">
+                {section.activities.map((act, i) => (
+                  <p key={i} className="text-sm text-gray-700 leading-relaxed">
+                    {act.description}
+                  </p>
                 ))}
               </div>
             </div>
           ))}
         </div>
+
+        {/* 🚍 Transportation (NO TIMELINE) */}
+        {transportSection && (
+          <div className="mt-8 bg-blue-50 border border-blue-200 rounded-xl p-5">
+            <h4 className="font-semibold text-blue-800">🚍 Transportation</h4>
+            {transportSection.activities.map((act, i) => (
+              <p key={i} className="mt-2 text-sm text-blue-700">
+                {act.description}
+              </p>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

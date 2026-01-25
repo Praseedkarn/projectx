@@ -37,10 +37,15 @@ End with "Location: <place>".
 End with "Location: <place>".
 `).join("")}
 
+## Transportation
+- [ ] : Explain how to travel within ${place} across these days (local transport, taxis, walking, passes, airport/rail connectivity).
+
 RULES:
 - Use DAY 1, DAY 2, etc.
 - Exactly ONE bullet per section
-- Location last
+- Transportation must be LAST section
+- Exactly ONE bullet in Transportation
+- Location last only for activity sections
 - No emojis
 - No extra text
 
