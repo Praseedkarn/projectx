@@ -74,111 +74,138 @@ const ItinerarySlider = ({ onItineraryClick = () => {} }) => {
     setCurrentX(null);
   };
 
-  const dragOffset =
-    isDragging && startX && currentX ? currentX - startX : 0;
 
-  return (
-    <section className="w-full max-w-7xl mx-auto px-4 mt-16">
-      {/* HEADING */}
-      <div className="mb-6 text-center">
-        <h2 className="text-3xl md:text-4xl font-semibold text-gray-900">
-          Explore ready-made itineraries
-        </h2>
-        <p className="mt-2 text-gray-500 text-sm md:text-base">
-          Hand-picked trips crafted by travelers like you
-        </p>
-      </div>
 
-      {/* SLIDER */}
-      <div className="relative w-full max-w-6xl mx-auto py-4">
-        {/* SLIDER WINDOW */}
-        <div
-          className="overflow-hidden touch-pan-y"
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-        >
-          <div
-            className={`flex ${
-              isDragging
-                ? ""
-                : "transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
-            }`}
-            style={{
-              transform: `translateX(calc(-${index * 100}% + ${dragOffset}px))`,
-            }}
-          >
-            {itineraries.map((item, i) => {
-              const isActive = i === index;
-              const isSide =
-                i === (index + 1) % total ||
-                i === (index - 1 + total) % total;
+return (
+  <section className="w-full max-w-7xl mx-auto px-4 mt-20">
+    {/* HEADING */}
+    <div className="text-center mb-12">
+      <h2 className="text-3xl md:text-4xl font-semibold text-gray-900">
+        Places You’ll Brag About Forever
+      </h2>
+      <p className="mt-3 text-gray-500 max-w-2xl mx-auto">
+        Destinations so good, they turn into stories, memories,
+        and serious travel envy.
+      </p>
+    </div>
 
-              return (
-                <div key={item.slug} className="min-w-full flex justify-center px-6">
-                  <div
-                    onClick={() => onItineraryClick(item.slug)}
-                    className={`
-                      cursor-pointer bg-white rounded-3xl p-6
-                      transition-all duration-500 w-full max-w-md
-                      ${isActive && "scale-100 opacity-100 shadow-[0_35px_80px_rgba(0,0,0,0.25)]"}
-                      ${isSide && "scale-95 opacity-60 blur-[1px] shadow-[0_20px_40px_rgba(0,0,0,0.18)]"}
-                      ${!isActive && !isSide && "scale-90 opacity-0"}
-                    `}
-                  >
-                    <div className="h-44 rounded-2xl bg-gray-100 overflow-hidden mb-5">
-                      <img
-                        src={item.image}
-                        alt={item.title}
-                        className="h-full w-full object-cover"
-                      />
-                    </div>
+    {/* SLIDER */}
+    <div className="relative w-full max-w-6xl mx-auto h-[520px] ">
+      <div
+        className="overflow-hidden h-full touch-pan-y"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
+        <div className="relative w-full h-full flex items-center justify-center">
+          {itineraries.map((item, i) => {
+            let offset = i - index;
+            if (offset > total / 2) offset -= total;
+            if (offset < -total / 2) offset += total;
 
-                    <h3 className="text-xl font-semibold text-gray-800">
+            // show only 3 cards
+            if (Math.abs(offset) > 1) return null;
+
+            return (
+              <div
+                key={item.slug}
+                onClick={() => onItineraryClick(item.slug)}
+                className="
+                  absolute
+                  transition-all duration-700
+                  ease-[cubic-bezier(0.22,1,0.36,1)]
+                  cursor-pointer
+                "
+                style={{
+                  transform: `
+                    translateX(${offset * 360}px)
+                    scale(${offset === 0 ? 1 : 0.88})
+                  `,
+                  filter: offset === 0 ? "none" : "blur(2px)",
+                  opacity: offset === 0 ? 1 : 0.6,
+                  zIndex: offset === 0 ? 20 : 10,
+                }}
+              >
+
+               <div
+                  className="
+                    relative
+                    w-[380px] h-[500px]
+                    rounded-[28px]
+                    overflow-hidden
+                    shadow-2xl
+                    bg-white
+                  "
+                >
+
+
+                  {/* IMAGE */}
+                  <img
+                    src={item.image}
+                    alt={item.title}
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+
+                  {/* GRADIENT */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+
+                  {/* TAGS */}
+                  <div className="absolute top-4 left-4 flex gap-2">
+                    <span className="bg-white/90 text-xs px-3 py-1 rounded-full">
+                      Adventure
+                    </span>
+                    <span className="bg-white/90 text-xs px-3 py-1 rounded-full">
+                      Nature
+                    </span>
+                  </div>
+
+                  {/* ARROW */}
+                  <div className="absolute top-4 right-4 bg-white rounded-full p-2 shadow">
+                    ↗
+                  </div>
+
+                  {/* TEXT */}
+                  <div className="absolute bottom-6 left-6 right-6 text-white">
+                    <h3 className="text-2xl font-semibold">
                       {item.title}
                     </h3>
-
-                    <p className="text-sm text-gray-500 mt-1">
-                      {item.duration}
+                    <p className="text-sm text-white/90 mt-1">
+                      {item.duration} · {item.location}
                     </p>
-
-                    <p className="text-sm text-gray-600 mt-1">
-                      📍 {item.location}
-                    </p>
-
-                    <div className="mt-5">
-                      <span className="inline-block rounded-full bg-[#5b7c67]/10 text-[#5b7c67] px-4 py-1.5 text-sm font-medium">
-                        View itinerary →
-                      </span>
-                    </div>
                   </div>
                 </div>
-              );
-            })}
-          </div>
+              </div>
+            );
+          })}
         </div>
-
-        {/* CONTROLS */}
-        <button
-          onClick={prev}
-          className="absolute left-2 top-1/2 -translate-y-1/2
-                     h-11 w-11 rounded-full bg-white shadow-lg
-                     flex items-center justify-center hover:scale-105 transition"
-        >
-          ◀
-        </button>
-
-        <button
-          onClick={next}
-          className="absolute right-2 top-1/2 -translate-y-1/2
-                     h-11 w-11 rounded-full bg-white shadow-lg
-                     flex items-center justify-center hover:scale-105 transition"
-        >
-          ▶
-        </button>
       </div>
-    </section>
-  );
+
+      {/* CONTROLS */}
+      <button
+        onClick={prev}
+        className="absolute left-0 top-1/2 -translate-y-1/2
+                   h-11 w-11 rounded-full bg-white shadow
+                   flex items-center justify-center hover:scale-105 transition z-30"
+      >
+        ◀
+      </button>
+
+      <button
+        onClick={next}
+        className="absolute right-0 top-1/2 -translate-y-1/2
+                   h-11 w-11 rounded-full bg-white shadow
+                   flex items-center justify-center hover:scale-105 transition z-30"
+      >
+        ▶
+      </button>
+    </div>
+
+    {/* CTA */}
+   
+  </section>
+);
+
+
 };
 
 export default ItinerarySlider;

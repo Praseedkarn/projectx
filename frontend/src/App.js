@@ -32,6 +32,7 @@ import LogoLoader from "./components/LogoLoader";
 import { buildHoursPrompt } from "./services/prompts/buildHoursPrompt";
 import { buildOneDayPrompt } from "./services/prompts/buildOneDayPrompt";
 import { buildMultiDayPrompt } from "./services/prompts/buildMultiDayPrompt";
+import CitySlider from "./components/CitySlider";
 
 
 function App() {
@@ -671,6 +672,11 @@ const handleSubmit = async (e) => {
                   navigate(`/itineraries/${slug}`);
                 }}
               />
+              <CitySlider
+                  onCityClick={(slug) => navigate(`/cities/${slug}`)}
+                />
+
+
 
 
               <div className="mt-20">
