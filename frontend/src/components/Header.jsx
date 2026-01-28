@@ -93,10 +93,12 @@ const go = (path) => {
             }}
             className="flex items-center gap-3"
           >
+                        {/* <img src="/logo3.png" alt="logo" className="w-12 h-12" /> */}
+
             <span className="italic text-3xl md:text-4xl text-[#5b6f00]">
-              PROJECT
+              EXPEDITIO
             </span>
-            <img src="/logo.png" alt="logo" className="w-8 h-8" />
+            {/* <img src="/logo3.png" alt="logo" className="w-12 h-12" /> */}
           </button>
 
           {/* DESKTOP NAV */}

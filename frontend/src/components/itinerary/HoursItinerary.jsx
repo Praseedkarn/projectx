@@ -22,52 +22,67 @@ const HoursItinerary = ({ data, city }) => {
     );
 
   return (
-    <section className="py-8">
-      <div className="max-w-3xl mx-auto px-3 sm:px-0 space-y-4">
-
-        {city && (
-          <h2 className="text-xl sm:text-2xl font-semibold text-gray-800">
-            ⏱ {city} Hourly Itinerary
+    <div className="space-y-8 animate-fade-in">
+      {/* Header */}
+      {city && (
+        <div className="flex items-center gap-3 pb-4 border-b border-gray-100">
+          <span className="text-2xl">⏳</span>
+          <h2 className="text-xl font-bold text-gray-900">
+            Hourly Plan for {city}
           </h2>
-        )}
+        </div>
+      )}
 
+      {/* Grid of Hours */}
+      <div className="grid gap-4 sm:grid-cols-1">
         {hours.map((item, index) => (
           <div
             key={index}
-            className="bg-white border rounded-xl p-4 space-y-2"
+            className="group flex gap-4 p-4 rounded-2xl hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-100"
           >
-            <p className="text-xs font-semibold text-[#5b7c67]">
-              Hour {index + 1}
-            </p>
+            {/* Time Marker */}
+            <div className="flex-shrink-0 w-16 text-right">
+              <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+                Hour
+              </span>
+              <div className="text-2xl font-bold text-indigo-600 leading-none">
+                {index + 1}
+              </div>
+            </div>
 
-            <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
-              {item.description}
-            </p>
-
-            {item.location && (
-              <p className="text-xs text-gray-500">
-                📍 {item.location}
+            {/* Content */}
+            <div className="flex-grow space-y-1 pt-1 opacity-90 group-hover:opacity-100">
+              <p className="text-gray-800 leading-relaxed font-medium">
+                {item.description}
               </p>
-            )}
+              {item.location && (
+                <div className="flex items-center gap-1 text-xs text-gray-400">
+                  <span>📍</span>
+                  <span>{item.location}</span>
+                </div>
+              )}
+            </div>
           </div>
         ))}
-
-        {/* 🚍 Transportation */}
-        {transportSection && (
-          <div className="mt-6 bg-blue-50 border border-blue-200 rounded-xl p-5">
-            <h4 className="font-semibold text-blue-800">🚍 Transportation</h4>
-            {transportSection.activities.map((act, i) => (
-              <p
-                key={i}
-                className="mt-3 text-sm text-blue-700 leading-relaxed whitespace-pre-line"
-              >
-                {act.description}
-              </p>
-            ))}
-          </div>
-        )}
       </div>
-    </section>
+
+      {/* Transportation */}
+      {transportSection && (
+        <div className="mt-8 pt-6 border-t border-gray-100">
+          <div className="flex gap-4 p-4 bg-gray-50 rounded-2xl">
+            <div className="text-2xl">🚕</div>
+            <div className="space-y-1">
+              <h4 className="font-bold text-gray-900">Transportation & Logistics</h4>
+              {transportSection.activities.map((act, i) => (
+                <p key={i} className="text-sm text-gray-600 leading-relaxed">
+                  {act.description}
+                </p>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 

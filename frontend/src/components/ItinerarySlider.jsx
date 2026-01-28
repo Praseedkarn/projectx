@@ -39,6 +39,7 @@ const ItinerarySlider = ({ onItineraryClick = () => {} }) => {
   const [startX, setStartX] = useState(null);
   const [currentX, setCurrentX] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState(0);
 
   const prev = () => {
     setIndex((prev) => (prev - 1 + total) % total);
@@ -55,24 +56,32 @@ const ItinerarySlider = ({ onItineraryClick = () => {} }) => {
     setIsDragging(true);
   };
 
-  const handleTouchMove = (e) => {
-    if (!isDragging) return;
-    setCurrentX(e.touches[0].clientX);
-  };
+ const handleTouchMove = (e) => {
+  if (!isDragging || startX === null) return;
 
-  const handleTouchEnd = () => {
-    if (!startX || !currentX) return;
+  const x = e.touches[0].clientX;
+  setCurrentX(x);
 
-    const diff = startX - currentX;
-    const threshold = 60;
+  // 🔥 follow finger slightly (damped)
+  setDragOffset((x - startX) * 0.6);
+};
 
-    if (diff > threshold) next();
-    else if (diff < -threshold) prev();
 
-    setIsDragging(false);
-    setStartX(null);
-    setCurrentX(null);
-  };
+ const handleTouchEnd = () => {
+  if (!startX || !currentX) return;
+
+  const diff = startX - currentX;
+  const threshold = 60;
+
+  if (diff > threshold) next();
+  else if (diff < -threshold) prev();
+
+  setIsDragging(false);
+  setStartX(null);
+  setCurrentX(null);
+  setDragOffset(0); // 🔥 snap back
+};
+
 
 
 
@@ -118,7 +127,7 @@ return (
                 "
                 style={{
                   transform: `
-                    translateX(${offset * 360}px)
+                    translateX(${offset * 360 + (offset === 0 ? dragOffset : 0)}px)
                     scale(${offset === 0 ? 1 : 0.88})
                   `,
                   filter: offset === 0 ? "none" : "blur(2px)",

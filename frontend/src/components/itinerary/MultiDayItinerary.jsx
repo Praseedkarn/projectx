@@ -1,28 +1,28 @@
 import React, { useEffect, useState } from "react";
 
-const PERIOD_STYLES = {
-  Morning: "bg-yellow-400",
-  Afternoon: "bg-blue-400",
-  Evening: "bg-purple-400",
-};
+// const PERIOD_STYLES = {
+//   Morning: "bg-yellow-400",
+//   Afternoon: "bg-blue-400",
+//   Evening: "bg-purple-400",
+// };
 
 
 
-const MultiDayItinerary = ({ data, city , startDate }) => {
+const MultiDayItinerary = ({ data, city, startDate }) => {
   const [activeDay, setActiveDay] = useState(1);
 
   const getDateLabel = (startDate, index) => {
-  if (!startDate) return `Day ${index + 1}`;
+    if (!startDate) return `Day ${index + 1}`;
 
-  const date = new Date(startDate);
-  date.setDate(date.getDate() + index);
+    const date = new Date(startDate);
+    date.setDate(date.getDate() + index);
 
-  return date.toLocaleDateString(undefined, {
-    weekday: "short",
-    day: "numeric",
-    month: "short",
-  });
-};
+    return date.toLocaleDateString(undefined, {
+      weekday: "short",
+      day: "numeric",
+      month: "short",
+    });
+  };
 
 
   useEffect(() => {
@@ -53,82 +53,105 @@ const MultiDayItinerary = ({ data, city , startDate }) => {
     .find(s => s.period.toLowerCase() === "transportation");
 
   return (
-    <section className="py-8 sm:py-12">
-      <div className="max-w-4xl mx-auto relative px-4 sm:px-0 space-y-10">
+    <div className="space-y-12 animate-fade-in">
 
-        {city && (
-          <h2 className="text-2xl font-semibold text-gray-800">
-            📍 {city} Itinerary
-          </h2>
-        )}
+      {/* Main Header */}
+      {city && (
+        <div className="text-center pb-8 border-b border-gray-100">
+          <h2 className="text-3xl font-bold text-gray-900 mb-2">Your Trip to {city}</h2>
+          <p className="text-gray-500">A day-by-day roadmap of your adventure</p>
+        </div>
+      )}
 
-        <div className="absolute left-[16px] sm:left-[28px] top-24 bottom-40 w-px bg-gray-200" />
+      <div className="relative space-y-16">
+        {/* Continuous Line */}
+        <div className="absolute left-4 sm:left-8 top-4 bottom-0 w-0.5 bg-gradient-to-b from-gray-200 via-gray-200 to-transparent" />
 
         {data.days.map((day, index) => {
           const normalSections = day.sections.filter(
             s => s.period.toLowerCase() !== "transportation"
           );
 
+          const isActive = activeDay === index + 1;
+
           return (
-            <div key={index} data-day={index + 1} className="relative pl-10 sm:pl-16">
+            <div key={index} data-day={index + 1} className="relative pl-12 sm:pl-24 transition-opacity duration-500">
 
-              <span
-                className={`absolute left-[12px] sm:left-[24px] top-7 w-3 h-3 rounded-full
-                  ${activeDay === index + 1 ? "bg-[#5b7c67] scale-125" : "bg-gray-300"}`}
-              />
+              {/* Floating Date Marker */}
+              <div className={`absolute left-0 sm:left-4 top-0 transition-transform duration-300 ${isActive ? 'scale-110' : 'scale-100'}`}>
+                <div className={`flex flex-col items-center justify-center w-8 sm:w-10 h-8 sm:h-10 rounded-full border-4 border-white shadow-sm z-10 
+                        ${isActive ? "bg-black text-white ring-4 ring-gray-100" : "bg-white text-gray-400 border-gray-200"}`}>
+                  <span className="text-xs sm:text-sm font-bold">{index + 1}</span>
+                </div>
+              </div>
 
-              <div className="bg-white rounded-2xl border p-3 sm:p-6 space-y-5 shadow-sm">
-                  <h3 className="text-lg sm:text-xl font-semibold">
-                    {getDateLabel(startDate, index)}
-                  </h3>
+              {/* Day Content Card */}
+              <div className={`space-y-6 ${isActive ? 'opacity-100' : 'opacity-80 hover:opacity-100'}`}>
+                <h3 className="text-2xl font-bold text-gray-900">
+                  {getDateLabel(startDate, index)}
+                </h3>
 
+                <div className="grid gap-4">
+                  {normalSections.map((section, sIdx) => {
+                    const isMorning = section.period.toLowerCase().includes("morning");
+                    const isEvening = section.period.toLowerCase().includes("evening");
 
-                {normalSections.map((section, sIdx) => (
-                  <div key={sIdx} className="space-y-3">
-                    <div className="flex items-center gap-3">
-                      <span className={`h-2.5 w-2.5 rounded-full ${PERIOD_STYLES[section.period]}`} />
-                      <h4 className="text-xs font-semibold uppercase tracking-wide">
-                        {section.period}
-                      </h4>
-                    </div>
-
-                    <div className="space-y-3 pl-3 sm:pl-5 border-l">
-                      {section.activities.map((act, aIdx) => (
-                        <div key={aIdx} className="space-y-2">
-                          <p className="text-sm leading-relaxed whitespace-pre-line">
-                            {act.description}
-                          </p>
-
-                          {act.location && (
-                            <p className="text-xs text-gray-500">
-                              📍 {act.location}
-                            </p>
-                          )}
+                    return (
+                      <div key={sIdx} className="bg-gray-50/50 rounded-2xl p-6 border border-gray-100 hover:bg-white hover:shadow-md transition-all">
+                        <div className="flex items-center gap-3 mb-4">
+                          <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider 
+                                       ${isMorning ? "bg-orange-100 text-orange-700" :
+                              isEvening ? "bg-indigo-100 text-indigo-700" :
+                                "bg-blue-100 text-blue-700"}`}>
+                            {section.period}
+                          </span>
                         </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
+
+                        <div className="space-y-4">
+                          {section.activities.map((act, aIdx) => (
+                            <div key={aIdx} className="group">
+                              <p className="text-gray-800 leading-relaxed">
+                                {act.description}
+                              </p>
+                              {act.location && (
+                                <div className="mt-2 flex items-center gap-1 text-xs text-gray-400 group-hover:text-indigo-600 transition-colors">
+                                  <span>📍</span>
+                                  <span>{act.location}</span>
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             </div>
           );
         })}
-
-        {/* 🚍 Transportation */}
-        {transportSection && (
-          <div className="bg-blue-50 border border-blue-200 rounded-2xl p-5 sm:p-6">
-            <h3 className="text-lg font-semibold text-blue-800">
-              🚍 Transportation
-            </h3>
-            {transportSection.activities.map((act, i) => (
-              <p key={i} className="mt-3 text-sm text-blue-700 leading-relaxed whitespace-pre-line">
-                {act.description}
-              </p>
-            ))}
-          </div>
-        )}
       </div>
-    </section>
+
+      {/* Overall Transportation */}
+      {transportSection && (
+        <div className="mt-12 bg-gray-900 text-gray-300 rounded-2xl p-8 shadow-xl">
+          <div className="flex items-start gap-4">
+            <span className="text-3xl">✈️</span>
+            <div className="space-y-4">
+              <h3 className="text-xl font-bold text-white">Logistics & Transportation</h3>
+              <div className="space-y-2">
+                {transportSection.activities.map((act, i) => (
+                  <p key={i} className="leading-relaxed text-sm opacity-90">
+                    {act.description}
+                  </p>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+    </div>
   );
 };
 

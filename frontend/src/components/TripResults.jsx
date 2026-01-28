@@ -13,7 +13,7 @@ import {
   rectSortingStrategy,
   SortableContext,
   useSortable,
-  
+
 } from "@dnd-kit/sortable";
 
 import { CSS } from "@dnd-kit/utilities";
@@ -32,11 +32,13 @@ import OneDayItinerary from "./itinerary/OneDayItinerary";
 import MultiDayItinerary from "./itinerary/MultiDayItinerary";
 import API_BASE_URL from "../services/apiClient";
 const TextSkeleton = ({ lines = 6 }) => (
-  <div className="space-y-3 animate-pulse">
+  <div className="space-y-4 py-6 w-full max-w-2xl mx-auto">
     {Array.from({ length: lines }).map((_, i) => (
       <div
         key={i}
-        className={`h-4 rounded bg-gray-200 ${i === lines - 1 ? "w-3/4" : "w-full"
+        className={`bg-gray-100 rounded-xl animate-pulse ${i === 0 ? "h-8 w-1/3 mb-8" :
+          i === 1 ? "h-4 w-full" :
+            i === lines - 1 ? "h-4 w-2/3" : "h-4 w-full"
           }`}
       />
     ))}
@@ -48,140 +50,136 @@ const TripResults = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const city = location.state?.city;
-  const isDemo = location.state?.isDemo;
-  const demoReason = location.state?.reason;
+  // const isDemo = location.state?.isDemo;
+  // const demoReason = location.state?.reason;
   const tripType = location.state?.tripType || "multi";
 
   const [placeImages, setPlaceImages] = useState([]);
   const [imageLoading, setImageLoading] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
+  // const [menuOpen, setMenuOpen] = useState(false);
   const [startDate, setStartDate] = useState(null); // yyyy-mm-dd
 
 
-const fetchPlaceImages = async (place, osmAttractions = []) => {
-  const queries = [
-    `${place} city`,
-    `${place} skyline`,
-    `${place} landmarks`,
-    `${place} tourism`,
-    `${place} travel`,
-  ];
-
-  const isGoodImage = (img) => {
-    const text =
-      `${img.alt_description || ""} ${img.description || ""}`.toLowerCase();
-
-    const banned = [
-      "person",
-      "people",
-      "portrait",
-      "model",
-      "food",
-      "dish",
-      "drink",
-      "selfie",
-      "face",
+  const fetchPlaceImages = async (place, osmAttractions = []) => {
+    const queries = [
+      `${place} city`,
+      `${place} skyline`,
+      `${place} landmarks`,
+      `${place} tourism`,
+      `${place} travel`,
     ];
 
-    if (banned.some((w) => text.includes(w))) return false;
+    const isGoodImage = (img) => {
+      const text =
+        `${img.alt_description || ""} ${img.description || ""}`.toLowerCase();
+
+      const banned = [
+        "person",
+        "people",
+        "portrait",
+        "model",
+        "food",
+        "dish",
+        "drink",
+        "selfie",
+        "face",
+      ];
+
+      if (banned.some((w) => text.includes(w))) return false;
+
+      return (
+        text.includes(place.toLowerCase()) ||
+        text.includes("city") ||
+        text.includes("street") ||
+        text.includes("landscape")
+      );
+    };
+
+    const search = async (q) => {
+      const res = await fetch(
+        `https://api.unsplash.com/search/photos?query=${encodeURIComponent(
+          q
+        )}&per_page=9&orientation=landscape&content_filter=high`,
+        {
+          headers: {
+            Authorization: `Client-ID ${process.env.REACT_APP_UNSPLASH_KEY}`,
+          },
+        }
+      );
+
+      if (!res.ok) return [];
+
+      const data = await res.json();
+      if (!data.results) return [];
+
+      return data.results.filter(isGoodImage);
+    };
+
+    // 1️⃣ Try city queries
+    for (const q of queries) {
+      const imgs = await search(q);
+      if (imgs.length >= 3) return imgs.slice(0, 6);
+    }
+
+    // 2️⃣ Try OSM attraction names
+    for (const a of osmAttractions) {
+      const imgs = await search(`${a.name} ${place}`);
+      if (imgs.length >= 3) return imgs.slice(0, 6);
+    }
+
+    // 3️⃣ Fail cleanly
+    return [];
+  };
+
+  const DraggableDayCard = ({ id, day }) => {
+    const {
+      attributes,
+      listeners,
+      setNodeRef,
+      transform,
+      transition,
+    } = useSortable({ id });
+
+    const style = {
+      transform: CSS.Transform.toString(transform),
+      transition,
+    };
 
     return (
-      text.includes(place.toLowerCase()) ||
-      text.includes("city") ||
-      text.includes("street") ||
-      text.includes("landscape")
-    );
-  };
-
-  const search = async (q) => {
-    const res = await fetch(
-      `https://api.unsplash.com/search/photos?query=${encodeURIComponent(
-        q
-      )}&per_page=9&orientation=landscape&content_filter=high`,
-      {
-        headers: {
-          Authorization: `Client-ID ${process.env.REACT_APP_UNSPLASH_KEY}`,
-        },
-      }
-    );
-
-    if (!res.ok) return [];
-
-    const data = await res.json();
-    if (!data.results) return [];
-
-    return data.results.filter(isGoodImage);
-  };
-
-  // 1️⃣ Try city queries
-  for (const q of queries) {
-    const imgs = await search(q);
-    if (imgs.length >= 3) return imgs.slice(0, 6);
-  }
-
-  // 2️⃣ Try OSM attraction names
-  for (const a of osmAttractions) {
-    const imgs = await search(`${a.name} ${place}`);
-    if (imgs.length >= 3) return imgs.slice(0, 6);
-  }
-
-  // 3️⃣ Fail cleanly
-  return [];
-};
-
-const DraggableDayCard = ({ id, day }) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-  } = useSortable({ id });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
-
-  return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className="border rounded-xl p-4 bg-gray-50 shadow-sm"
-    >
-      <p className="font-medium text-center">Day {day.displayDay}</p>
-
       <div
-  {...attributes}
-  {...listeners}
-  className="
-    mt-2 text-xs text-gray-400 cursor-grab
-    text-center select-none
-    touch-none
-    active:cursor-grabbing
-  "
->
-  ⠿ Hold & Drag
-</div>
+        ref={setNodeRef}
+        style={style}
+        className="group relative flex flex-col items-center justify-center p-6 bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md transition-all cursor-grab active:cursor-grabbing touch-none select-none"
+      >
+        <div className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">
+          Itinerary
+        </div>
+        <div className="text-xl font-bold text-gray-900 mb-1">Day {day.displayDay}</div>
+        <div className="w-8 h-1 bg-gray-100 rounded-full group-hover:bg-indigo-500 transition-colors" />
 
-    </div>
+        <div
+          {...attributes}
+          {...listeners}
+          className="absolute inset-0 rounded-2xl"
+        />
+      </div>
+    );
+  };
+
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // desktop drag threshold
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 150, // ⏱️ long press for mobile
+        tolerance: 5,
+      },
+    })
   );
-};
-
-
-const sensors = useSensors(
-  useSensor(PointerSensor, {
-    activationConstraint: {
-      distance: 8, // desktop drag threshold
-    },
-  }),
-  useSensor(TouchSensor, {
-    activationConstraint: {
-      delay: 150, // ⏱️ long press for mobile
-      tolerance: 5,
-    },
-  })
-);
 
 
 
@@ -190,9 +188,9 @@ const sensors = useSensors(
     location.state?.suggestions ||
     JSON.parse(localStorage.getItem("lastTripResult"));
 
- 
 
-const [buildingDays, setBuildingDays] = useState(false);
+
+  const [buildingDays, setBuildingDays] = useState(false);
 
 
   const [isTyping, setIsTyping] = useState(false);
@@ -207,261 +205,261 @@ const [buildingDays, setBuildingDays] = useState(false);
 
   const [cityInfo, setCityInfo] = useState(null);
   const [cityLoading, setCityLoading] = useState(false);
-const [osmData, setOsmData] = useState(null);
-const [osmLoading, setOsmLoading] = useState(false);
-const [osmError, setOsmError] = useState("");
+  const [osmData, setOsmData] = useState(null);
+  // const [osmLoading, setOsmLoading] = useState(false);
+  const [osmError, setOsmError] = useState("");
 
-const [viewMode, setViewMode] = useState("days"); // text | json|Days
-const [jsonData, setJsonData] = useState(null);
-const [showReorderModal, setShowReorderModal] = useState(false);
-const [tempDays, setTempDays] = useState([]);
-
-
-const [jsonError, setJsonError] = useState("");
-const [savingOrder, setSavingOrder] = useState(false);
+  const [viewMode, setViewMode] = useState("days"); // text | json|Days
+  const [jsonData, setJsonData] = useState(null);
+  const [showReorderModal, setShowReorderModal] = useState(false);
+  const [tempDays, setTempDays] = useState([]);
 
 
-
-useEffect(() => {
-  if (!city) return;
-
-  setImageLoading(true);
-
-  fetchPlaceImages(city , osmData?.attractions||[])
-    .then((imgs) => setPlaceImages(imgs))
-    .catch(() => setPlaceImages([]))
-    .finally(() => setImageLoading(false));
-
-}, [city , osmData]);
+  const [jsonError, setJsonError] = useState("");
+  const [savingOrder, setSavingOrder] = useState(false);
 
 
-const convertTextToJSON = (text, suggestions) => {
-  if (!text) return null;
 
-  // normalize dashes
-  text = text.replace(/–|—/g, "-");
+  useEffect(() => {
+    if (!city) return;
 
-  const lines = text
-    .split("\n")
-    .map(l => l.trim())
-    .filter(Boolean);
+    setImageLoading(true);
 
-  const result = {
-    title: "",
-    preferences:
-      typeof suggestions === "string"
-        ? suggestions.split(",").map(s => s.trim())
-        : Array.isArray(suggestions)
-        ? suggestions
-        : [],
-    days: [],
-  };
+    fetchPlaceImages(city, osmData?.attractions || [])
+      .then((imgs) => setPlaceImages(imgs))
+      .catch(() => setPlaceImages([]))
+      .finally(() => setImageLoading(false));
 
-  let currentDay = null;
-  let currentSection = null;
+  }, [city, osmData]);
 
-  const fallbackPeriods = ["Morning", "Afternoon", "Evening"];
-  let fallbackIndex = 0;
 
-  for (let line of lines) {
-    /* ===== TITLE ===== */
-    if (line.startsWith("TITLE:")) {
-      result.title = line.replace("TITLE:", "").trim();
-      continue;
-    }
+  const convertTextToJSON = (text, suggestions) => {
+    if (!text) return null;
 
-    /* ===== DAY ===== */
-    if (/^day\s+\d+/i.test(line)) {
-      currentDay = {
-        day: line.toUpperCase(),
-        sections: [],
-      };
-      result.days.push(currentDay);
-      currentSection = null;
-      fallbackIndex = 0;
-      continue;
-    }
+    // normalize dashes
+    text = text.replace(/–|—/g, "-");
 
-    /* ===== SECTION ===== */
-    if (line.startsWith("##")) {
-      if (!currentDay) {
-        currentDay = { day: "DAY 1", sections: [] };
-        result.days.push(currentDay);
+    const lines = text
+      .split("\n")
+      .map(l => l.trim())
+      .filter(Boolean);
+
+    const result = {
+      title: "",
+      preferences:
+        typeof suggestions === "string"
+          ? suggestions.split(",").map(s => s.trim())
+          : Array.isArray(suggestions)
+            ? suggestions
+            : [],
+      days: [],
+    };
+
+    let currentDay = null;
+    let currentSection = null;
+
+    const fallbackPeriods = ["Morning", "Afternoon", "Evening"];
+    let fallbackIndex = 0;
+
+    for (let line of lines) {
+      /* ===== TITLE ===== */
+      if (line.startsWith("TITLE:")) {
+        result.title = line.replace("TITLE:", "").trim();
+        continue;
       }
 
-      currentSection = {
-        period: line.replace("##", "").trim(),
-        activities: [],
-      };
+      /* ===== DAY ===== */
+      if (/^day\s+\d+/i.test(line)) {
+        currentDay = {
+          day: line.toUpperCase(),
+          sections: [],
+        };
+        result.days.push(currentDay);
+        currentSection = null;
+        fallbackIndex = 0;
+        continue;
+      }
 
-      currentDay.sections.push(currentSection);
-      continue;
-    }
-
-    /* ===== BULLET ACTIVITY (OLD FORMAT SUPPORT) ===== */
-    if (line.startsWith("-")) {
-      if (!currentSection) {
-        const period =
-          fallbackPeriods[fallbackIndex] || `Part ${fallbackIndex + 1}`;
+      /* ===== SECTION ===== */
+      if (line.startsWith("##")) {
+        if (!currentDay) {
+          currentDay = { day: "DAY 1", sections: [] };
+          result.days.push(currentDay);
+        }
 
         currentSection = {
-          period,
+          period: line.replace("##", "").trim(),
           activities: [],
         };
 
         currentDay.sections.push(currentSection);
-        fallbackIndex++;
+        continue;
       }
 
-      const raw = line.replace(/^-+\s*/, "").trim();
+      /* ===== BULLET ACTIVITY (OLD FORMAT SUPPORT) ===== */
+      if (line.startsWith("-")) {
+        if (!currentSection) {
+          const period =
+            fallbackPeriods[fallbackIndex] || `Part ${fallbackIndex + 1}`;
 
-      const costMatch = raw.match(/Cost:\s*([^.]+)/i);
-      const locationMatch = raw.match(/Location:\s*(.+)$/i);
+          currentSection = {
+            period,
+            activities: [],
+          };
 
-      const description = raw
-        .replace(/Cost:\s*[^.]+\.?/i, "")
-        .replace(/Location:\s*.+$/i, "")
-        .trim();
+          currentDay.sections.push(currentSection);
+          fallbackIndex++;
+        }
 
-      currentSection.activities.push({
-        time: null,
-        description,
-        cost: costMatch ? costMatch[1].trim() : null,
-        location: locationMatch ? locationMatch[1].trim() : null,
-        raw,
-      });
+        const raw = line.replace(/^-+\s*/, "").trim();
 
-      continue;
+        const costMatch = raw.match(/Cost:\s*([^.]+)/i);
+        const locationMatch = raw.match(/Location:\s*(.+)$/i);
+
+        const description = raw
+          .replace(/Cost:\s*[^.]+\.?/i, "")
+          .replace(/Location:\s*.+$/i, "")
+          .trim();
+
+        currentSection.activities.push({
+          time: null,
+          description,
+          cost: costMatch ? costMatch[1].trim() : null,
+          location: locationMatch ? locationMatch[1].trim() : null,
+          raw,
+        });
+
+        continue;
+      }
+
+      /* ===== PARAGRAPH ACTIVITY (NEW FORMAT) ===== */
+      if (currentSection) {
+        const costMatch = line.match(/Cost:\s*([^.]+)/i);
+        const locationMatch = line.match(/Location:\s*(.+)$/i);
+
+        const description = line
+          .replace(/Cost:\s*[^.]+\.?/i, "")
+          .replace(/Location:\s*.+$/i, "")
+          .trim();
+
+        currentSection.activities.push({
+          time: null,
+          description,
+          cost: costMatch ? costMatch[1].trim() : null,
+          location: locationMatch ? locationMatch[1].trim() : null,
+          raw: line,
+        });
+
+        continue;
+      }
     }
 
-    /* ===== PARAGRAPH ACTIVITY (NEW FORMAT) ===== */
-    if (currentSection) {
-      const costMatch = line.match(/Cost:\s*([^.]+)/i);
-      const locationMatch = line.match(/Location:\s*(.+)$/i);
+    return result.days.length ? result : null;
+  };
 
-      const description = line
-        .replace(/Cost:\s*[^.]+\.?/i, "")
-        .replace(/Location:\s*.+$/i, "")
-        .trim();
 
-      currentSection.activities.push({
-        time: null,
-        description,
-        cost: costMatch ? costMatch[1].trim() : null,
-        location: locationMatch ? locationMatch[1].trim() : null,
-        raw: line,
-      });
 
-      continue;
+
+  const handleExportToGoogleCalendar = () => {
+    if (!startDate || !jsonData?.days?.length) {
+      alert("Please select a start date first");
+      return;
     }
-  }
 
-  return result.days.length ? result : null;
-};
+    const urls = buildGoogleCalendarUrl({
+      startDate,
+      days: jsonData.days.length,
+      city,
+      tripType, // 🔥 IMPORTANT
+    });
 
-
-
-
-const handleExportToGoogleCalendar = () => {
-  if (!startDate || !jsonData?.days?.length) {
-    alert("Please select a start date first");
-    return;
-  }
-
-  const urls = buildGoogleCalendarUrl({
-    startDate,
-    days: jsonData.days.length,
-    city,
-    tripType, // 🔥 IMPORTANT
-  });
-
-  urls.forEach((url) => window.open(url, "_blank"));
-};
+    urls.forEach((url) => window.open(url, "_blank"));
+  };
 
 
 
 
 
 
-// const transformAIJsonToDayWise = (aiJson) => {
-//   if (!aiJson || !aiJson.days) return null;
+  // const transformAIJsonToDayWise = (aiJson) => {
+  //   if (!aiJson || !aiJson.days) return null;
 
-//   return {
-//     title: aiJson.title,
-//     preferences: aiJson.preferences || [],
-//     days: aiJson.days.map((dayObj, index) => {
-//       const activities = [];
+  //   return {
+  //     title: aiJson.title,
+  //     preferences: aiJson.preferences || [],
+  //     days: aiJson.days.map((dayObj, index) => {
+  //       const activities = [];
 
-//       dayObj.sections.forEach(section => {
-//         section.activities.forEach(act => {
-//           activities.push(
-//             `${section.period}: ${act.description}`
-//           );
-//         });
-//       });
+  //       dayObj.sections.forEach(section => {
+  //         section.activities.forEach(act => {
+  //           activities.push(
+  //             `${section.period}: ${act.description}`
+  //           );
+  //         });
+  //       });
 
-//       return {
-//         day: index + 1,
-//         title: `Day ${index + 1}`,
-//         activities,
-//       };
-//     }),
-//   };
-// };
+  //       return {
+  //         day: index + 1,
+  //         title: `Day ${index + 1}`,
+  //         activities,
+  //       };
+  //     }),
+  //   };
+  // };
 
-// const transformAIJsonToHours = (aiJson) => {
-//   if (!aiJson || !aiJson.days?.length) return null;
+  // const transformAIJsonToHours = (aiJson) => {
+  //   if (!aiJson || !aiJson.days?.length) return null;
 
-//   const hours = [];
+  //   const hours = [];
 
-//   aiJson.days.forEach((day) => {
-//     day.sections.forEach((section) => {
-//       section.activities.forEach((act) => {
-//         hours.push(
-//           `${section.period}: ${act.description}`
-//         );
-//       });
-//     });
-//   });
+  //   aiJson.days.forEach((day) => {
+  //     day.sections.forEach((section) => {
+  //       section.activities.forEach((act) => {
+  //         hours.push(
+  //           `${section.period}: ${act.description}`
+  //         );
+  //       });
+  //     });
+  //   });
 
-//   return {
-//     title: aiJson.title,
-//     hours,
-//   };
-// };
-
-
-
-/* ⬆️ END HERE ⬆️ */
+  //   return {
+  //     title: aiJson.title,
+  //     hours,
+  //   };
+  // };
 
 
-const handleViewChange = (mode) => {
-  setViewMode(mode);
 
-  if (mode === "text") {
-    setJsonError("");
-    return;
-  }
+  /* ⬆️ END HERE ⬆️ */
 
-  if (!finalText) {
-    setJsonError("Text not ready");
-    return;
-  }
 
-  const parsed = convertTextToJSON(finalText, suggestions);
+  const handleViewChange = (mode) => {
+    setViewMode(mode);
 
-  if (!parsed) {
-    setJsonError("Failed to create JSON");
-    return;
-  }
+    if (mode === "text") {
+      setJsonError("");
+      return;
+    }
 
-  if (mode === "json") {
-    setJsonData(parsed);
-    setJsonError("");
-    return;
-  }
+    if (!finalText) {
+      setJsonError("Text not ready");
+      return;
+    }
 
-};
+    const parsed = convertTextToJSON(finalText, suggestions);
+
+    if (!parsed) {
+      setJsonError("Failed to create JSON");
+      return;
+    }
+
+    if (mode === "json") {
+      setJsonData(parsed);
+      setJsonError("");
+      return;
+    }
+
+  };
 
 
 
@@ -486,7 +484,7 @@ const handleViewChange = (mode) => {
 
 
   /* ================= LOADING TEXT ================= */
- 
+
 
   /* ================= GUIDE (STAGE 1 - MANUAL) ================= */
 
@@ -520,53 +518,53 @@ const handleViewChange = (mode) => {
   }, [city]);
 
 
-useEffect(() => {
-  if (!city) return;
+  useEffect(() => {
+    if (!city) return;
 
-  const fetchCityData = async () => {
-    setCityLoading(true);
-    setOsmLoading(true);
-    
-    setOsmError("");
+    const fetchCityData = async () => {
+      setCityLoading(true);
+      // setOsmLoading(true);
 
-    try {
-      const [wikiRes, osmRes] = await Promise.allSettled([
-        fetch(
-          `${API_BASE_URL}/api/wiki?query=${encodeURIComponent(city)}`
-        ).then(r => r.json()),
+      setOsmError("");
 
-        fetch(
-          `${API_BASE_URL}/api/osm?city=${encodeURIComponent(city)}`
-        ).then(r => r.json()),
-      ]);
+      try {
+        const [wikiRes, osmRes] = await Promise.allSettled([
+          fetch(
+            `${API_BASE_URL}/api/wiki?query=${encodeURIComponent(city)}`
+          ).then(r => r.json()),
 
-      // ✅ WIKI (independent)
-      if (
-        wikiRes.status === "fulfilled" &&
-        wikiRes.value?.available
-      ) {
-        setCityInfo(wikiRes.value);
+          fetch(
+            `${API_BASE_URL}/api/osm?city=${encodeURIComponent(city)}`
+          ).then(r => r.json()),
+        ]);
+
+        // ✅ WIKI (independent)
+        if (
+          wikiRes.status === "fulfilled" &&
+          wikiRes.value?.available
+        ) {
+          setCityInfo(wikiRes.value);
+        }
+
+        // ✅ OSM (independent)
+        if (
+          osmRes.status === "fulfilled" &&
+          osmRes.value?.available &&
+          osmRes.value?.attractions?.length > 0
+        ) {
+          setOsmData(osmRes.value);
+        }
+      } catch (err) {
+        console.error("City data load failed", err);
+        setOsmError("Attractions service temporarily unavailable");
+      } finally {
+        setCityLoading(false);
+        // setOsmLoading(false);
       }
+    };
 
-      // ✅ OSM (independent)
-      if (
-        osmRes.status === "fulfilled" &&
-        osmRes.value?.available &&
-        osmRes.value?.attractions?.length > 0
-      ) {
-        setOsmData(osmRes.value);
-      }
-    } catch (err) {
-      console.error("City data load failed", err);
-      setOsmError("Attractions service temporarily unavailable");
-    } finally {
-      setCityLoading(false);
-      setOsmLoading(false);
-    }
-  };
-
-  fetchCityData();
-}, [city]);
+    fetchCityData();
+  }, [city]);
 
 
 
@@ -574,57 +572,57 @@ useEffect(() => {
 
 
 
-const buildGoogleCalendarUrl = ({
-  startDate,
-  days,
-  city,
-  tripType,
-}) => {
-  const base =
-    "https://calendar.google.com/calendar/render?action=TEMPLATE";
+  const buildGoogleCalendarUrl = ({
+    startDate,
+    days,
+    city,
+    tripType,
+  }) => {
+    const base =
+      "https://calendar.google.com/calendar/render?action=TEMPLATE";
 
-  const events = [];
+    const events = [];
 
-  // 🔹 Title logic
-  const title =
-    tripType === "day"
-      ? `${city} One Day Trip`
-      : `${city} ${days} Days Trip`;
+    // 🔹 Title logic
+    const title =
+      tripType === "day"
+        ? `${city} One Day Trip`
+        : `${city} ${days} Days Trip`;
 
-  // 🔹 One-day → ONE event
-  if (tripType === "day") {
-    const date = new Date(startDate);
-    const start = date.toISOString().slice(0, 10).replace(/-/g, "");
+    // 🔹 One-day → ONE event
+    if (tripType === "day") {
+      const date = new Date(startDate);
+      const start = date.toISOString().slice(0, 10).replace(/-/g, "");
 
-    events.push(
-      `${base}` +
+      events.push(
+        `${base}` +
         `&text=${encodeURIComponent(title)}` +
         `&dates=${start}/${start}` +
         `&details=${encodeURIComponent(`Travel itinerary for ${city}`)}` +
         `&location=${encodeURIComponent(city)}`
-    );
+      );
+
+      return events;
+    }
+
+    // 🔹 Multi-day → ONE event per day (same title)
+    for (let i = 0; i < days; i++) {
+      const date = new Date(startDate);
+      date.setDate(date.getDate() + i);
+
+      const start = date.toISOString().slice(0, 10).replace(/-/g, "");
+
+      events.push(
+        `${base}` +
+        `&text=${encodeURIComponent(title)}` +
+        `&dates=${start}/${start}` +
+        `&details=${encodeURIComponent(`Travel itinerary for ${city}`)}` +
+        `&location=${encodeURIComponent(city)}`
+      );
+    }
 
     return events;
-  }
-
-  // 🔹 Multi-day → ONE event per day (same title)
-  for (let i = 0; i < days; i++) {
-    const date = new Date(startDate);
-    date.setDate(date.getDate() + i);
-
-    const start = date.toISOString().slice(0, 10).replace(/-/g, "");
-
-    events.push(
-      `${base}` +
-        `&text=${encodeURIComponent(title)}` +
-        `&dates=${start}/${start}` +
-        `&details=${encodeURIComponent(`Travel itinerary for ${city}`)}` +
-        `&location=${encodeURIComponent(city)}`
-    );
-  }
-
-  return events;
-};
+  };
 
 
 
@@ -638,7 +636,7 @@ const buildGoogleCalendarUrl = ({
   useEffect(() => {
     if (!suggestions?.text) return;
 
-   
+
     setIsTyping(true);
     setFinalText("");
     setDisplayText("");
@@ -670,21 +668,21 @@ const buildGoogleCalendarUrl = ({
 
 
     try {
-     const token =
-  sessionStorage.getItem("token") ||
-  localStorage.getItem("token");
+      const token =
+        sessionStorage.getItem("token") ||
+        localStorage.getItem("token");
 
-const res = await fetch(
-  `${API_BASE_URL}/api/qr-trips`,
-  {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({ text: finalText, place:city }),
-  }
-);
+      const res = await fetch(
+        `${API_BASE_URL}/api/qr-trips`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ text: finalText, place: city }),
+        }
+      );
 
 
 
@@ -699,641 +697,473 @@ const res = await fetch(
     }
   };
 
-useEffect(() => {
-  if (!finalText) return;
+  useEffect(() => {
+    if (!finalText) return;
 
-  const parsed = convertTextToJSON(finalText, suggestions);
+    const parsed = convertTextToJSON(finalText, suggestions);
 
-  // ❌ JSON failed → fallback immediately
-  if (!parsed) {
-    setViewMode("text");
-    setJsonError("Failed to convert itinerary");
-    return;
-  }
+    // ❌ JSON failed → fallback immediately
+    if (!parsed) {
+      setViewMode("text");
+      setJsonError("Failed to convert itinerary");
+      return;
+    }
 
-  // ✅ JSON success → show loader first
-  setBuildingDays(true);
-  setViewMode("days");
+    // ✅ JSON success → show loader first
+    setBuildingDays(true);
+    setViewMode("days");
 
-  const timer = setTimeout(() => {
-    
+    const timer = setTimeout(() => {
 
-    setJsonData(parsed);
-    setBuildingDays(false);
-  }, 5000); // ⏱️ 2 seconds buffer
 
-  return () => clearTimeout(timer);
+      setJsonData(parsed);
+      setBuildingDays(false);
+    }, 5000); // ⏱️ 2 seconds buffer
 
-}, [finalText, tripType, suggestions]);
+    return () => clearTimeout(timer);
+
+  }, [finalText, tripType, suggestions]);
 
 
 
   /* ================= LOADING SCREEN ================= */
 
 
-const AttractionSection = ({ title, items }) => {
-  if (!items || items.length === 0) return null;
+  const AttractionSection = ({ title, items }) => {
+    if (!items || items.length === 0) return null;
 
-  return (
-    <div className="space-y-3">
-      <h3 className="text-lg font-semibold text-gray-800">{title}</h3>
+    return (
+      <div className="space-y-6">
+        <h3 className="text-xl font-bold text-gray-900 border-b pb-2">{title}</h3>
+        <div className="grid gap-4 sm:grid-cols-2">
+          {items.map((place) => (
+            <div key={place.id} className="flex items-start gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors">
+              <div className="mt-1 bg-indigo-100 p-2 rounded-lg text-indigo-600">
+                📍
+              </div>
+              <div>
+                <div className="font-semibold text-gray-900">{place.name}</div>
+                {place.mapsLink && (
+                  <a
+                    href={place.mapsLink}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-sm text-gray-500 hover:text-indigo-600 hover:underline flex items-center gap-1"
+                  >
+                    View on map ↗
+                  </a>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
 
-      <ul className="list-disc ml-5 space-y-2 text-sm text-gray-700">
-        {items.map((place) => (
-          <li key={place.id}>
-            <span className="font-medium text-gray-800">
-              {place.name}
-            </span>
 
-            {place.mapsLink && (
-              <a
-                href={place.mapsLink}
-                target="_blank"
-                rel="noreferrer"
-                className="ml-2 text-indigo-600 underline text-xs"
-              >
-                View on map
-              </a>
-            )}
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-};
-
-
+const heroImage =
+  placeImages.length > 0
+    ? placeImages[0].urls.regular
+    : cityInfo?.image || null;
 
 
   /* ================= RESULT ================= */
- return (
-  <div className="pt-16 sm:pt-20 px-4 animate-fade-in">
-    <div className="max-w-4xl mx-auto space-y-8">
+  return (
+    <div className="min-h-screen bg-white text-gray-900 font-sans selection:bg-indigo-100 selection:text-indigo-800 pb-20">
 
-      {/* ================= HEADER ================= */}
-      <div className="bg-white p-4 sm:p-6 rounded-3xl shadow flex items-start sm:items-center justify-between gap-3">
-        <div>
-          <h2 className="text-lg sm:text-xl font-semibold">
-            Your AI Travel Plan
-          </h2>
-
-          {isDemo && demoReason && (
-            <p className="text-xs text-gray-500 mt-1">
-              {demoReason}
-            </p>
-          )}
-        </div>
-
-        <div className="flex items-center gap-2">
-          {isDemo && (
-            <span className="text-xs bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full">
-              ⚠ Demo
-            </span>
-          )}
-          <button onClick={() => navigate("/")}>✕</button>
-        </div>
-      </div>
-
-      {/* ================= CITY INFO (WIKI) ================= */}
-      {city && (
-        <div className="bg-white rounded-3xl shadow p-6 space-y-4">
-          {cityLoading ? (
-            <p className="text-sm text-gray-500">
-              Loading information about {city}…
-            </p>
-          ) : cityInfo ? (
-            <>
-              <h2 className="text-2xl font-semibold">
-                About {cityInfo.title}
-              </h2>
-
-              {cityInfo.image && (
-              <div className="relative">
-                <img
-                  src={cityInfo.image}
-                  alt={cityInfo.title}
-                  className="w-full max-h-64 object-cover rounded-xl"
-                />
-
-                {/* CITY TAG (LIKE CITY PAGE) */}
-               <div className="absolute bottom-4 left-4
-                bg-white
-                rounded-full px-5 py-2
-                shadow-md">
-                  <span className="text-sm font-medium text-gray-900">
-                    📍 {city}
-                  </span>
-                </div>
-
-              </div>
-            )}
-
-              <p className="text-gray-700 leading-relaxed">
-                {cityInfo.description}
-              </p>
-
-              <a
-                href={cityInfo.wikipediaUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="text-indigo-600 text-sm font-medium"
-              >
-                Read more on Wikipedia →
-              </a>
-            </>
-          ) : (
-            <p className="text-sm text-gray-500">
-              No information found for {city}.
-            </p>
-          )}
-        </div>
-      )}
-
-      {city && (
-  <div className="bg-white rounded-3xl shadow p-6 space-y-4">
-    <h2 className="text-xl font-semibold">
-      📸 Views of {city}
-    </h2>
-
-    {imageLoading && (
-      <p className="text-sm text-gray-500">
-        Loading images…
-      </p>
-    )}
-
-    {!imageLoading && placeImages.length > 0 && (
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-        {placeImages.map((img) => (
-          <img
-            key={img.id}
-            src={img.urls.regular}
-            alt={img.alt_description || city}
-            className="rounded-xl object-cover h-40 w-full hover:scale-[1.02] transition"
-            loading="lazy"
-          />
-        ))}
-      </div>
-    )}
-
-    {!imageLoading && placeImages.length === 0 && (
-  <div className="text-sm text-gray-500 text-center py-6">
-    📷 No images found for <strong>{city}</strong>.<br />
-    This destination may be less photographed — still worth exploring!
-  </div>
-)}
-
-
-    <p className="text-[11px] text-gray-400">
-      Images powered by Unsplash
-    </p>
-  </div>
-)}
-
-
-      {/* ================= MAP ================= */}
-      {city && (
-        <div className="bg-white rounded-3xl shadow p-6 space-y-3">
-          <h3 className="text-lg font-semibold text-gray-800">
-            Explore {city}
-          </h3>
-
-          <p className="text-sm text-gray-500">
-            Zoom in to see famous places, attractions, and landmarks
+      {/* ================= HERO HEADER ================= */}
+      <div className="max-w-5xl mx-auto px-6 py-10 sm:py-16 space-y-6">
+        <div className="animate-fade-in space-y-2">
+          <span className="inline-block px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-semibold tracking-wide uppercase">
+            Trip Itinerary
+          </span>
+          <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-gray-900">
+            {city || "Your Destination"}
+          </h1>
+          <p className="text-lg text-gray-500 max-w-2xl">
+            A personalized travel plan curated just for you. Explore, eat, and enjoy {city}.
           </p>
-
-          <iframe
-            title="city-map"
-            className="w-full h-96 rounded-xl"
-            loading="lazy"
-            src={`https://www.google.com/maps?q=top+tourist+attractions+in+${encodeURIComponent(
-              city
-            )}&z=13&output=embed`}
-          />
         </div>
-      )}
 
-      {/* ================= AI TEXT (DO NOT TOUCH LOGIC) ================= */}
-      <div className="bg-white p-6 rounded-3xl shadow space-y-4">
-        <div className="flex justify-end">
-          <div className="relative">
-            <button
-              onClick={() => setMenuOpen(!menuOpen)}
-              className="bg-slate-800 text-white px-4 py-2 rounded"
-            >
-              ☰
-            </button>
+        {/* ================= IMAGES + WIKI GRID ================= */}
+        {city && (
+  <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-8">
 
-            {menuOpen && (
-              <div className="absolute right-0 mt-2 w-56 bg-white border rounded-xl shadow-lg z-50 p-4 space-y-3">
-                
-                {/* Date Picker */}
-                <div className="space-y-1">
-                  <label className="text-xs text-gray-500">
-                    Start date
-                  </label>
-                  <input
-                    type="date"
-                    value={startDate || ""}
-                    onChange={(e) => setStartDate(e.target.value)}
-                    className="w-full border rounded px-2 py-1 text-sm"
-                  />
-                </div>
+    {/* Left: Main Visuals */}
+    <div className="lg:col-span-8 space-y-6">
 
-                <button
-                  onClick={() => {
-                    handleExportToGoogleCalendar();
-                    setMenuOpen(false);
-                  }}
-                  disabled={!startDate}
-                  className={`w-full text-left text-sm px-2 py-1 rounded
-                    ${!startDate
-                      ? "text-gray-400 cursor-not-allowed"
-                      : "hover:bg-gray-100"}
-                  `}
-                >
-                  📆 Export to Google Calendar
-                </button>
-
-                
-
-
-                {/* Edit toggle */}
-               
-              <button
-                onClick={() => {
-                  setTempDays(
-                      jsonData.days.map((day, i) => ({
-                        ...day,
-                        _id: `day-${i}`,
-                        displayDay: i +1 , // 🔥 stable drag id
-                      }))
-                    );
-              
- // snapshot
-                  setShowReorderModal(true);
-                  setMenuOpen(false);
-                }}
-                className="w-full text-left text-sm hover:bg-gray-100 px-2 py-1 rounded"
-              >
-                ✏️ Reorder days
-              </button>
-
-
-              <button
-                onClick={() => {
-                  setIsEditing(false);
-                  
-                }}
-                className="w-full text-left text-sm hover:bg-gray-100 px-2 py-1 rounded"
-              >
-                ✅ Save itinerary
-              </button>
-
-
-                {/* Clear date */}
-                {startDate && (
-                  <button
-                    onClick={() => {
-                      setStartDate(null);
-                      setMenuOpen(false);
-                    }}
-                    className="w-full text-left text-sm text-red-600 hover:bg-red-50 px-2 py-1 rounded"
-                  >
-                    ❌ Clear date
-                  </button>
-                )}
-              </div>
-            )}
+      {/* Image Gallery */}
+      <div className="rounded-3xl overflow-hidden shadow-sm border border-gray-100 bg-gray-50 min-h-[300px] relative">
+        {imageLoading ? (
+          <div className="absolute inset-0 flex items-center justify-center text-gray-400">
+            <span className="animate-pulse">Loading visual inspiration...</span>
           </div>
-
-{showReorderModal && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-    <div className="bg-white rounded-3xl w-full max-w-lg p-6 shadow-xl animate-fade-in">
-
-      <h3 className="text-lg font-semibold text-gray-800">
-        Reorder your trip days
-      </h3>
-      <p className="text-sm text-gray-500 mt-1">
-        Drag days to change the order. Names will update after saving.
-      </p>
-
-      <DndContext
-  sensors={sensors}
-  collisionDetection={closestCenter}
-  onDragEnd={({ active, over }) => {
-    if (!over || active.id === over.id) return;
-
-    setTempDays((items) => {
-      const oldIndex = items.findIndex(d => d._id === active.id);
-      const newIndex = items.findIndex(d => d._id === over.id);
-
-      const updated = [...items];
-      const [moved] = updated.splice(oldIndex, 1);
-      updated.splice(newIndex, 0, moved);
-
-      return updated;
-    });
-  }}
->
-
-        <SortableContext
-          items={tempDays.map(day => day._id)}
-          strategy={rectSortingStrategy}
-        >
-          <div className="grid grid-cols-3 gap-3 mt-5">
-            {tempDays.map((day) => (
-              <DraggableDayCard
-                key={day._id}
-                id={day._id}
-                day={day}   // 🔥 pass whole day
+        ) : heroImage ? (
+          placeImages.length > 0 ? (
+            <div className="grid grid-cols-3 grid-rows-2 gap-2 h-96 p-2">
+              <img
+                src={heroImage}
+                className="col-span-2 row-span-2 w-full h-full object-cover rounded-2xl"
+                alt={city}
               />
-            ))}
-
-          </div>
-        </SortableContext>
-      </DndContext>
-
-      {/* ACTIONS */}
-      <div className="flex justify-end gap-3 mt-6">
-        <button
-          onClick={() => setShowReorderModal(false)}
-          className="px-4 py-2 rounded border hover:bg-gray-50"
-        >
-          Cancel
-        </button>
-
-        <button
-  disabled={savingOrder}
-  onClick={() => {
-    setSavingOrder(true);
-
-    setTimeout(() => {
-      setJsonData(prev => ({
-        ...prev,
-        days: tempDays.map((day, index) => ({
-          ...day,
-          day: `DAY ${index + 1}`, // rename only after save
-        })),
-      }));
-
-      setSavingOrder(false);
-      setShowReorderModal(false);
-    }, 2000);
-  }}
-  className={`px-4 py-2 rounded text-white flex items-center gap-2
-    ${savingOrder
-      ? "bg-gray-400 cursor-not-allowed"
-      : "bg-slate-800 hover:bg-slate-700"}
-  `}
->
-  {savingOrder ? (
-    <>
-      <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-      Saving
-    </>
-  ) : (
-    "Save changes"
-  )}
-</button>
-
-      </div>
-
-    </div>
-  </div>
-)}
-
-
-
-
-        </div>
-
-       <div className="flex gap-2 mb-3">
-        <button
-          onClick={() => handleViewChange("text")}
-          className={`px-4 py-2 rounded ${
-            viewMode === "text" ? "bg-slate-800 text-white" : "bg-gray-100"
-          }`}
-        >
-          Text
-        </button>
-
-        <button
-          onClick={() => handleViewChange("json")}
-          className={`px-4 py-2 rounded ${
-            viewMode === "json" ? "bg-slate-800 text-white" : "bg-gray-100"
-          }`}
-        >
-          JSON
-        </button>
-
-        <button
-          onClick={() => handleViewChange("days")}
-          className={`px-4 py-2 rounded ${
-            viewMode === "days" ? "bg-slate-800 text-white" : "bg-gray-100"
-          }`}
-        >
-          Day-wise
-        </button>
-      </div>
-
-
-
-        <div
-          className="
-            sm:bg-slate-50 sm:rounded-xl sm:p-5
-            text-[15px] sm:text-base leading-7
-            whitespace-pre-wrap break-words text-gray-800
-          "
-        >
-          {isTyping && displayText === "" && (
-            <TextSkeleton lines={6} />
-          )}
-
-          {isTyping && displayText !== "" && (
-            <div>
-              {displayText}
-              <span className="ml-1 animate-pulse">▍</span>
+              {placeImages.slice(1, 3).map((img, i) => (
+                <img
+                  key={i}
+                  src={img.urls.regular}
+                  className="w-full h-full object-cover rounded-2xl"
+                  alt={city}
+                />
+              ))}
             </div>
-          )}
-
-         {!isTyping && !isEditing && viewMode === "text" && finalText && (
-  <div>{finalText}</div>
-)}
-
-{!isTyping && viewMode === "json" && (
-  <pre className="bg-black text-green-400 text-xs p-4 rounded-xl overflow-auto">
-    {jsonError
-      ? jsonError
-      : JSON.stringify(jsonData, null, 2)}
-  </pre>
-)}
-
-{/* ⏳ Day-wise loading buffer */}
-{viewMode === "days" && buildingDays && (
-  <div className="py-12 text-center space-y-3 animate-fade-in">
-    <div className="w-10 h-10 mx-auto rounded-full border-4 border-[#5b7c67] border-t-transparent animate-spin" />
-    <p className="text-sm text-gray-500">
-      Building your itinerary…
-    </p>
-  </div>
-)}
-
-{viewMode === "days" && tripType === "multi" && (
-  <MultiDayItinerary data={jsonData} city={city} startDate={startDate}/>
-)}
-
-{viewMode === "days" && tripType === "day" && (
-  <OneDayItinerary data={jsonData}  city={city} startDate={startDate}/>
-)}
-
-{viewMode === "days" && tripType === "hours" && (
-  <HoursItinerary data={jsonData} city={city}/>
-)}
-
-
-
-
-
-
-        </div>
-
-        {isEditing && (
-          <textarea
-            value={finalText}
-            onChange={(e) => setFinalText(e.target.value)}
-            className="w-full min-h-[300px] border rounded-xl p-4"
-          />
+          ) : (
+            <img
+              src={heroImage}
+              className="w-full h-96 object-cover"
+              alt={city}
+            />
+          )
+        ) : (
+          <div className="h-96 flex flex-col items-center justify-center text-gray-400 p-10 text-center">
+            <span className="text-4xl mb-2">📸</span>
+            <p>No images available for this destination.</p>
+          </div>
         )}
       </div>
 
-      {!isEditing && finalText && (
-  <div className="mt-4 rounded-xl bg-indigo-50 px-4 py-2 text-xs text-indigo-700">
-    ℹ️ Generating the QR will <strong>save</strong> this trip and make it
-    <strong> shareable & downloadable</strong>.
+    </div>
+
+    {/* Right: Wiki / Info Card */}
+    <div className="lg:col-span-4 flex flex-col gap-6">
+      {cityLoading ? (
+        <div className="h-full bg-gray-50 rounded-3xl animate-pulse" />
+      ) : cityInfo ? (
+        <div className="bg-gray-50 rounded-3xl p-6 h-full flex flex-col justify-between border border-gray-100">
+          <div className="space-y-4">
+            <h2 className="text-xl font-bold flex items-center gap-2">
+              <span>ℹ️</span> About {city}
+            </h2>
+            <p className="text-sm leading-relaxed text-gray-600 line-clamp-6">
+              {cityInfo.description}
+            </p>
+          </div>
+          {cityInfo.wikipediaUrl && (
+            <a
+              href={cityInfo.wikipediaUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-6 inline-flex items-center text-sm font-semibold text-indigo-600 hover:text-indigo-800 transition-colors"
+            >
+              Read on Wikipedia →
+            </a>
+          )}
+        </div>
+      ) : null}
+
+      {/* Local Guide Teaser */}
+      {guide && (
+        <div className="bg-green-50 rounded-3xl p-6 border border-green-100">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-10 h-10 bg-green-200 rounded-full flex items-center justify-center text-xl">👋</div>
+            <div>
+              <p className="text-xs font-bold text-green-800 uppercase">Local Expert</p>
+              <p className="font-semibold text-green-900">{guide.name}</p>
+            </div>
+          </div>
+          <a
+            href={`https://wa.me/${guide.phone}`}
+            target="_blank"
+            rel="noreferrer"
+            className="block text-center bg-white text-green-700 font-medium py-2 rounded-xl text-sm shadow-sm hover:shadow-md transition"
+          >
+            Chat Now
+          </a>
+        </div>
+      )}
+    </div>
   </div>
 )}
 
-
-      {/* ================= QR ================= */}
-      <button
-        onClick={handleGenerateQR}
-        disabled={!finalText || isEditing || qrLoading}
-        className="bg-indigo-600 text-white px-4 py-2 rounded"
-      >
-        {qrLoading ? "Generating QR..." : "📱 Generate QR"}
-      </button>
-
-      {qrTripId && (
-        <div className="flex flex-col items-center gap-3">
-          <QRCodeCanvas
-            value={`${window.location.origin}/qr-trip/${qrTripId}`}
-            size={220}
-          />
-
-          <a
-            href={`${window.location.origin}/qr-trip/${qrTripId}`}
-            target="_blank"
-            rel="noreferrer"
-            className="text-sm text-indigo-600 underline break-all"
-          >
-            {window.location.origin}/qr-trip/{qrTripId}
-          </a>
-
-        <p className="text-xs text-gray-500 text-center">
-          ⏳ Expires in <strong>7 days</strong> · This itinerary is safely saved in
-          <strong> Saved Trips</strong>
-        </p>
-        </div>
-      )}
-
-      {qrTripId && (
-        <div className="rounded-2xl border border-indigo-100 bg-indigo-50/60 px-4 py-3 text-sm">
-          <p className="font-medium text-gray-800">
-            Trip saved successfully
-          </p>
-          <p className="text-xs text-gray-600">
-            Available in <strong>Saved Trips</strong>
-          </p>
-        </div>
-      )}
-
-      {/* ================= OSM ATTRACTIONS ================= */}
-      {city && (
-        <div className="bg-white rounded-3xl shadow p-6 space-y-4">
-          <h2 className="text-xl font-semibold">
-            📍 Things to Explore in {city}
-          </h2>
-
-          {osmLoading && (
-            <p className="text-sm text-gray-500">
-              Finding attractions…
-            </p>
-          )}
-
-          {!osmLoading && osmError && (
-            <p className="text-sm text-red-500">{osmError}</p>
-          )}
-
-          {!osmLoading && osmData?.attractions?.length > 0 && (
-            <AttractionSection
-              title="🏛️ Tourist Attractions"
-              items={osmData.attractions}
-            />
-          )}
-
-          {!osmLoading &&
-            osmData &&
-            osmData.attractions?.length === 0 && (
-              <p className="text-sm text-gray-500">
-                Showing limited attractions for {city}.
-              </p>
-            )}
-        </div>
-      )}
-
-      {/* ================= LOCAL GUIDE ================= */}
-      <div>
-        {city && guide ? (
-          <div className="bg-green-50 border border-green-200 rounded-3xl p-6 shadow-sm">
-            <h3 className="text-xl font-semibold">
-              Local Guide Available in {city}
-            </h3>
-
-            <p className="mt-2 text-gray-600">
-              Explore {city} with a verified local expert.
-            </p>
-
-            <p className="text-sm mt-3">
-              <strong>Name:</strong> {guide.name}
-            </p>
-            <p className="text-sm">
-              <strong>Languages:</strong> {guide.languages}
-            </p>
-
-            <a
-              href={`https://wa.me/${guide.phone}`}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-block mt-4 rounded-full bg-green-600 px-6 py-3 text-white"
-            >
-              💬 Contact Guide
-            </a>
-          </div>
-        ) : city ? (
-          <div className="bg-gray-50 border rounded-3xl p-6 text-center">
-            <h3 className="text-lg font-semibold">
-              No Local Guide Available Yet
-            </h3>
-            <p className="text-sm text-gray-600 mt-1">
-              Want a local expert for {city}?
-            </p>
-          </div>
-        ) : null}
       </div>
 
+
+
+      {/* ================= ITINERARY SECTION ================= */}
+      <div className="max-w-5xl mx-auto px-6 mt-12">
+
+        {/* Toolbar */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <h2 className="text-2xl font-bold text-gray-900">Your Itinerary</h2>
+
+          <div className="flex bg-gray-100 p-1 rounded-full self-start sm:self-auto">
+            {["days", "text", "json"].map((m) => (
+              <button
+                key={m}
+                onClick={() => handleViewChange(m)}
+                className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${viewMode === m
+                  ? "bg-white text-gray-900 shadow-sm"
+                  : "text-gray-500 hover:text-gray-900"
+                  }`}
+              >
+                {m === "days" ? "Day by Day" : m.charAt(0).toUpperCase() + m.slice(1)}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Content Box */}
+        <div className="bg-white rounded-3xl shadow-xl shadow-gray-100 border border-gray-100 overflow-hidden min-h-[400px]">
+
+          {/* Top Actions Bar (Inside Content) */}
+          <div className="border-b px-6 py-4 flex flex-wrap items-center justify-between gap-4 bg-gray-50/50">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-gray-500">Trip Dates:</span>
+              <input
+                type="date"
+                value={startDate || ""}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="bg-transparent border-none text-sm font-semibold text-gray-900 focus:ring-0 p-0"
+              />
+              {!startDate && <span className="text-xs text-red-400">(Select to export)</span>}
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setShowReorderModal(true)}
+                className="p-2 hover:bg-gray-200 rounded-full text-gray-500 transition-colors"
+                title="Reorder Days"
+              >
+                <span className="sr-only">Reorder</span>
+                ✏️
+              </button>
+
+              <button
+                onClick={handleExportToGoogleCalendar}
+                disabled={!startDate}
+                className={`text-sm px-4 py-2 rounded-full font-medium transition-colors ${!startDate ? "text-gray-300 cursor-not-allowed" : "text-gray-700 hover:bg-white hover:shadow-sm"
+                  }`}
+              >
+                📆 Add to Calendar
+              </button>
+            </div>
+          </div>
+
+          {/* MAIN CONTENT DISPLAY */}
+          <div className="p-6 sm:p-10">
+
+            {/* Typewriter text */}
+            {isTyping && (
+              <div className="prose max-w-none text-gray-600">
+                <div className="whitespace-pre-wrap font-mono text-sm">
+                  {displayText}<span className="animate-pulse">|</span>
+                </div>
+              </div>
+            )}
+
+            {/* Text Mode Display */}
+            {!isTyping && viewMode === "text" && (
+              isEditing ? (
+                <div className="space-y-4">
+                  <textarea
+                    value={finalText}
+                    onChange={(e) => setFinalText(e.target.value)}
+                    className="w-full h-[500px] p-4 font-mono text-sm bg-gray-50 rounded-xl border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
+                  />
+                  <div className="flex justify-end">
+                    <button
+                      onClick={() => setIsEditing(false)}
+                      className="bg-black text-white px-6 py-2 rounded-full text-sm font-semibold hover:bg-gray-800 transition-colors"
+                    >
+                      ✅ Done Editing
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="prose max-w-none text-gray-800 whitespace-pre-wrap">
+                  {finalText || <TextSkeleton />}
+
+                  <button
+                    onClick={() => setIsEditing(true)}
+                    className="mt-4 text-sm text-indigo-600 hover:underline"
+                  >
+                    Edit raw text
+                  </button>
+                </div>
+              )
+            )}
+
+            {/* JSON Mode Display */}
+            {!isTyping && viewMode === "json" && (
+              <div className="relative group">
+                <div className="absolute top-2 right-2 flex gap-2">
+                  {jsonError && <span className="bg-red-100 text-red-600 text-xs px-2 py-1 rounded">Error parsing JSON</span>}
+                </div>
+                <pre className="bg-gray-900 text-gray-300 p-6 rounded-2xl overflow-auto text-xs font-mono max-h-[600px] shadow-inner">
+                  {JSON.stringify(jsonData, null, 2)}
+                </pre>
+              </div>
+            )}
+
+            {/* Day Wise Mode - The Star Show */}
+            {!isTyping && viewMode === "days" && (
+              <div className="space-y-8">
+                {buildingDays ? (
+                  <div className="flex flex-col items-center justify-center py-20 space-y-4">
+                    <div className="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+                    <p className="text-gray-500 font-medium">Organizing your schedule...</p>
+                  </div>
+                ) : (
+                  <>
+                    {/* Render correct component based on trip type */}
+                    {tripType === "multi" && <MultiDayItinerary data={jsonData} city={city} startDate={startDate} />}
+                    {tripType === "day" && <OneDayItinerary data={jsonData} city={city} startDate={startDate} />}
+                    {tripType === "hours" && <HoursItinerary data={jsonData} city={city} />}
+                  </>
+                )}
+              </div>
+            )}
+
+          </div>
+
+        </div>
+      </div>
+
+      {/* ================= ACTIONS & SAVE ================= */}
+      <div className="max-w-3xl mx-auto px-6 mt-12 text-center space-y-8">
+
+        <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-3xl p-8 border border-white shadow-lg">
+          <h3 className="text-2xl font-bold text-gray-900 mb-2">Save this Trip</h3>
+          <p className="text-gray-600 mb-6">Create a unique QR code to access this itinerary on your phone or share it with friends.</p>
+
+          {!qrTripId ? (
+            <button
+              onClick={handleGenerateQR}
+              disabled={!finalText || qrLoading}
+              className="bg-gray-900 text-white px-8 py-4 rounded-full font-bold hover:bg-black transition-transform hover:scale-105 shadow-xl disabled:opacity-50 disabled:hover:scale-100"
+            >
+              {qrLoading ? "Generating..." : "Generate QR Code"}
+            </button>
+          ) : (
+            <div className="space-y-6 animate-fade-in-up">
+              <div className="bg-white p-4 rounded-2xl shadow-sm inline-block">
+                <QRCodeCanvas
+                  value={`${window.location.origin}/qr-trip/${qrTripId}`}
+                  size={200}
+                />
+              </div>
+              <div>
+                <a
+                  href={`${window.location.origin}/qr-trip/${qrTripId}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-indigo-600 font-medium hover:underline break-all"
+                >
+                  {window.location.origin}/qr-trip/{qrTripId}
+                </a>
+                <p className="text-xs text-gray-400 mt-2">Link expires in 7 days</p>
+              </div>
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-100 text-green-700 rounded-full text-sm font-medium">
+                ✅ Trip Saved for later
+              </div>
+            </div>
+          )}
+        </div>
+
+      </div>
+
+      {/* ================= EXPLORE MAP & ATTRACTIONS ================= */}
+      <div className="max-w-5xl mx-auto px-6 mt-16 space-y-12">
+
+        {/* Map */}
+        {city && (
+          <div className="space-y-4">
+            <h3 className="text-2xl font-bold text-gray-900">Map Exploration</h3>
+            <div className="h-96 w-full rounded-3xl overflow-hidden shadow-sm border border-gray-200">
+              <iframe
+                title="city-map"
+                className="w-full h-full grayscale-[20%] hover:grayscale-0 transition-all duration-700"
+                loading="lazy"
+                src={`https://www.google.com/maps?q=top+tourist+attractions+in+${encodeURIComponent(city)}&z=13&output=embed`}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* OSM Attractions */}
+        {osmData?.attractions?.length > 0 && (
+          <div className="space-y-4">
+            {!osmError && <AttractionSection title={`Top Sights in ${city}`} items={osmData.attractions} />}
+          </div>
+        )}
+
+      </div>
+
+      {/* ================= MODAL: REORDER ================= */}
+      {showReorderModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-3xl w-full max-w-2xl p-8 shadow-2xl animate-scale-in">
+            <h3 className="text-2xl font-bold text-gray-900 mb-2">Reorder Days</h3>
+            <p className="text-gray-500 mb-6">Drag and drop to rearrange your itinerary.</p>
+
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={({ active, over }) => {
+                if (!over || active.id === over.id) return;
+                setTempDays((items) => {
+                  const oldIndex = items.findIndex((d) => d._id === active.id);
+                  const newIndex = items.findIndex((d) => d._id === over.id);
+                  const updated = [...items];
+                  const [moved] = updated.splice(oldIndex, 1);
+                  updated.splice(newIndex, 0, moved);
+                  return updated;
+                });
+              }}
+            >
+              <SortableContext items={tempDays.map((day) => day._id)} strategy={rectSortingStrategy}>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                  {tempDays.map((day) => (
+                    <DraggableDayCard key={day._id} id={day._id} day={day} />
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
+
+            <div className="flex justify-end gap-3 mt-8">
+              <button
+                onClick={() => setShowReorderModal(false)}
+                className="px-6 py-3 rounded-full text-gray-600 font-medium hover:bg-gray-100 transition"
+              >
+                Cancel
+              </button>
+              <button
+                disabled={savingOrder}
+                onClick={() => {
+                  setSavingOrder(true);
+                  setTimeout(() => {
+                    setJsonData((prev) => ({
+                      ...prev,
+                      days: tempDays.map((day, index) => ({
+                        ...day,
+                        day: `DAY ${index + 1}`,
+                      })),
+                    }));
+                    setSavingOrder(false);
+                    setShowReorderModal(false);
+                  }, 2000);
+                }}
+                className="bg-black text-white px-8 py-3 rounded-full font-bold hover:bg-gray-800 transition disabled:opacity-50 flex items-center gap-2"
+              >
+                {savingOrder && <div className="w-4 h-4 border-2 border-white/50 border-t-white rounded-full animate-spin" />}
+                Save Order
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
-  </div>
-);
+  );
 
 };
 

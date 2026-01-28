@@ -3,30 +3,30 @@ import { Link } from "react-router-dom";
 const faqs = [
   {
     q: "Why yet another trip planning tool?",
-    a: "Most travel tools focus on bookings. Project X focuses on planning, clarity, and real-world travel logic before you spend money."
+    a: "Most travel tools focus on bookings. Expeditio focuses on planning, clarity, and real-world travel logic before you spend money."
   },
   {
-    q: "What can I do with Project X?",
+    q: "What can I do with Expeditio?",
     a: "You can plan trips day-by-day, estimate budgets, discover destinations, and organize travel details in one place."
   },
   {
-    q: "Who is Project X for?",
-    a: "Project X is for solo travelers, families, students, and anyone who wants stress-free and realistic trip planning."
+    q: "Who is Expeditio for?",
+    a: "Expeditio is for solo travelers, families, students, and anyone who wants stress-free and realistic trip planning."
   },
   {
-    q: "How can I plan my stay with Project X?",
+    q: "How can I plan my stay with Expeditio?",
     a: "You can explore destinations, choose activities, estimate stay duration, and build a structured itinerary based on your travel style."
   },
   {
     q: "How does the trip budgeting work?",
-    a: "Project X provides rough cost estimates for transport, stay, food, and activities to help you plan within your budget."
+    a: "Expeditio provides rough cost estimates for transport, stay, food, and activities to help you plan within your budget."
   },
   {
     q: "Can I book plane tickets or accommodations?",
-    a: "Currently, Project X focuses on planning. Booking integrations may be added in the future."
+    a: "Currently, Expeditio focuses on planning. Booking integrations may be added in the future."
   },
   {
-    q: "Why are there so few places listed on Project X?",
+    q: "Why are there so few places listed on Expeditio?",
     a: "Project X is growing gradually to ensure accurate and meaningful data rather than overwhelming users with unreliable information."
   },
   {
@@ -34,7 +34,7 @@ const faqs = [
     a: "Future updates will allow you to connect with travelers, local guides, and communities for shared experiences and tips."
   },
   {
-    q: "What activities can I experience on Project X?",
+    q: "What activities can I experience on Expeditio?",
     a: "You can explore sightseeing spots, local experiences, nature activities, cultural visits, and travel-friendly adventures."
   }
 ];
@@ -88,7 +88,7 @@ export default function FaqFooterSection() {
             {/* BRAND */}
             <div className="md:col-span-2 space-y-3">
               <h3 className="text-2xl font-semibold tracking-wide">
-                PROJECT X
+                EXPEDITIO
               </h3>
               <p className="text-gray-700 max-w-xs">
                 Experience the world, your way.
@@ -127,7 +127,7 @@ export default function FaqFooterSection() {
           </div>
 
           <div className="mt-8 pt-4 border-t border-black/10 text-xs text-gray-700">
-            © 2026 Project X. All rights reserved.
+            © 2026 Expeditio. All rights reserved.
           </div>
         </div>
       </footer>
