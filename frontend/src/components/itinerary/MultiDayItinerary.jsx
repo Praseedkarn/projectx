@@ -10,6 +10,7 @@ import React, { useEffect, useState } from "react";
 
 const MultiDayItinerary = ({ data, city, startDate }) => {
   const [activeDay, setActiveDay] = useState(1);
+const [showBudgetDetails, setShowBudgetDetails] = useState(false);
 
   const getDateLabel = (startDate, index) => {
     if (!startDate) return `Day ${index + 1}`;
@@ -52,6 +53,9 @@ const MultiDayItinerary = ({ data, city, startDate }) => {
     .flatMap(d => d.sections || [])
     .find(s => s.period.toLowerCase() === "transportation");
 
+
+
+
   return (
     <div className="space-y-12 animate-fade-in">
 
@@ -62,6 +66,64 @@ const MultiDayItinerary = ({ data, city, startDate }) => {
           <p className="text-gray-500">A day-by-day roadmap of your adventure</p>
         </div>
       )}
+
+    {(() => {
+  let budgetText = data?.estimatedBudget;
+
+  if (!budgetText) {
+    const budgetSection = data?.days?.[0]?.sections?.find(
+      s => s.period.toLowerCase().includes("estimated budget")
+    );
+    budgetText = budgetSection?.activities?.[0]?.description;
+  }
+
+  if (!budgetText) return null;
+
+  const totalDays = data?.days?.length || 1;
+
+  return (
+    <div className="mt-6 rounded-2xl border border-emerald-100 bg-emerald-50/60 overflow-hidden">
+      
+      {/* Header */}
+      <button
+        onClick={() => setShowBudgetDetails(v => !v)}
+        className="w-full flex items-center justify-between px-5 py-4 text-left"
+      >
+        <div className="flex items-center gap-2 text-emerald-800 font-semibold">
+          <span className="text-lg">💰</span>
+          <span>Estimated Budget</span>
+        </div>
+
+        <span className="text-sm text-emerald-700 font-medium">
+          {showBudgetDetails ? "Hide details ▲" : "View details ▼"}
+        </span>
+      </button>
+
+      {/* Summary */}
+      <div className="px-5 pb-4 text-sm text-emerald-900">
+        {budgetText}
+      </div>
+
+      {/* Expanded Details */}
+      {showBudgetDetails && (
+        <div className="px-5 pb-5 pt-2 text-xs text-emerald-700 space-y-2 border-t border-emerald-100">
+          <p>• Budget is calculated <b>per person, per day</b></p>
+
+          {totalDays > 1 && (
+            <p>• Total trip estimate ≈ per-day budget × {totalDays} days</p>
+          )}
+
+          <p>• Includes food, local transport, and attraction entry fees</p>
+          <p>• Excludes flights, accommodation, and shopping</p>
+          <p>• Actual spending may vary based on preferences and season</p>
+        </div>
+      )}
+    </div>
+  );
+})()}
+
+
+
 
       <div className="relative space-y-16">
         {/* Continuous Line */}
@@ -134,11 +196,11 @@ const MultiDayItinerary = ({ data, city, startDate }) => {
 
       {/* Overall Transportation */}
       {transportSection && (
-        <div className="mt-12 bg-gray-900 text-gray-300 rounded-2xl p-8 shadow-xl">
+        <div className="mt-12 bg-gray-100 text-gray-900 rounded-2xl p-8 shadow-xl">
           <div className="flex items-start gap-4">
-            <span className="text-3xl">✈️</span>
+            <span className="text-3xl"></span>
             <div className="space-y-4">
-              <h3 className="text-xl font-bold text-white">Logistics & Transportation</h3>
+              <h3 className="text-xl font-bold text-black">Logistics & Transportation</h3>
               <div className="space-y-2">
                 {transportSection.activities.map((act, i) => (
                   <p key={i} className="leading-relaxed text-sm opacity-90">

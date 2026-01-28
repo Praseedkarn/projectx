@@ -252,6 +252,7 @@ const TripResults = () => {
           : Array.isArray(suggestions)
             ? suggestions
             : [],
+       estimatedBudget: null,
       days: [],
     };
 
@@ -267,6 +268,15 @@ const TripResults = () => {
         result.title = line.replace("TITLE:", "").trim();
         continue;
       }
+
+      /* ===== ESTIMATED BUDGET ===== */
+      if (/^estimated budget/i.test(line)) {
+        result.estimatedBudget = line
+          .replace(/estimated budget[:-]*/i, "")
+          .trim();
+        continue;
+      }
+
 
       /* ===== DAY ===== */
       if (/^day\s+\d+/i.test(line)) {
@@ -775,6 +785,14 @@ const heroImage =
       {/* ================= HERO HEADER ================= */}
       <div className="max-w-5xl mx-auto px-6 py-10 sm:py-16 space-y-6">
         <div className="animate-fade-in space-y-2">
+
+          <button
+            onClick={() => navigate(-1)}
+            className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-gray-900 transition"
+          >
+            ← Back
+          </button>
+
           <span className="inline-block px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-semibold tracking-wide uppercase">
             Trip Itinerary
           </span>

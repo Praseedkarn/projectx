@@ -25,17 +25,23 @@ ${Array.from({ length: days }, (_, i) => `
 DAY ${i + 1}
 
 ## Morning
-Write ONE paragraph (3–4 sentences) describing morning activities.
+Write ONE paragraph (2–3 sentences) describing morning activities.
 End with: Location: <place>.
 
 ## Afternoon
-Write ONE paragraph (3–4 sentences) describing afternoon activities.
+Write ONE paragraph (2–3 sentences) describing afternoon activities.
 End with: Location: <place>.
 
 ## Evening
-Write ONE paragraph (3–4 sentences) describing evening activities.
+Write ONE paragraph (2–3 sentences) describing evening activities.
 End with: Location: <place>.
 `).join("")}
+
+Estimated Budget (Per Person Per Day): <amount>
+Write the budget on ONE line only.
+India: ₹ | Others: $
+Exclude flights and accommodation.
+Use a realistic range.
 
 ## Transportation
 Write ONE concise paragraph explaining how to travel within ${place} across all days
