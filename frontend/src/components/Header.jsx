@@ -195,11 +195,16 @@ const go = (path) => {
                   </button>
                   {user.role === "admin" && (
                     <button
-                      onClick={() => go("/admin")}
-                      className="menu-item"
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        go("/admin");
+                      }}
+                      className="menu-item relative z-[9999]"
                     >
                       Admin Dashboard
                     </button>
+
                   )}
 
                 </div>
