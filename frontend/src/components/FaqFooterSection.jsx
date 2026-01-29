@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+
 const faqs = [
   {
     q: "Why yet another trip planning tool?",
@@ -27,7 +28,7 @@ const faqs = [
   },
   {
     q: "Why are there so few places listed on Expeditio?",
-    a: "Project X is growing gradually to ensure accurate and meaningful data rather than overwhelming users with unreliable information."
+    a: "Expeditio is growing gradually to ensure accurate and meaningful data rather than overwhelming users with unreliable information."
   },
   {
     q: "How can I connect with communities and travelers?",
@@ -39,14 +40,40 @@ const faqs = [
   }
 ];
 
-
 export default function FaqFooterSection() {
   const [open, setOpen] = useState(null);
+  const [footerHero, setFooterHero] = useState(false);
+
+  /* ===== FOOTER HERO SCROLL LOGIC ===== */
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      const windowHeight = window.innerHeight;
+      const docHeight = document.documentElement.scrollHeight;
+
+      // Trigger hero when near bottom
+      const nearBottom = scrollY + windowHeight > docHeight - 220;
+      setFooterHero(nearBottom);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
     <>
-      {/* ================= FAQ SECTION ================= */}
-      <section className="bg-white rounded-t-[80px] pt-24 pb-32 ">
+      {/* ================= FAQ HERO SECTION ================= */}
+      <section
+        className={`
+          relative
+          transition-all duration-700 ease-out
+          will-change-transform
+          bg-white
+          ${footerHero
+            ? "rounded-t-[80px] pt-32 pb-40 min-h-[70vh]"
+            : "rounded-t-[48px] pt-20 pb-28"}
+        `}
+      >
         <div className="max-w-7xl mx-auto px-10 md:px-20">
           <div className="grid md:grid-cols-[260px_1fr] gap-14">
 
@@ -79,8 +106,18 @@ export default function FaqFooterSection() {
         </div>
       </section>
 
-      {/* ================= FOOTER SECTION ================= */}
-      <footer className="bg-[#d7f26e] rounded-t-[80px] pt-20 pb-10 -mt-20 relative z-10">
+      {/* ================= FOOTER HERO ATTACHED ================= */}
+      <footer
+        className={`
+          relative z-10
+          transition-all duration-700 ease-out
+          will-change-transform
+          bg-[#d7f26e]
+          ${footerHero
+            ? "rounded-t-[80px] pt-24 pb-16 -mt-32"
+            : "rounded-t-[48px] pt-16 pb-10 -mt-20"}
+        `}
+      >
         <div className="max-w-7xl mx-auto px-10 md:px-20">
 
           <div className="grid grid-cols-2 md:grid-cols-5 gap-10 text-sm">
@@ -100,8 +137,8 @@ export default function FaqFooterSection() {
               <h4 className="font-semibold mb-3">Support</h4>
               <ul className="space-y-2 text-gray-700">
                 <li>FAQ</li>
-               <li><Link to="/terms">Terms & Conditions</Link></li>
-               <li> <Link to="/privacy">Privacy Policy</Link></li>
+                <li><Link to="/terms">Terms & Conditions</Link></li>
+                <li><Link to="/privacy">Privacy Policy</Link></li>
                 <li>Refunds</li>
               </ul>
             </div>

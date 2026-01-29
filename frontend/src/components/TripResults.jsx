@@ -131,40 +131,46 @@ const TripResults = () => {
     return [];
   };
 
-  const DraggableDayCard = ({ id, day }) => {
-    const {
-      attributes,
-      listeners,
-      setNodeRef,
-      transform,
-      transition,
-    } = useSortable({ id });
+ const DraggableDayCard = ({ id, day }) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+  } = useSortable({ id });
 
-    const style = {
-      transform: CSS.Transform.toString(transform),
-      transition,
-    };
-
-    return (
-      <div
-        ref={setNodeRef}
-        style={style}
-        className="group relative flex flex-col items-center justify-center p-6 bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md transition-all cursor-grab active:cursor-grabbing touch-none select-none"
-      >
-        <div className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">
-          Itinerary
-        </div>
-        <div className="text-xl font-bold text-gray-900 mb-1">Day {day.displayDay}</div>
-        <div className="w-8 h-1 bg-gray-100 rounded-full group-hover:bg-indigo-500 transition-colors" />
-
-        <div
-          {...attributes}
-          {...listeners}
-          className="absolute inset-0 rounded-2xl"
-        />
-      </div>
-    );
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
   };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="relative flex flex-col items-center justify-center p-6 bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md transition-all select-none"
+    >
+      <div className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">
+        Itinerary
+      </div>
+
+      <div className="text-xl font-bold text-gray-900 mb-2">
+        Day {day.displayDay}
+      </div>
+
+      {/* ✅ DRAG HANDLE */}
+      <button
+        {...attributes}
+        {...listeners}
+        className="mt-2 px-4 py-2 text-sm font-semibold bg-gray-100 rounded-full cursor-grab active:cursor-grabbing hover:bg-gray-200"
+      >
+        ⠿ Drag
+      </button>
+    </div>
+  );
+};
+
 
 
   const sensors = useSensors(
@@ -213,6 +219,18 @@ const TripResults = () => {
   const [jsonData, setJsonData] = useState(null);
   const [showReorderModal, setShowReorderModal] = useState(false);
   const [tempDays, setTempDays] = useState([]);
+useEffect(() => {
+  if (showReorderModal && jsonData?.days?.length) {
+    setTempDays(
+      jsonData.days.map((day, index) => ({
+        ...day,
+        _id: `day-${index}`,     // required by dnd-kit
+        displayDay: index + 1,   // for UI label
+      }))
+    );
+  }
+}, [showReorderModal, jsonData]);
+
 
 
   const [jsonError, setJsonError] = useState("");
@@ -1159,11 +1177,12 @@ const heroImage =
                 onClick={() => {
                   setSavingOrder(true);
                   setTimeout(() => {
-                    setJsonData((prev) => ({
+                   setJsonData((prev) => ({
                       ...prev,
                       days: tempDays.map((day, index) => ({
                         ...day,
                         day: `DAY ${index + 1}`,
+                        displayDay: index + 1,
                       })),
                     }));
                     setSavingOrder(false);

@@ -26,7 +26,7 @@ const Privacy = () => {
 
         <section className="space-y-3 text-sm text-gray-700">
           <p>
-            This Privacy Policy explains how <strong>Project X</strong>
+            This Privacy Policy explains how <strong>Expeditio</strong>
             collects, uses, and protects your data.
           </p>
 

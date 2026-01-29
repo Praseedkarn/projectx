@@ -39,7 +39,7 @@ End with: Location: <place>.
 
 Estimated Budget (Per Person Per Day): <amount>
 Write the budget on ONE line only.
-India: ₹ | Others: $
+India: ₹ 
 Exclude flights and accommodation.
 Use a realistic range.
 

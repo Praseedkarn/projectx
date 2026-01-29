@@ -12,7 +12,7 @@ const TravelQuotes = () => {
     },
     {
       text: "A good trip is measured in moments, not miles.",
-      author: "Project X",
+      author: "Expeditio",
     },
     {
       text: "Don’t rush through places meant to be felt.",
@@ -20,7 +20,7 @@ const TravelQuotes = () => {
     },
     {
       text: "Smart travel is about flow, not speed.",
-      author: "Project X",
+      author: "Expeditio",
     },
   ];
 

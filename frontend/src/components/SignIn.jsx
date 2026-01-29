@@ -136,8 +136,8 @@ const handleLogin = async () => {
 
         <p className="mt-1 text-sm text-center text-gray-500">
           {isLogin
-            ? "Sign in to your Project X account"
-            : "Join Project X and start planning"}
+            ? "Sign in to your Expeditio account"
+            : "Join Expeditio and start planning"}
         </p>
 
         {/* Error */}

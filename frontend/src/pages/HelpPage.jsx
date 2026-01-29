@@ -30,21 +30,21 @@ const HelpPage = () => {
           </button>
         </div>
 
-        {/* WHAT IS PROJECT X */}
-        <Section title="What is Project X?">
+       
+        <Section title="What is Expeditio?">
           <p>
-            Project X is an <strong>AI-powered travel planning website</strong>.
+            Expeditio  is an <strong>AI-powered travel planning website</strong>.
             It helps you create realistic and well-paced travel itineraries
             based on your destination, time, and preferences.
           </p>
           <p>
-            Instead of random suggestions, Project X creates
+            Instead of random suggestions, Expeditio creates
             <strong> practical travel plans</strong> that you can actually follow.
           </p>
         </Section>
 
         {/* HOW IT WORKS */}
-        <Section title="How does Project X work?">
+        <Section title="How does Expeditio X work?">
           <ol className="list-decimal ml-5 space-y-1">
             <li>Go to the home page</li>
             <li>Select how long your trip is</li>
@@ -109,7 +109,7 @@ const HelpPage = () => {
         <Section title="What is Demo mode?">
           <p>
             If you enter <strong>demo</strong> as the destination,
-            Project X shows a sample itinerary.
+            Expeditio shows a sample itinerary.
           </p>
           <p>
             Demo mode:

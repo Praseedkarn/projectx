@@ -26,7 +26,7 @@ const Terms = () => {
 
         <section className="space-y-3 text-sm text-gray-700">
           <p>
-            Welcome to <strong>Project X</strong>. By using this website,
+            Welcome to <strong>Expeditio</strong>. By using this website,
             you agree to these Terms & Conditions.
           </p>
 
@@ -34,7 +34,7 @@ const Terms = () => {
             1. Nature of the Service
           </h2>
           <p>
-            Project X is an <strong>AI-powered travel planning platform</strong>.
+            Expeditio is an <strong>AI-powered travel planning platform</strong>.
             We provide travel itineraries, suggestions, and planning tools
             for informational purposes only.
           </p>
@@ -89,7 +89,7 @@ const Terms = () => {
             7. Limitation of Liability
           </h2>
           <p>
-            Project X shall not be liable for any loss, damage, delay,
+            Expeditio shall not be liable for any loss, damage, delay,
             or inconvenience resulting from the use of the platform.
           </p>
 
