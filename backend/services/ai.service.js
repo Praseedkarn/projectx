@@ -25,8 +25,7 @@ export const generateItinerary = async (prompt) => {
           }
         ],
         temperature: 0.7,       // more stable than 0.7
-        max_tokens: 1200,        // prevents rambling
-        stop: ["END"], // hard stop
+        max_tokens: 2000,        // prevents rambling
       },
       {
         headers: {

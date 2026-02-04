@@ -8,7 +8,7 @@ import React, { useEffect, useState } from "react";
 
 
 
-const MultiDayItinerary = ({ data, city, startDate }) => {
+const MultiDayItinerary = ({ data, city, startDate , onActiveDayChange, scrollContainerRef}) => {
   const [activeDay, setActiveDay] = useState(1);
 const [showBudgetDetails, setShowBudgetDetails] = useState(false);
 
@@ -25,29 +25,39 @@ const [showBudgetDetails, setShowBudgetDetails] = useState(false);
     });
   };
 
-
   useEffect(() => {
+    const container = scrollContainerRef?.current;
+    if (!container) return;
+
     const onScroll = () => {
-      const sections = document.querySelectorAll("[data-day]");
+      const sections = container.querySelectorAll("[data-day]");
       let current = 1;
 
       sections.forEach(section => {
         const rect = section.getBoundingClientRect();
-        if (rect.top <= window.innerHeight * 0.55) {
+        const containerRect = container.getBoundingClientRect();
+
+        if (rect.top - containerRect.top <= container.clientHeight * 0.5) {
           current = Number(section.dataset.day);
         }
       });
 
       setActiveDay(current);
+      onActiveDayChange?.(current);
     };
 
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+    container.addEventListener("scroll", onScroll, { passive: true });
+    onScroll(); // initial sync
+
+    return () => container.removeEventListener("scroll", onScroll);
+  }, [scrollContainerRef, onActiveDayChange]);
+  
 
   if (!data?.days?.length) {
     return <p className="text-sm text-gray-500">No itinerary available</p>;
   }
+
+
 
   const transportSection = data.days
     .flatMap(d => d.sections || [])
@@ -198,9 +208,9 @@ const [showBudgetDetails, setShowBudgetDetails] = useState(false);
       {transportSection && (
         <div className="mt-12 bg-gray-100 text-gray-900 rounded-2xl p-8 shadow-xl">
           <div className="flex items-start gap-4">
-            <span className="text-3xl"></span>
+            <span className="text-3xl">🚗</span>
             <div className="space-y-4">
-              <h3 className="text-xl font-bold text-black">Logistics & Transportation</h3>
+              <h3 className="text-xl font-bold text-black"> Logistics & Transportation</h3>
               <div className="space-y-2">
                 {transportSection.activities.map((act, i) => (
                   <p key={i} className="leading-relaxed text-sm opacity-90">

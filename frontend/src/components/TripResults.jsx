@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { QRCodeCanvas } from "qrcode.react";
+import { useRef } from "react";
 
-
+import DayMap from "./DayMap";
 
 import {
   DndContext,
@@ -59,6 +60,8 @@ const TripResults = () => {
   // const [menuOpen, setMenuOpen] = useState(false);
   const [startDate, setStartDate] = useState(null); // yyyy-mm-dd
 
+  const [activeDay, setActiveDay]=useState(1)
+  const itineraryScrollRef = useRef(null);
 
   const fetchPlaceImages = async (place, osmAttractions = []) => {
     const queries = [
@@ -490,31 +493,12 @@ useEffect(() => {
   };
 
 
-
-
-
-
-
-
-
-
-
-
-
   /* ================= HARD REDIRECT IF NOTHING ================= */
   useEffect(() => {
     if (!suggestions) {
       navigate("/", { replace: true });
     }
   }, [suggestions, navigate]);
-
-
-
-
-  /* ================= LOADING TEXT ================= */
-
-
-  /* ================= GUIDE (STAGE 1 - MANUAL) ================= */
 
   useEffect(() => {
     if (!city) return;
@@ -1051,7 +1035,41 @@ const heroImage =
                 ) : (
                   <>
                     {/* Render correct component based on trip type */}
-                    {tripType === "multi" && <MultiDayItinerary data={jsonData} city={city} startDate={startDate} />}
+                    {/* DESKTOP SPLIT VIEW */}
+<div className="hidden lg:grid lg:grid-cols-2 gap-6">
+  
+  {/* LEFT – ITINERARY */}
+  <div 
+  ref={itineraryScrollRef}
+  className="h-[calc(100vh-140px)] overflow-y-auto pr-4">
+    <MultiDayItinerary
+      data={jsonData}
+      city={city}
+      startDate={startDate}
+      onActiveDayChange={setActiveDay} 
+      scrollContainerRef={itineraryScrollRef}// 🔥 VERY IMPORTANT
+    />
+  </div>
+
+  {/* RIGHT – MAP */}
+  <div className="sticky top-28 h-[calc(100vh-140px)] rounded-3xl overflow-hidden border">
+    <DayMap
+      city={city}
+      data={jsonData}
+      day={activeDay}
+    />
+  </div>
+</div>
+
+{/* MOBILE – SAME AS BEFORE */}
+<div className="lg:hidden">
+  <MultiDayItinerary
+    data={jsonData}
+    city={city}
+    startDate={startDate}
+  />
+</div>
+
                     {tripType === "day" && <OneDayItinerary data={jsonData} city={city} startDate={startDate} />}
                     {tripType === "hours" && <HoursItinerary data={jsonData} city={city} />}
                   </>

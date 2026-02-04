@@ -4,7 +4,7 @@ export const buildMultiDayPrompt = ({
   group,
   suggestions,
 }) => `
-Create a detailed multi-day travel itinerary.
+Create a clear, natural-sounding multi-day travel itinerary in a professional travel-guide tone.
 
 Destination: ${place}
 Duration: ${days} days
