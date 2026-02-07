@@ -4,8 +4,7 @@ export const buildHoursPrompt = ({
   group,
   suggestions,
 }) => `
-Create an hourly travel itinerary.
-
+Create a clear, natural-sounding hours travel itinerary in a professional travel-guide tone.
 Destination: ${place}
 Duration: ${hours} hours
 Group: ${group}

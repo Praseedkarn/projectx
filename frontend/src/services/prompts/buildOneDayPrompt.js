@@ -3,7 +3,7 @@ export const buildOneDayPrompt = ({
   group,
   suggestions,
 }) => `
-Create a one-day travel itinerary.
+Create a clear, natural-sounding one-day travel itinerary in a professional travel-guide tone.
 
 Destination: ${place}
 Duration: 1 day
