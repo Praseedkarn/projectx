@@ -1,15 +1,26 @@
 import React, { useState } from "react";
 
+/* ================= HELPERS ================= */
+
 const getBudgetText = (data) => {
   if (data?.estimatedBudget) return data.estimatedBudget;
 
   const sections = data?.days?.[0]?.sections || [];
   const budgetSection = sections.find(s =>
-    s.period.toLowerCase().includes("estimated budget")
+    s.period.toLowerCase().includes("budget")
   );
 
   return budgetSection?.activities?.[0]?.description || null;
 };
+
+const isTransportSection = (section) =>
+  section.period.toLowerCase().includes("transport");
+
+const isBudgetSection = (section) =>
+  section.period.toLowerCase().includes("budget");
+
+/* ================= COMPONENT ================= */
+
 const HoursItinerary = ({ data, city }) => {
   const [showBudgetDetails, setShowBudgetDetails] = useState(false);
 
@@ -19,27 +30,30 @@ const HoursItinerary = ({ data, city }) => {
 
   const sections = data.days[0].sections || [];
 
-  const transportSection = sections.find(
-    s => s.period.toLowerCase() === "transportation"
-  );
+  /* ================= TRANSPORT ================= */
+  const transportSection = sections.find(isTransportSection);
 
+  /* ================= HOURS (STRICT FILTER) ================= */
   const hours = sections
-    .filter(s => s.period.toLowerCase() !== "transportation")
-    .flatMap(section =>
-      section.activities.map(act => ({
+    .filter(
+      (s) =>
+        !isTransportSection(s) &&
+        !isBudgetSection(s)
+    )
+    .flatMap((section) =>
+      section.activities.map((act) => ({
         description: act.description,
         location: act.location,
       }))
     );
 
-  // 🔹 Budget extraction
-const budgetText = getBudgetText(data);
-
-
-
+  /* ================= BUDGET ================= */
+  const budgetText = getBudgetText(data);
 
   return (
     <div className="space-y-8 animate-fade-in">
+
+      {/* ================= HEADER ================= */}
       {city && (
         <div className="flex items-center gap-3 pb-4 border-b border-gray-100">
           <span className="text-2xl">⏳</span>
@@ -49,7 +63,7 @@ const budgetText = getBudgetText(data);
         </div>
       )}
 
-      {/* 💰 Budget */}
+      {/* ================= BUDGET ================= */}
       {budgetText && (
         <div className="rounded-2xl border border-emerald-100 bg-emerald-50/60 overflow-hidden">
           <button
@@ -70,7 +84,7 @@ const budgetText = getBudgetText(data);
 
           {showBudgetDetails && (
             <div className="px-5 pb-5 pt-2 text-xs text-emerald-700 space-y-1 border-t border-emerald-100">
-              <p>• Estimated for this visit (single day / few hours)</p>
+              <p>• Estimated for this visit (few hours)</p>
               <p>• Includes food, local transport & entry fees</p>
               <p>• Excludes flights & accommodation</p>
             </div>
@@ -78,7 +92,7 @@ const budgetText = getBudgetText(data);
         </div>
       )}
 
-      {/* Hours list */}
+      {/* ================= HOURS LIST ================= */}
       <div className="grid gap-4">
         {hours.map((item, index) => (
           <div
@@ -93,7 +107,10 @@ const budgetText = getBudgetText(data);
             </div>
 
             <div className="space-y-1">
-              <p className="text-gray-800 font-medium">{item.description}</p>
+              <p className="text-gray-800 font-medium">
+                {item.description}
+              </p>
+
               {item.location && (
                 <div className="text-xs text-gray-400 flex items-center gap-1">
                   📍 {item.location}
@@ -104,7 +121,7 @@ const budgetText = getBudgetText(data);
         ))}
       </div>
 
-      {/* Transportation */}
+      {/* ================= TRANSPORT ================= */}
       {transportSection && (
         <div className="pt-6 border-t border-gray-100">
           <div className="flex gap-4 p-4 bg-gray-50 rounded-2xl">
@@ -122,6 +139,7 @@ const budgetText = getBudgetText(data);
           </div>
         </div>
       )}
+
     </div>
   );
 };

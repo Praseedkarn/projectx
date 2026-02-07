@@ -29,10 +29,9 @@ import AppRouter from "./AppRouter";
 // import QuizPage from "./pages/QuizPage";
 // import { logTokenChange } from "./services/api";
 import LogoLoader from "./components/LogoLoader";
-import { buildHoursPrompt } from "./services/prompts/buildHoursPrompt";
-import { buildOneDayPrompt } from "./services/prompts/buildOneDayPrompt";
-import { buildMultiDayPrompt } from "./services/prompts/buildMultiDayPrompt";
+
 import CitySlider from "./components/CitySlider";
+import { buildPrompt } from "./services/prompts/buildPrompt";
 
 
 function App() {
@@ -260,7 +259,7 @@ function App() {
     try {
       let result;
       let aiResponse;
-      let prompt;
+      
 
       /* ================= DEMO ================= */
       if (isDemoRequest) {
@@ -269,31 +268,15 @@ function App() {
       /* ================= AI ================= */
       else {
         // 🔥 STEP 2 — SELECT PROMPT BASED ON TRIP TYPE
-        if (tripType === "hours") {
-          prompt = buildHoursPrompt({
-            place: cleanedPlace,
-            hours,
-            group,
-            suggestions,
-          });
-        }
+       const prompt = buildPrompt({
+          tripType,
+          place: cleanedPlace,
+          hours,
+          days,
+          group,
+          suggestions,
+        });
 
-        if (tripType === "day") {
-          prompt = buildOneDayPrompt({
-            place: cleanedPlace,
-            group,
-            suggestions,
-          });
-        }
-
-        if (tripType === "multi") {
-          prompt = buildMultiDayPrompt({
-            place: cleanedPlace,
-            days,
-            group,
-            suggestions,
-          });
-        }
 
         aiResponse = await generateTravelItinerary(prompt);
 

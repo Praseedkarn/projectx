@@ -31,6 +31,7 @@ import {
 import HoursItinerary from "./itinerary/HoursItinerary";
 import OneDayItinerary from "./itinerary/OneDayItinerary";
 import MultiDayItinerary from "./itinerary/MultiDayItinerary";
+
 import API_BASE_URL from "../services/apiClient";
 const TextSkeleton = ({ lines = 6 }) => (
   <div className="space-y-4 py-6 w-full max-w-2xl mx-auto">
@@ -1027,53 +1028,70 @@ const heroImage =
             {/* Day Wise Mode - The Star Show */}
             {!isTyping && viewMode === "days" && (
               <div className="space-y-8">
-                {buildingDays ? (
-                  <div className="flex flex-col items-center justify-center py-20 space-y-4">
-                    <div className="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin" />
-                    <p className="text-gray-500 font-medium">Organizing your schedule...</p>
-                  </div>
-                ) : (
-                  <>
-                    {/* Render correct component based on trip type */}
-                    {/* DESKTOP SPLIT VIEW */}
-<div className="hidden lg:grid lg:grid-cols-2 gap-6">
-  
-  {/* LEFT – ITINERARY */}
-  <div 
-  ref={itineraryScrollRef}
-  className="h-[calc(100vh-140px)] overflow-y-auto pr-4">
-    <MultiDayItinerary
-      data={jsonData}
-      city={city}
-      startDate={startDate}
-      onActiveDayChange={setActiveDay} 
-      scrollContainerRef={itineraryScrollRef}// 🔥 VERY IMPORTANT
-    />
+              {buildingDays ? (
+  <div className="flex flex-col items-center justify-center py-20 space-y-4">
+    <div className="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+    <p className="text-gray-500 font-medium">Organizing your schedule...</p>
   </div>
+) : (
+  <>
+    {/* HOURS TRIP */}
+    {tripType === "hours" && (
+      <HoursItinerary
+        data={jsonData}
+        city={city}
+      />
+    )}
 
-  {/* RIGHT – MAP */}
-  <div className="sticky top-28 h-[calc(100vh-140px)] rounded-3xl overflow-hidden border">
-    <DayMap
-      city={city}
-      data={jsonData}
-      day={activeDay}
-    />
-  </div>
-</div>
+    {/* ONE DAY TRIP */}
+    {tripType === "day" && (
+      <OneDayItinerary
+        data={jsonData}
+        city={city}
+        startDate={startDate}
+      />
+    )}
 
-{/* MOBILE – SAME AS BEFORE */}
-<div className="lg:hidden">
-  <MultiDayItinerary
-    data={jsonData}
-    city={city}
-    startDate={startDate}
-  />
-</div>
+    {/* MULTI DAY TRIP */}
+    {tripType === "multi" && (
+      <>
+        {/* DESKTOP SPLIT VIEW */}
+        <div className="hidden lg:grid lg:grid-cols-2 gap-6">
+          <div
+            ref={itineraryScrollRef}
+            className="h-[calc(100vh-140px)] overflow-y-auto pr-4"
+          >
+            <MultiDayItinerary
+              data={jsonData}
+              city={city}
+              startDate={startDate}
+              onActiveDayChange={setActiveDay}
+              scrollContainerRef={itineraryScrollRef}
+            />
+          </div>
 
-                    {tripType === "day" && <OneDayItinerary data={jsonData} city={city} startDate={startDate} />}
-                    {tripType === "hours" && <HoursItinerary data={jsonData} city={city} />}
-                  </>
-                )}
+          <div className="sticky top-28 h-[calc(100vh-140px)] rounded-3xl overflow-hidden border">
+            <DayMap
+              city={city}
+              data={jsonData}
+              day={activeDay}
+            />
+          </div>
+        </div>
+
+        {/* MOBILE */}
+        <div className="lg:hidden">
+          <MultiDayItinerary
+            data={jsonData}
+            city={city}
+            startDate={startDate}
+          />
+        </div>
+      </>
+    )}
+  </>
+)}
+
               </div>
             )}
 
