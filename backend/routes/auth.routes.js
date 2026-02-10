@@ -12,10 +12,18 @@ router.post("/register", register);
 router.post("/login", login);
 
 /* GOOGLE AUTH */
-router.get(
-  "/google",
-  passport.authenticate("google", { scope: ["profile", "email"] })
-);
+router.get("/google", (req, res, next) => {
+  const from = req.query.from;
+  if (from) {
+    res.cookie("oauth_from", from, {
+      httpOnly: true,
+      sameSite: "none",
+      secure: true,
+    });
+  }
+  next();
+}, passport.authenticate("google", { scope: ["profile", "email"] }));
+
 
 router.get(
   "/google/callback",
@@ -27,9 +35,12 @@ router.get(
       { expiresIn: "7d" }
     );
 
-res.redirect(
-  `${process.env.CLIENT_URL}/auth-success?token=${token}`
-);
+const frontend =
+  req.cookies?.oauth_from ||
+  process.env.CLIENT_URL;
+
+res.redirect(`${frontend}/auth-success?token=${token}`);
+
 
 
   }

@@ -7,9 +7,11 @@ import { Link } from "react-router-dom";
 
 // const captchaRef= useRef(null);
 const SignIn = ({ onClose, onLoginSuccess }) => {
-  const handleGoogleLogin = () => {
-  window.location.href = `${API_URL}/api/auth/google`;
+const handleGoogleLogin = () => {
+  window.location.href =
+    `${API_URL}/api/auth/google?from=${window.location.origin}`;
 };
+
 const API_URL = process.env.REACT_APP_API_URL;
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);

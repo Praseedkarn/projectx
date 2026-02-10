@@ -4,6 +4,7 @@ import "./config/env.js";
 import express from "express";
 import passport from "passport";
 import "./config/passport.js";
+import cookieParser from "cookie-parser";
 
 // 🔗 DB
 import connectDB from "./config/db.js";
@@ -64,6 +65,7 @@ app.use((req, res, next) => {
    🔗 DATABASE
 ===================================================== */
 connectDB();
+app.use(cookieParser());
 
 /* =====================================================
    🧩 MIDDLEWARE
