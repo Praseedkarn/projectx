@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect , useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { QRCodeCanvas } from "qrcode.react";
-import { useRef } from "react";
+
 
 
 import {
@@ -63,8 +63,7 @@ const TripResults = () => {
   // const [menuOpen, setMenuOpen] = useState(false);
   const [startDate, setStartDate] = useState(null); // yyyy-mm-dd
 
-  const [activeDay, setActiveDay] = useState(1)
-  const itineraryScrollRef = useRef(null);
+ 
 
   const fetchPlaceImages = async (place, osmAttractions = []) => {
     const queries = [
@@ -278,7 +277,21 @@ const TripResults = () => {
 
     urls.forEach((url) => window.open(url, "_blank"));
   };
+ const parseByTripType = useCallback(
+  (text) => {
+    if (!text) return null;
 
+    try {
+      if (tripType === "hours") return parseHoursText(text);
+      if (tripType === "day") return parseOneDayText(text);
+      return parseMultiDayText(text);
+    } catch (err) {
+      console.error("Parsing failed:", err);
+      return null;
+    }
+  },
+  [tripType]
+);
 
   useEffect(() => {
     if (!finalText) return;
@@ -300,7 +313,7 @@ const TripResults = () => {
     }, 300); // 👈 small delay so spinner renders
 
     return () => clearTimeout(timer);
-  }, [finalText, tripType]);
+  }, [finalText, parseByTripType]);
 
 
 
@@ -461,25 +474,7 @@ const TripResults = () => {
 
 
 
-  const parseByTripType = (text) => {
-    if (!text) return null;
 
-    try {
-      if (tripType === "hours") {
-        return parseHoursText(text);
-      }
-
-      if (tripType === "day") {
-        return parseOneDayText(text);
-      }
-
-      // default: multi
-      return parseMultiDayText(text);
-    } catch (err) {
-      console.error("Parsing failed:", err);
-      return null;
-    }
-  };
 
 
 
