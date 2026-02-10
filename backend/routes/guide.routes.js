@@ -14,8 +14,13 @@ router.get("/", async (req, res) => {
       return res.status(400).json({ message: "City is required" });
     }
 
+     city = city
+      .toLowerCase()
+      .split(",")[0]   // "Mumbai, India" → "mumbai"
+      .trim();
+
     const guide = await Guide.findOne({
-      city: city.toLowerCase(),
+      city,
       verified: true,
       active: true,
     }).select("-notes");

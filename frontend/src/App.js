@@ -259,7 +259,7 @@ function App() {
     try {
       let result;
       let aiResponse;
-      
+
 
       /* ================= DEMO ================= */
       if (isDemoRequest) {
@@ -268,7 +268,7 @@ function App() {
       /* ================= AI ================= */
       else {
         // 🔥 STEP 2 — SELECT PROMPT BASED ON TRIP TYPE
-       const prompt = buildPrompt({
+        const prompt = buildPrompt({
           tripType,
           place: cleanedPlace,
           hours,
@@ -422,17 +422,17 @@ function App() {
           homeContent={
             <>
               {/* HERO SECTION */}
-              <div className="max-w-6xl mx-auto mb-20 grid grid-cols-1 md:grid-cols-2 gap-12 items-center  mt-60 md:mt-60">
-                <div className="space-y-5 text-center md:text-left">
-                  <h2 className="text-3xl md:text-4xl font-semibold text-gray-800">
+              <div className="max-w-6xl mx-auto mb-24 grid grid-cols-1 md:grid-cols-2 gap-16 items-center mt-60 md:mt-60">
+                <div className="space-y-6 text-center md:text-left">
+                  <h2 className="text-3xl md:text-4xl font-semibold text-gray-800 leading-tight">
                     What is EXPEDITIO ?
                   </h2>
-                  <p className="text-gray-600">
+                  <p className="text-gray-600 leading-relaxed">
                     Expeditio is an AI-powered travel planning platform designed to help travelers create realistic, well-paced itineraries based on their available time, travel style, budget, and destination.
                   </p>
                   <button
                     onClick={() => formCardRef.current?.scrollIntoView({ behavior: "smooth" })}
-                    className="rounded-full bg-[#5b7c67] px-6 py-3 text-white font-medium hover:bg-[#4a6a58] transition"
+                    className="rounded-full bg-[#5b7c67] px-8 py-3.5 text-white font-medium hover:bg-[#4a6a58] transition-all shadow-md hover:shadow-lg"
                   >
                     Start Planning
                   </button>
@@ -448,13 +448,13 @@ function App() {
               </div>
 
               {/* AI FORM CARD */}
-              <div className="w-full bg-white rounded-[50px] shadow-[0_10px_30px_rgba(0,0,0,0.12)]">
-                <div ref={formCardRef} className="max-w-[1400px] mx-auto px-8 md:px-20 py-10">
-                  <div className="text-center space-y-2 mb-10">
-                    <h2 className="text-2xl md:text-3xl font-semibold text-gray-800">
+              <div className="w-full bg-white rounded-[50px] shadow-[0_10px_30px_rgba(0,0,0,0.08)]">
+                <div ref={formCardRef} className="max-w-[1400px] mx-auto px-8 md:px-20 py-12">
+                  <div className="text-center space-y-3 mb-12">
+                    <h2 className="text-2xl md:text-3xl font-semibold text-gray-800 leading-tight">
                       Tell us your travel preferences
                     </h2>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-gray-500 leading-relaxed">
                       Just provide some basic information and we’ll plan your trip.
                     </p>
 
@@ -466,11 +466,11 @@ function App() {
                     )}
                   </div>
 
-                  <form onSubmit={handleSubmit} className="space-y-5">
+                  <form onSubmit={handleSubmit} className="space-y-6">
 
                     {/* SEGMENTED CONTROL */}
                     <div className="w-full sm:max-w-md mx-auto">
-                      <div className="relative flex w-full rounded-xl border border-gray-300 bg-gray-100 p-1">
+                      <div className="relative flex w-full rounded-xl border border-gray-200 bg-gray-50 p-1.5">
                         {[
                           { key: "hours", label: "Few hours" },
                           { key: "day", label: "One day" },
@@ -480,7 +480,7 @@ function App() {
                             key={t.key}
                             type="button"
                             onClick={() => setTripType(t.key)}
-                            className={`flex-1 rounded-lg px-3 py-2 text-sm font-medium
+                            className={`flex-1 rounded-lg px-3 py-2.5 text-sm font-medium
           transition-all duration-200 ease-out
           ${tripType === t.key
                                 ? "bg-white text-blue-700 shadow-sm"
@@ -496,7 +496,7 @@ function App() {
 
                     {/* CONDITIONAL INPUTS */}
                     {tripType === "hours" && (
-                      <div className="space-y-2">
+                      <div className="space-y-3">
                         <label className="text-sm font-medium text-gray-700">
                           Number of hours
                         </label>
@@ -506,13 +506,13 @@ function App() {
                           max={12}
                           value={hours}
                           onChange={(e) => setHours(Number(e.target.value))}
-                          className="w-full rounded-xl border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                          className="w-full rounded-xl border border-gray-200 px-4 py-3.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none transition-shadow"
                         />
                       </div>
                     )}
 
                     {tripType === "multi" && (
-                      <div className="space-y-2">
+                      <div className="space-y-3">
                         <label className="text-sm font-medium text-gray-700">
                           Number of days
                         </label>
@@ -527,7 +527,7 @@ function App() {
                     )}
 
 
-                    <div className="relative space-y-2">
+                    <div className="relative space-y-3">
                       <label className="text-sm font-medium text-gray-700">Destination</label>
 
                       <input
@@ -536,14 +536,14 @@ function App() {
                         onFocus={() => setShowSuggestions(true)}
                         onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
                         placeholder="Enter city or place"
-                        className="w-full rounded-xl border px-4 py-3
-               focus:ring-2 focus:ring-[#5b7c67] outline-none"
+                        className="w-full rounded-xl border border-gray-200 px-4 py-3.5
+               focus:ring-2 focus:ring-[#5b7c67] focus:border-transparent outline-none transition-shadow"
                       />
 
                       {/* ===== SUGGESTIONS DROPDOWN ===== */}
                       {showSuggestions && citySuggestions.length > 0 && (
-                        <div className="absolute z-20 w-full bg-white border
-                    rounded-xl shadow mt-1 max-h-60 overflow-y-auto">
+                        <div className="absolute z-20 w-full bg-white border border-gray-200
+                    rounded-xl shadow-lg mt-2 max-h-60 overflow-y-auto">
                           {citySuggestions.map((city) => (
                             <div
                               key={city.geonameId}
@@ -552,8 +552,8 @@ function App() {
                                 setPlace(`${city.name}, ${city.countryName}`);
                                 setShowSuggestions(false);
                               }}
-                              className="px-4 py-2 hover:bg-gray-100
-                     cursor-pointer text-sm"
+                              className="px-4 py-3 hover:bg-gray-50
+                     cursor-pointer text-sm transition-colors border-b border-gray-100 last:border-0"
                             >
                               <strong>{city.name}</strong>, {city.countryName}
                             </div>
@@ -563,15 +563,15 @@ function App() {
                     </div>
 
 
-                    <div className="space-y-3">
-                      <label className="text-sm font-semibold text-gray-700 ml-1">Travel group</label>
+                    <div className="space-y-4">
+                      <label className="text-sm font-semibold text-gray-700">Travel group</label>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                         {["Solo", "Couple", "Family", "Friends"].map((g) => (
                           <button
                             key={g}
                             type="button"
                             onClick={() => setGroup(g)}
-                            className={`rounded-lg border px-3 py-2 text-sm transition ${group === g ? "border-[#5b7c67] bg-[#5b7c67]/10 font-medium" : "hover:bg-gray-50"}`}
+                            className={`rounded-lg border px-4 py-3 text-sm transition-all ${group === g ? "border-[#5b7c67] bg-[#5b7c67]/10 font-medium" : "border-gray-200 hover:bg-gray-50 hover:border-gray-300"}`}
                           >
                             {g}
                           </button>
@@ -579,7 +579,7 @@ function App() {
                       </div>
                     </div>
 
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                       <label className="text-sm font-medium text-gray-700">
                         Special preferences (optional)
                       </label>
@@ -587,10 +587,10 @@ function App() {
                         value={suggestions}
                         onChange={(e) => setSuggestions(e.target.value)}
                         placeholder="Avoid crowds, cafes, photography spots..."
-                        className="w-full rounded-lg border px-3 py-2 text-sm"
+                        className="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm focus:ring-2 focus:ring-[#5b7c67] focus:border-transparent outline-none transition-shadow"
                       />
                     </div>
-                    <div className="flex flex-wrap gap-2 mt-2">
+                    <div className="flex flex-wrap gap-2.5">
                       {[
                         "Hotels",
                         "Food spots",
@@ -604,13 +604,13 @@ function App() {
                           type="button"
                           onClick={() => addSuggestion(item)}
                           className="
-                            rounded-full border
+                            rounded-full border border-gray-200
                             px-3 py-1.5
                             text-xs font-medium
-                            text-gray-700
-                            hover:bg-gray-100
-                            hover:border-gray-400
-                            transition
+                            text-gray-600
+                            hover:bg-gray-50
+                            hover:border-gray-300
+                            transition-all
                           "
                         >
                           + {item}
@@ -621,15 +621,15 @@ function App() {
 
 
 
-                    <div className="pt-6 border-t border-gray-100">
+                    <div className="pt-8 border-t border-gray-100">
                       <button
                         type="submit"
                         disabled={loading}
-                        className="w-full rounded-full bg-[#5b7c67] py-4 text-white font-medium hover:bg-[#4a6a58] transition disabled:opacity-60"
+                        className="w-full rounded-full bg-[#5b7c67] py-4 text-white font-semibold hover:bg-[#4a6a58] transition-all shadow-md hover:shadow-lg disabled:opacity-60 disabled:cursor-not-allowed"
                       >
                         {loading ? "Planning your trip..." : "Generate itinerary"}
                       </button>
-                      {loading && <p className="text-center text-sm text-gray-500 mt-2">Analyzing destinations, routes & experiences...</p>}
+                      {loading && <p className="text-center text-sm text-gray-500 mt-3">Analyzing destinations, routes & experiences...</p>}
                     </div>
 
                     <button
@@ -661,14 +661,14 @@ function App() {
 
 
 
-              <div className="mt-20">
-                <div className="bg-[#d7f26e] py-16 px-6 text-center">
-                  <div className="max-w-3xl mx-auto space-y-6">
+              <div className="mt-24">
+                <div className="bg-[#d7f26e] py-20 px-6 text-center">
+                  <div className="max-w-3xl mx-auto space-y-8">
                     <div className="w-16 h-1 bg-black/30 mx-auto rounded-full" />
-                    <h2 className="text-3xl md:text-4xl font-serif text-black">You too can earn while on the move</h2>
+                    <h2 className="text-3xl md:text-4xl font-serif text-black leading-tight">You too can earn while on the move</h2>
                     <button
                       onClick={() => navigate("/become-guide")}
-                      className="inline-flex items-center justify-center rounded-full bg-[#556b00] px-8 py-4 text-white text-lg font-medium hover:scale-105 transition"
+                      className="inline-flex items-center justify-center rounded-full bg-[#556b00] px-10 py-4 text-white text-lg font-semibold hover:scale-105 transition-all shadow-lg hover:shadow-xl"
                     >
                       Become a local guide
                     </button>

@@ -3,7 +3,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { QRCodeCanvas } from "qrcode.react";
 import { useRef } from "react";
 
-import DayMap from "./DayMap";
 
 import {
   DndContext,
@@ -31,6 +30,9 @@ import {
 import HoursItinerary from "./itinerary/HoursItinerary";
 import OneDayItinerary from "./itinerary/OneDayItinerary";
 import MultiDayItinerary from "./itinerary/MultiDayItinerary";
+import { parseHoursText } from "../utils/parsers/parseHoursText";
+import { parseOneDayText } from "../utils/parsers/parseOneDayText";
+import { parseMultiDayText } from "../utils/parsers/parseMultiDayText";
 
 import API_BASE_URL from "../services/apiClient";
 const TextSkeleton = ({ lines = 6 }) => (
@@ -61,7 +63,7 @@ const TripResults = () => {
   // const [menuOpen, setMenuOpen] = useState(false);
   const [startDate, setStartDate] = useState(null); // yyyy-mm-dd
 
-  const [activeDay, setActiveDay]=useState(1)
+  const [activeDay, setActiveDay] = useState(1)
   const itineraryScrollRef = useRef(null);
 
   const fetchPlaceImages = async (place, osmAttractions = []) => {
@@ -135,45 +137,46 @@ const TripResults = () => {
     return [];
   };
 
- const DraggableDayCard = ({ id, day }) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-  } = useSortable({ id });
+  const DraggableDayCard = ({ id, day }) => {
+    const {
+      attributes,
+      listeners,
+      setNodeRef,
+      transform,
+      transition,
+    } = useSortable({ id });
 
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
+    const style = {
+      transform: CSS.Transform.toString(transform),
+      transition,
+    };
 
-  return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className="relative flex flex-col items-center justify-center p-6 bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md transition-all select-none"
-    >
-      <div className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">
-        Itinerary
-      </div>
-
-      <div className="text-xl font-bold text-gray-900 mb-2">
-        Day {day.displayDay}
-      </div>
-
-      {/* ✅ DRAG HANDLE */}
-      <button
-        {...attributes}
-        {...listeners}
-        className="mt-2 px-4 py-2 text-sm font-semibold bg-gray-100 rounded-full cursor-grab active:cursor-grabbing hover:bg-gray-200"
+    return (
+      <div
+        ref={setNodeRef}
+        style={style}
+        className="relative flex flex-col items-center justify-center p-8 bg-white border-2 border-gray-100 rounded-2xl hover:border-gray-300 hover:shadow-md transition-all select-none group"
       >
-        ⠿ Drag
-      </button>
-    </div>
-  );
-};
+        <div className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">
+          Day
+        </div>
+
+        <div className="text-3xl font-bold text-gray-900 mb-4">
+          {day.displayDay}
+        </div>
+
+        {/* ✅ DRAG HANDLE */}
+        <button
+          {...attributes}
+          {...listeners}
+          className="px-6 py-2.5 text-sm font-medium bg-gray-50 rounded-xl cursor-grab active:cursor-grabbing hover:bg-gray-100 transition-colors text-gray-600"
+        >
+          <span className="mr-2">⋮⋮</span>
+          Drag
+        </button>
+      </div>
+    );
+  };
 
 
 
@@ -223,17 +226,17 @@ const TripResults = () => {
   const [jsonData, setJsonData] = useState(null);
   const [showReorderModal, setShowReorderModal] = useState(false);
   const [tempDays, setTempDays] = useState([]);
-useEffect(() => {
-  if (showReorderModal && jsonData?.days?.length) {
-    setTempDays(
-      jsonData.days.map((day, index) => ({
-        ...day,
-        _id: `day-${index}`,     // required by dnd-kit
-        displayDay: index + 1,   // for UI label
-      }))
-    );
-  }
-}, [showReorderModal, jsonData]);
+  useEffect(() => {
+    if (showReorderModal && jsonData?.days?.length) {
+      setTempDays(
+        jsonData.days.map((day, index) => ({
+          ...day,
+          _id: `day-${index}`,     // required by dnd-kit
+          displayDay: index + 1,   // for UI label
+        }))
+      );
+    }
+  }, [showReorderModal, jsonData]);
 
 
 
@@ -255,139 +258,7 @@ useEffect(() => {
   }, [city, osmData]);
 
 
-  const convertTextToJSON = (text, suggestions) => {
-    if (!text) return null;
 
-    // normalize dashes
-    text = text.replace(/–|—/g, "-");
-
-    const lines = text
-      .split("\n")
-      .map(l => l.trim())
-      .filter(Boolean);
-
-    const result = {
-      title: "",
-      preferences:
-        typeof suggestions === "string"
-          ? suggestions.split(",").map(s => s.trim())
-          : Array.isArray(suggestions)
-            ? suggestions
-            : [],
-       estimatedBudget: null,
-      days: [],
-    };
-
-    let currentDay = null;
-    let currentSection = null;
-
-    const fallbackPeriods = ["Morning", "Afternoon", "Evening"];
-    let fallbackIndex = 0;
-
-    for (let line of lines) {
-      /* ===== TITLE ===== */
-      if (line.startsWith("TITLE:")) {
-        result.title = line.replace("TITLE:", "").trim();
-        continue;
-      }
-
-      /* ===== ESTIMATED BUDGET ===== */
-      if (/^estimated budget/i.test(line)) {
-        result.estimatedBudget = line
-          .replace(/estimated budget[:-]*/i, "")
-          .trim();
-        continue;
-      }
-
-
-      /* ===== DAY ===== */
-      if (/^day\s+\d+/i.test(line)) {
-        currentDay = {
-          day: line.toUpperCase(),
-          sections: [],
-        };
-        result.days.push(currentDay);
-        currentSection = null;
-        fallbackIndex = 0;
-        continue;
-      }
-
-      /* ===== SECTION ===== */
-      if (line.startsWith("##")) {
-        if (!currentDay) {
-          currentDay = { day: "DAY 1", sections: [] };
-          result.days.push(currentDay);
-        }
-
-        currentSection = {
-          period: line.replace("##", "").trim(),
-          activities: [],
-        };
-
-        currentDay.sections.push(currentSection);
-        continue;
-      }
-
-      /* ===== BULLET ACTIVITY (OLD FORMAT SUPPORT) ===== */
-      if (line.startsWith("-")) {
-        if (!currentSection) {
-          const period =
-            fallbackPeriods[fallbackIndex] || `Part ${fallbackIndex + 1}`;
-
-          currentSection = {
-            period,
-            activities: [],
-          };
-
-          currentDay.sections.push(currentSection);
-          fallbackIndex++;
-        }
-
-        const raw = line.replace(/^-+\s*/, "").trim();
-
-        const costMatch = raw.match(/Cost:\s*([^.]+)/i);
-        const locationMatch = raw.match(/Location:\s*(.+)$/i);
-
-        const description = raw
-          .replace(/Cost:\s*[^.]+\.?/i, "")
-          .replace(/Location:\s*.+$/i, "")
-          .trim();
-
-        currentSection.activities.push({
-          time: null,
-          description,
-          cost: costMatch ? costMatch[1].trim() : null,
-          location: locationMatch ? locationMatch[1].trim() : null,
-          raw,
-        });
-
-        continue;
-      }
-
-      /* ===== PARAGRAPH ACTIVITY (NEW FORMAT) ===== */
-      if (currentSection) {
-        const costMatch = line.match(/Cost:\s*([^.]+)/i);
-        const locationMatch = line.match(/Location:\s*(.+)$/i);
-
-        const description = line
-          .replace(/Cost:\s*[^.]+\.?/i, "")
-          .replace(/Location:\s*.+$/i, "")
-          .trim();
-
-        currentSection.activities.push({
-          time: null,
-          description,
-          cost: costMatch ? costMatch[1].trim() : null,
-          location: locationMatch ? locationMatch[1].trim() : null,
-          raw: line,
-        });
-
-        continue;
-      }
-    }
-
-    return result.days.length ? result : null;
-  };
 
 
 
@@ -409,60 +280,29 @@ useEffect(() => {
   };
 
 
+  useEffect(() => {
+    if (!finalText) return;
+
+    setBuildingDays(true);
+
+    const timer = setTimeout(() => {
+      try {
+        const parsed = parseByTripType(finalText);
+        setJsonData(parsed);
+        setJsonError("");
+      } catch (e) {
+        console.error(e);
+        setJsonError("Failed to parse itinerary");
+        setJsonData(null);
+      } finally {
+        setBuildingDays(false);
+      }
+    }, 300); // 👈 small delay so spinner renders
+
+    return () => clearTimeout(timer);
+  }, [finalText, tripType]);
 
 
-
-
-  // const transformAIJsonToDayWise = (aiJson) => {
-  //   if (!aiJson || !aiJson.days) return null;
-
-  //   return {
-  //     title: aiJson.title,
-  //     preferences: aiJson.preferences || [],
-  //     days: aiJson.days.map((dayObj, index) => {
-  //       const activities = [];
-
-  //       dayObj.sections.forEach(section => {
-  //         section.activities.forEach(act => {
-  //           activities.push(
-  //             `${section.period}: ${act.description}`
-  //           );
-  //         });
-  //       });
-
-  //       return {
-  //         day: index + 1,
-  //         title: `Day ${index + 1}`,
-  //         activities,
-  //       };
-  //     }),
-  //   };
-  // };
-
-  // const transformAIJsonToHours = (aiJson) => {
-  //   if (!aiJson || !aiJson.days?.length) return null;
-
-  //   const hours = [];
-
-  //   aiJson.days.forEach((day) => {
-  //     day.sections.forEach((section) => {
-  //       section.activities.forEach((act) => {
-  //         hours.push(
-  //           `${section.period}: ${act.description}`
-  //         );
-  //       });
-  //     });
-  //   });
-
-  //   return {
-  //     title: aiJson.title,
-  //     hours,
-  //   };
-  // };
-
-
-
-  /* ⬆️ END HERE ⬆️ */
 
 
   const handleViewChange = (mode) => {
@@ -475,19 +315,6 @@ useEffect(() => {
 
     if (!finalText) {
       setJsonError("Text not ready");
-      return;
-    }
-
-    const parsed = convertTextToJSON(finalText, suggestions);
-
-    if (!parsed) {
-      setJsonError("Failed to create JSON");
-      return;
-    }
-
-    if (mode === "json") {
-      setJsonData(parsed);
-      setJsonError("");
       return;
     }
 
@@ -506,29 +333,24 @@ useEffect(() => {
 
     const fetchGuide = async () => {
       try {
-
-
         const res = await fetch(
-          `https://projectx-yzu3.onrender.com/api/guides?city=${city}`
+          `${API_BASE_URL}/api/guides?city=${encodeURIComponent(city)}`
         );
+
+        if (!res.ok) throw new Error("Guide fetch failed");
 
         const data = await res.json();
 
-        if (data.available) {
-          setGuide(data.guide);
-        } else {
-          setGuide(null);
-        }
+        setGuide(data.available ? data.guide : null);
       } catch (err) {
-        console.error("Failed to fetch guide");
+        console.error("Failed to fetch guide:", err);
         setGuide(null);
-      } finally {
-
       }
     };
 
     fetchGuide();
   }, [city]);
+
 
 
   useEffect(() => {
@@ -639,6 +461,27 @@ useEffect(() => {
 
 
 
+  const parseByTripType = (text) => {
+    if (!text) return null;
+
+    try {
+      if (tripType === "hours") {
+        return parseHoursText(text);
+      }
+
+      if (tripType === "day") {
+        return parseOneDayText(text);
+      }
+
+      // default: multi
+      return parseMultiDayText(text);
+    } catch (err) {
+      console.error("Parsing failed:", err);
+      return null;
+    }
+  };
+
+
 
 
 
@@ -710,32 +553,7 @@ useEffect(() => {
     }
   };
 
-  useEffect(() => {
-    if (!finalText) return;
 
-    const parsed = convertTextToJSON(finalText, suggestions);
-
-    // ❌ JSON failed → fallback immediately
-    if (!parsed) {
-      setViewMode("text");
-      setJsonError("Failed to convert itinerary");
-      return;
-    }
-
-    // ✅ JSON success → show loader first
-    setBuildingDays(true);
-    setViewMode("days");
-
-    const timer = setTimeout(() => {
-
-
-      setJsonData(parsed);
-      setBuildingDays(false);
-    }, 5000); // ⏱️ 2 seconds buffer
-
-    return () => clearTimeout(timer);
-
-  }, [finalText, tripType, suggestions]);
 
 
 
@@ -746,26 +564,29 @@ useEffect(() => {
     if (!items || items.length === 0) return null;
 
     return (
-      <div className="space-y-6">
-        <h3 className="text-xl font-bold text-gray-900 border-b pb-2">{title}</h3>
-        <div className="grid gap-4 sm:grid-cols-2">
+      <div className="space-y-8">
+        <h3 className="text-3xl sm:text-4xl font-bold text-gray-900">{title}</h3>
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((place) => (
-            <div key={place.id} className="flex items-start gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors">
-              <div className="mt-1 bg-indigo-100 p-2 rounded-lg text-indigo-600">
-                📍
-              </div>
-              <div>
-                <div className="font-semibold text-gray-900">{place.name}</div>
-                {place.mapsLink && (
-                  <a
-                    href={place.mapsLink}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-sm text-gray-500 hover:text-indigo-600 hover:underline flex items-center gap-1"
-                  >
-                    View on map ↗
-                  </a>
-                )}
+            <div key={place.id} className="group">
+              <div className="flex items-start gap-4 py-4 border-b border-gray-100 group-hover:border-gray-300 transition-colors">
+                <div className="text-2xl flex-shrink-0 opacity-60 group-hover:opacity-100 transition-opacity">
+                  📍
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="font-semibold text-gray-900 mb-1 truncate">{place.name}</div>
+                  {place.mapsLink && (
+                    <a
+                      href={place.mapsLink}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-900 transition-colors group"
+                    >
+                      <span>View map</span>
+                      <span className="group-hover:translate-x-0.5 transition-transform">→</span>
+                    </a>
+                  )}
+                </div>
               </div>
             </div>
           ))}
@@ -775,385 +596,396 @@ useEffect(() => {
   };
 
 
-const heroImage =
-  placeImages.length > 0
-    ? placeImages[0].urls.regular
-    : cityInfo?.image || null;
+  const heroImage =
+    placeImages.length > 0
+      ? placeImages[0].urls.regular
+      : cityInfo?.image || null;
 
 
   /* ================= RESULT ================= */
   return (
-    <div className="min-h-screen bg-white text-gray-900 font-sans selection:bg-indigo-100 selection:text-indigo-800 pb-20">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white text-gray-900 font-sans selection:bg-indigo-100 selection:text-indigo-800 pb-32">
 
       {/* ================= HERO HEADER ================= */}
-      <div className="max-w-5xl mx-auto px-6 py-10 sm:py-16 space-y-6">
-        <div className="animate-fade-in space-y-2">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-16 space-y-8">
 
-          <button
-            onClick={() => navigate(-1)}
-            className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-gray-900 transition"
-          >
-            ← Back
-          </button>
+        {/* Back Button - Minimal */}
+        <button
+          onClick={() => navigate(-1)}
+          className="inline-flex items-center gap-2 text-sm font-medium text-gray-400 hover:text-gray-900 transition-colors group"
+        >
+          <span className="group-hover:-translate-x-1 transition-transform">←</span>
+          <span>Back</span>
+        </button>
 
-          <span className="inline-block px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-semibold tracking-wide uppercase">
-            Trip Itinerary
-          </span>
-          <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-gray-900">
+        {/* Hero Content */}
+        <div className="space-y-4 animate-fade-in">
+          <div className="inline-block">
+            <span className="text-xs font-semibold tracking-widest uppercase text-gray-400">
+              Your Journey
+            </span>
+          </div>
+
+          <h1 className="text-5xl sm:text-7xl lg:text-8xl font-bold tracking-tight text-gray-900 leading-none">
             {city || "Your Destination"}
           </h1>
-          <p className="text-lg text-gray-500 max-w-2xl">
-            A personalized travel plan curated just for you. Explore, eat, and enjoy {city}.
+
+          <p className="text-xl sm:text-2xl text-gray-500 max-w-3xl font-light leading-relaxed">
+            A personalized travel plan curated just for you
           </p>
         </div>
 
-        {/* ================= IMAGES + WIKI GRID ================= */}
+        {/* ================= IMAGES + INFO LAYOUT ================= */}
         {city && (
-  <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-16">
 
-    {/* Left: Main Visuals */}
-    <div className="lg:col-span-8 space-y-6">
-
-      {/* Image Gallery */}
-      <div className="rounded-3xl overflow-hidden shadow-sm border border-gray-100 bg-gray-50 min-h-[300px] relative">
-        {imageLoading ? (
-          <div className="absolute inset-0 flex items-center justify-center text-gray-400">
-            <span className="animate-pulse">Loading visual inspiration...</span>
-          </div>
-        ) : heroImage ? (
-          placeImages.length > 0 ? (
-            <div className="grid grid-cols-3 grid-rows-2 gap-2 h-96 p-2">
-              <img
-                src={heroImage}
-                className="col-span-2 row-span-2 w-full h-full object-cover rounded-2xl"
-                alt={city}
-              />
-              {placeImages.slice(1, 3).map((img, i) => (
-                <img
-                  key={i}
-                  src={img.urls.regular}
-                  className="w-full h-full object-cover rounded-2xl"
-                  alt={city}
-                />
-              ))}
+            {/* Main Image - Full Width on Mobile, 2/3 on Desktop */}
+            <div className="lg:col-span-2 space-y-6">
+              <div className="rounded-2xl overflow-hidden bg-gray-100 min-h-[400px] relative group">
+                {imageLoading ? (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="flex flex-col items-center gap-3">
+                      <div className="w-8 h-8 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
+                      <span className="text-sm text-gray-400">Loading images...</span>
+                    </div>
+                  </div>
+                ) : heroImage ? (
+                  placeImages.length > 0 ? (
+                    <div className="grid grid-cols-3 grid-rows-2 gap-3 h-[500px] p-3">
+                      <img
+                        src={heroImage}
+                        className="col-span-2 row-span-2 w-full h-full object-cover rounded-xl transition-transform duration-700 group-hover:scale-[1.02]"
+                        alt={city}
+                      />
+                      {placeImages.slice(1, 3).map((img, i) => (
+                        <img
+                          key={i}
+                          src={img.urls.regular}
+                          className="w-full h-full object-cover rounded-xl transition-transform duration-700 group-hover:scale-[1.02]"
+                          alt={city}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <img
+                      src={heroImage}
+                      className="w-full h-[500px] object-cover transition-transform duration-700 group-hover:scale-[1.02]"
+                      alt={city}
+                    />
+                  )
+                ) : (
+                  <div className="h-[500px] flex flex-col items-center justify-center text-gray-300">
+                    <span className="text-6xl mb-4">📸</span>
+                    <p className="text-sm">No images available</p>
+                  </div>
+                )}
+              </div>
             </div>
-          ) : (
-            <img
-              src={heroImage}
-              className="w-full h-96 object-cover"
-              alt={city}
-            />
-          )
-        ) : (
-          <div className="h-96 flex flex-col items-center justify-center text-gray-400 p-10 text-center">
-            <span className="text-4xl mb-2">📸</span>
-            <p>No images available for this destination.</p>
+
+            {/* Sidebar - Info & Guide */}
+            <div className="lg:col-span-1 space-y-6">
+
+              {/* City Info - Minimal Card */}
+              {cityLoading ? (
+                <div className="h-64 bg-gray-100 rounded-2xl animate-pulse" />
+              ) : cityInfo ? (
+                <div className="space-y-6">
+                  <div>
+                    <h2 className="text-sm font-semibold uppercase tracking-wider text-gray-400 mb-4">
+                      About
+                    </h2>
+                    <p className="text-base leading-relaxed text-gray-600">
+                      {cityInfo.description}
+                    </p>
+                  </div>
+
+                  {cityInfo.wikipediaUrl && (
+                    <a
+                      href={cityInfo.wikipediaUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-2 text-sm font-medium text-gray-900 hover:text-indigo-600 transition-colors group"
+                    >
+                      <span>Learn more</span>
+                      <span className="group-hover:translate-x-1 transition-transform">→</span>
+                    </a>
+                  )}
+                </div>
+              ) : null}
+
+              {/* Local Guide - Conversational */}
+              {guide && (
+                <div className="pt-8 border-t border-gray-200">
+                  <div className="space-y-4">
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center text-2xl flex-shrink-0">
+                        👋
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">
+                          Local Expert
+                        </p>
+                        <p className="text-lg font-semibold text-gray-900">{guide.name}</p>
+                        <p className="text-sm text-gray-500 mt-1">Available to help you explore</p>
+                      </div>
+                    </div>
+
+                    <a
+                      href={`https://wa.me/${guide.phone}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="block w-full text-center bg-gray-900 text-white font-medium py-3 rounded-xl text-sm hover:bg-gray-800 transition-colors"
+                    >
+                      Start Conversation
+                    </a>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         )}
-      </div>
-
-    </div>
-
-    {/* Right: Wiki / Info Card */}
-    <div className="lg:col-span-4 flex flex-col gap-6">
-      {cityLoading ? (
-        <div className="h-full bg-gray-50 rounded-3xl animate-pulse" />
-      ) : cityInfo ? (
-        <div className="bg-gray-50 rounded-3xl p-6 h-full flex flex-col justify-between border border-gray-100">
-          <div className="space-y-4">
-            <h2 className="text-xl font-bold flex items-center gap-2">
-              <span>ℹ️</span> About {city}
-            </h2>
-            <p className="text-sm leading-relaxed text-gray-600 line-clamp-6">
-              {cityInfo.description}
-            </p>
-          </div>
-          {cityInfo.wikipediaUrl && (
-            <a
-              href={cityInfo.wikipediaUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="mt-6 inline-flex items-center text-sm font-semibold text-indigo-600 hover:text-indigo-800 transition-colors"
-            >
-              Read on Wikipedia →
-            </a>
-          )}
-        </div>
-      ) : null}
-
-      {/* Local Guide Teaser */}
-      {guide && (
-        <div className="bg-green-50 rounded-3xl p-6 border border-green-100">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 bg-green-200 rounded-full flex items-center justify-center text-xl">👋</div>
-            <div>
-              <p className="text-xs font-bold text-green-800 uppercase">Local Expert</p>
-              <p className="font-semibold text-green-900">{guide.name}</p>
-            </div>
-          </div>
-          <a
-            href={`https://wa.me/${guide.phone}`}
-            target="_blank"
-            rel="noreferrer"
-            className="block text-center bg-white text-green-700 font-medium py-2 rounded-xl text-sm shadow-sm hover:shadow-md transition"
-          >
-            Chat Now
-          </a>
-        </div>
-      )}
-    </div>
-  </div>
-)}
 
       </div>
-
-
 
       {/* ================= ITINERARY SECTION ================= */}
-      <div className="max-w-5xl mx-auto px-6 mt-12">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-24">
 
-        {/* Toolbar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">Your Itinerary</h2>
+        {/* Section Header - Clean */}
+        <div className="mb-12">
+          <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-6">
+            Your Itinerary
+          </h2>
 
-          <div className="flex bg-gray-100 p-1 rounded-full self-start sm:self-auto">
-            {["days", "text", "json"].map((m) => (
-              <button
-                key={m}
-                onClick={() => handleViewChange(m)}
-                className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${viewMode === m
-                  ? "bg-white text-gray-900 shadow-sm"
-                  : "text-gray-500 hover:text-gray-900"
-                  }`}
-              >
-                {m === "days" ? "Day by Day" : m.charAt(0).toUpperCase() + m.slice(1)}
-              </button>
-            ))}
-          </div>
-        </div>
+          {/* View Toggle + Actions Row */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
 
-        {/* Content Box */}
-        <div className="bg-white rounded-3xl shadow-xl shadow-gray-100 border border-gray-100 overflow-hidden min-h-[400px]">
-
-          {/* Top Actions Bar (Inside Content) */}
-          <div className="border-b px-6 py-4 flex flex-wrap items-center justify-between gap-4 bg-gray-50/50">
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-gray-500">Trip Dates:</span>
-              <input
-                type="date"
-                value={startDate || ""}
-                onChange={(e) => setStartDate(e.target.value)}
-                className="bg-transparent border-none text-sm font-semibold text-gray-900 focus:ring-0 p-0"
-              />
-              {!startDate && <span className="text-xs text-red-400">(Select to export)</span>}
+            {/* View Mode Toggle */}
+            <div className="inline-flex bg-gray-100 p-1 rounded-xl">
+              {["days", "text", "json"].map((m) => (
+                <button
+                  key={m}
+                  onClick={() => handleViewChange(m)}
+                  className={`px-6 py-2.5 rounded-lg text-sm font-medium transition-all ${viewMode === m
+                    ? "bg-white text-gray-900 shadow-sm"
+                    : "text-gray-500 hover:text-gray-900"
+                    }`}
+                >
+                  {m === "days" ? "Timeline" : m.charAt(0).toUpperCase() + m.slice(1)}
+                </button>
+              ))}
             </div>
 
-            <div className="flex items-center gap-2">
+            {/* Trip Actions - Subtle */}
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-gray-400">Start date:</span>
+                <input
+                  type="date"
+                  value={startDate || ""}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm font-medium text-gray-900 focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-shadow"
+                />
+              </div>
+
               <button
                 onClick={() => setShowReorderModal(true)}
-                className="p-2 hover:bg-gray-200 rounded-full text-gray-500 transition-colors"
+                className="p-2.5 hover:bg-gray-100 rounded-lg text-gray-400 hover:text-gray-900 transition-colors"
                 title="Reorder Days"
               >
-                <span className="sr-only">Reorder</span>
-                ✏️
+                <span className="text-lg">⚙️</span>
               </button>
 
               <button
                 onClick={handleExportToGoogleCalendar}
                 disabled={!startDate}
-                className={`text-sm px-4 py-2 rounded-full font-medium transition-colors ${!startDate ? "text-gray-300 cursor-not-allowed" : "text-gray-700 hover:bg-white hover:shadow-sm"
+                className={`text-sm px-5 py-2.5 rounded-lg font-medium transition-all ${!startDate
+                  ? "text-gray-300 cursor-not-allowed"
+                  : "text-gray-700 hover:bg-gray-100"
                   }`}
               >
-                📆 Add to Calendar
+                <span className="mr-2">📆</span>
+                Export
               </button>
             </div>
           </div>
+        </div>
 
-          {/* MAIN CONTENT DISPLAY */}
-          <div className="p-6 sm:p-10">
+        {/* Content Area - No Heavy Box */}
+        <div className="min-h-[500px]">
 
-            {/* Typewriter text */}
-            {isTyping && (
-              <div className="prose max-w-none text-gray-600">
-                <div className="whitespace-pre-wrap font-mono text-sm">
-                  {displayText}<span className="animate-pulse">|</span>
-                </div>
+          {/* Typewriter Effect */}
+          {isTyping && (
+            <div className="py-12">
+              <div className="whitespace-pre-wrap font-mono text-sm text-gray-500 leading-relaxed">
+                {displayText}<span className="animate-pulse">|</span>
               </div>
-            )}
+            </div>
+          )}
 
-            {/* Text Mode Display */}
-            {!isTyping && viewMode === "text" && (
-              isEditing ? (
-                <div className="space-y-4">
+          {/* Text Mode */}
+          {!isTyping && viewMode === "text" && (
+            <div className="py-8">
+              {isEditing ? (
+                <div className="space-y-6">
                   <textarea
                     value={finalText}
                     onChange={(e) => setFinalText(e.target.value)}
-                    className="w-full h-[500px] p-4 font-mono text-sm bg-gray-50 rounded-xl border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
+                    className="w-full h-[600px] p-6 font-mono text-sm bg-white border border-gray-200 rounded-2xl focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none resize-none"
                   />
                   <div className="flex justify-end">
                     <button
                       onClick={() => setIsEditing(false)}
-                      className="bg-black text-white px-6 py-2 rounded-full text-sm font-semibold hover:bg-gray-800 transition-colors"
+                      className="bg-gray-900 text-white px-8 py-3 rounded-xl text-sm font-semibold hover:bg-gray-800 transition-colors"
                     >
-                      ✅ Done Editing
+                      Done Editing
                     </button>
                   </div>
                 </div>
               ) : (
-                <div className="prose max-w-none text-gray-800 whitespace-pre-wrap">
-                  {finalText || <TextSkeleton />}
+                <div className="space-y-6">
+                  <div className="prose prose-lg max-w-none text-gray-700 whitespace-pre-wrap leading-relaxed">
+                    {finalText || <TextSkeleton />}
+                  </div>
 
                   <button
                     onClick={() => setIsEditing(true)}
-                    className="mt-4 text-sm text-indigo-600 hover:underline"
+                    className="text-sm text-gray-400 hover:text-gray-900 transition-colors"
                   >
-                    Edit raw text
+                    Edit text →
                   </button>
                 </div>
-              )
-            )}
+              )}
+            </div>
+          )}
 
-            {/* JSON Mode Display */}
-            {!isTyping && viewMode === "json" && (
-              <div className="relative group">
-                <div className="absolute top-2 right-2 flex gap-2">
-                  {jsonError && <span className="bg-red-100 text-red-600 text-xs px-2 py-1 rounded">Error parsing JSON</span>}
-                </div>
-                <pre className="bg-gray-900 text-gray-300 p-6 rounded-2xl overflow-auto text-xs font-mono max-h-[600px] shadow-inner">
+          {/* JSON Mode */}
+          {!isTyping && viewMode === "json" && (
+            <div className="py-8">
+              <div className="relative">
+                {jsonError && (
+                  <div className="absolute top-4 right-4 bg-red-50 text-red-600 text-xs px-3 py-2 rounded-lg">
+                    Parse error
+                  </div>
+                )}
+                <pre className="bg-gray-900 text-gray-300 p-8 rounded-2xl overflow-auto text-xs font-mono max-h-[700px] leading-relaxed">
                   {JSON.stringify(jsonData, null, 2)}
                 </pre>
               </div>
-            )}
-
-            {/* Day Wise Mode - The Star Show */}
-            {!isTyping && viewMode === "days" && (
-              <div className="space-y-8">
-              {buildingDays ? (
-  <div className="flex flex-col items-center justify-center py-20 space-y-4">
-    <div className="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin" />
-    <p className="text-gray-500 font-medium">Organizing your schedule...</p>
-  </div>
-) : (
-  <>
-    {/* HOURS TRIP */}
-    {tripType === "hours" && (
-      <HoursItinerary
-        data={jsonData}
-        city={city}
-      />
-    )}
-
-    {/* ONE DAY TRIP */}
-    {tripType === "day" && (
-      <OneDayItinerary
-        data={jsonData}
-        city={city}
-        startDate={startDate}
-      />
-    )}
-
-    {/* MULTI DAY TRIP */}
-    {tripType === "multi" && (
-      <>
-        {/* DESKTOP SPLIT VIEW */}
-        <div className="hidden lg:grid lg:grid-cols-2 gap-6">
-          <div
-            ref={itineraryScrollRef}
-            className="h-[calc(100vh-140px)] overflow-y-auto pr-4"
-          >
-            <MultiDayItinerary
-              data={jsonData}
-              city={city}
-              startDate={startDate}
-              onActiveDayChange={setActiveDay}
-              scrollContainerRef={itineraryScrollRef}
-            />
-          </div>
-
-          <div className="sticky top-28 h-[calc(100vh-140px)] rounded-3xl overflow-hidden border">
-            <DayMap
-              city={city}
-              data={jsonData}
-              day={activeDay}
-            />
-          </div>
-        </div>
-
-        {/* MOBILE */}
-        <div className="lg:hidden">
-          <MultiDayItinerary
-            data={jsonData}
-            city={city}
-            startDate={startDate}
-          />
-        </div>
-      </>
-    )}
-  </>
-)}
-
-              </div>
-            )}
-
-          </div>
-
-        </div>
-      </div>
-
-      {/* ================= ACTIONS & SAVE ================= */}
-      <div className="max-w-3xl mx-auto px-6 mt-12 text-center space-y-8">
-
-        <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-3xl p-8 border border-white shadow-lg">
-          <h3 className="text-2xl font-bold text-gray-900 mb-2">Save this Trip</h3>
-          <p className="text-gray-600 mb-6">Create a unique QR code to access this itinerary on your phone or share it with friends.</p>
-
-          {!qrTripId ? (
-            <button
-              onClick={handleGenerateQR}
-              disabled={!finalText || qrLoading}
-              className="bg-gray-900 text-white px-8 py-4 rounded-full font-bold hover:bg-black transition-transform hover:scale-105 shadow-xl disabled:opacity-50 disabled:hover:scale-100"
-            >
-              {qrLoading ? "Generating..." : "Generate QR Code"}
-            </button>
-          ) : (
-            <div className="space-y-6 animate-fade-in-up">
-              <div className="bg-white p-4 rounded-2xl shadow-sm inline-block">
-                <QRCodeCanvas
-                  value={`${window.location.origin}/qr-trip/${qrTripId}`}
-                  size={200}
-                />
-              </div>
-              <div>
-                <a
-                  href={`${window.location.origin}/qr-trip/${qrTripId}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-indigo-600 font-medium hover:underline break-all"
-                >
-                  {window.location.origin}/qr-trip/{qrTripId}
-                </a>
-                <p className="text-xs text-gray-400 mt-2">Link expires in 7 days</p>
-              </div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-100 text-green-700 rounded-full text-sm font-medium">
-                ✅ Trip Saved for later
-              </div>
             </div>
           )}
-        </div>
 
+          {/* Timeline Mode - The Star */}
+          {!isTyping && viewMode === "days" && (
+            <div className="py-8">
+              {buildingDays ? (
+                <div className="flex flex-col items-center justify-center py-32 space-y-6">
+                  <div className="w-16 h-16 border-4 border-gray-900 border-t-transparent rounded-full animate-spin" />
+                  <p className="text-gray-400 font-medium">Building your timeline...</p>
+                </div>
+              ) : (
+                <>
+                  {/* HOURS TRIP */}
+                  {tripType === "hours" && (
+                    <HoursItinerary
+                      data={jsonData}
+                      city={city}
+                    />
+                  )}
+
+                  {/* ONE DAY TRIP */}
+                  {tripType === "day" && (
+                    <OneDayItinerary
+                      data={jsonData}
+                      city={city}
+                      startDate={startDate}
+                    />
+                  )}
+
+                  {/* MULTI DAY TRIP */}
+                  {tripType === "multi" && jsonData?.days?.length > 0 && (
+                    <MultiDayItinerary
+                      data={jsonData}
+                      city={city}
+                      startDate={startDate}
+                    />
+                  )}
+                </>
+              )}
+            </div>
+          )}
+
+        </div>
       </div>
 
-      {/* ================= EXPLORE MAP & ATTRACTIONS ================= */}
-      <div className="max-w-5xl mx-auto px-6 mt-16 space-y-12">
+      {/* ================= SAVE TRIP - Smart Insight Style ================= */}
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-32">
+        <div className="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 rounded-3xl p-12 relative overflow-hidden">
 
-        {/* Map */}
+          {/* Decorative Element */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-indigo-200/30 to-purple-200/30 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+
+          <div className="relative z-10 text-center space-y-6">
+            <div className="space-y-3">
+              <h3 className="text-3xl sm:text-4xl font-bold text-gray-900">
+                Save for Later
+              </h3>
+              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                Generate a QR code to access this itinerary on any device, anytime
+              </p>
+            </div>
+
+            {!qrTripId ? (
+              <button
+                onClick={handleGenerateQR}
+                disabled={!finalText || qrLoading}
+                className="bg-gray-900 text-white px-10 py-4 rounded-xl font-semibold hover:bg-gray-800 transition-all hover:scale-105 disabled:opacity-40 disabled:hover:scale-100 disabled:cursor-not-allowed shadow-lg"
+              >
+                {qrLoading ? "Generating..." : "Generate QR Code"}
+              </button>
+            ) : (
+              <div className="space-y-8 animate-fade-in">
+                <div className="inline-block bg-white p-6 rounded-2xl shadow-lg">
+                  <QRCodeCanvas
+                    value={`${window.location.origin}/qr-trip/${qrTripId}`}
+                    size={220}
+                  />
+                </div>
+
+                <div className="space-y-3">
+                  <a
+                    href={`${window.location.origin}/qr-trip/${qrTripId}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-block text-indigo-600 font-medium hover:text-indigo-700 transition-colors break-all px-4"
+                  >
+                    {window.location.origin}/qr-trip/{qrTripId}
+                  </a>
+                  <p className="text-sm text-gray-400">Expires in 7 days</p>
+                </div>
+
+                <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-green-100 text-green-700 rounded-full text-sm font-medium">
+                  <span>✓</span>
+                  <span>Saved successfully</span>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* ================= MAP & ATTRACTIONS - Soft Sections ================= */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-32 space-y-20">
+
+        {/* Map Section */}
         {city && (
-          <div className="space-y-4">
-            <h3 className="text-2xl font-bold text-gray-900">Map Exploration</h3>
-            <div className="h-96 w-full rounded-3xl overflow-hidden shadow-sm border border-gray-200">
+          <div className="space-y-8">
+            <h3 className="text-3xl sm:text-4xl font-bold text-gray-900">
+              Explore the Area
+            </h3>
+            <div className="h-[500px] w-full rounded-2xl overflow-hidden bg-gray-100 shadow-sm">
               <iframe
                 title="city-map"
-                className="w-full h-full grayscale-[20%] hover:grayscale-0 transition-all duration-700"
+                className="w-full h-full grayscale-[30%] hover:grayscale-0 transition-all duration-700"
                 loading="lazy"
                 src={`https://www.google.com/maps?q=top+tourist+attractions+in+${encodeURIComponent(city)}&z=13&output=embed`}
               />
@@ -1161,10 +993,10 @@ const heroImage =
           </div>
         )}
 
-        {/* OSM Attractions */}
+        {/* Attractions Section */}
         {osmData?.attractions?.length > 0 && (
-          <div className="space-y-4">
-            {!osmError && <AttractionSection title={`Top Sights in ${city}`} items={osmData.attractions} />}
+          <div className="space-y-8">
+            {!osmError && <AttractionSection title={`Must-See in ${city}`} items={osmData.attractions} />}
           </div>
         )}
 
@@ -1172,10 +1004,12 @@ const heroImage =
 
       {/* ================= MODAL: REORDER ================= */}
       {showReorderModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-3xl w-full max-w-2xl p-8 shadow-2xl animate-scale-in">
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">Reorder Days</h3>
-            <p className="text-gray-500 mb-6">Drag and drop to rearrange your itinerary.</p>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-md p-4">
+          <div className="bg-white rounded-3xl w-full max-w-3xl p-10 shadow-2xl animate-scale-in">
+            <div className="space-y-2 mb-8">
+              <h3 className="text-3xl font-bold text-gray-900">Reorder Days</h3>
+              <p className="text-gray-500">Drag cards to rearrange your itinerary</p>
+            </div>
 
             <DndContext
               sensors={sensors}
@@ -1193,7 +1027,7 @@ const heroImage =
               }}
             >
               <SortableContext items={tempDays.map((day) => day._id)} strategy={rectSortingStrategy}>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-8">
                   {tempDays.map((day) => (
                     <DraggableDayCard key={day._id} id={day._id} day={day} />
                   ))}
@@ -1201,10 +1035,10 @@ const heroImage =
               </SortableContext>
             </DndContext>
 
-            <div className="flex justify-end gap-3 mt-8">
+            <div className="flex justify-end gap-4">
               <button
                 onClick={() => setShowReorderModal(false)}
-                className="px-6 py-3 rounded-full text-gray-600 font-medium hover:bg-gray-100 transition"
+                className="px-8 py-3 rounded-xl text-gray-600 font-medium hover:bg-gray-100 transition-colors"
               >
                 Cancel
               </button>
@@ -1213,7 +1047,7 @@ const heroImage =
                 onClick={() => {
                   setSavingOrder(true);
                   setTimeout(() => {
-                   setJsonData((prev) => ({
+                    setJsonData((prev) => ({
                       ...prev,
                       days: tempDays.map((day, index) => ({
                         ...day,
@@ -1225,10 +1059,10 @@ const heroImage =
                     setShowReorderModal(false);
                   }, 2000);
                 }}
-                className="bg-black text-white px-8 py-3 rounded-full font-bold hover:bg-gray-800 transition disabled:opacity-50 flex items-center gap-2"
+                className="bg-gray-900 text-white px-10 py-3 rounded-xl font-semibold hover:bg-gray-800 transition-all disabled:opacity-50 flex items-center gap-3"
               >
-                {savingOrder && <div className="w-4 h-4 border-2 border-white/50 border-t-white rounded-full animate-spin" />}
-                Save Order
+                {savingOrder && <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />}
+                <span>Save Changes</span>
               </button>
             </div>
           </div>

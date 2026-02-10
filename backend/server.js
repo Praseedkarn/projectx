@@ -30,9 +30,11 @@ const app = express();
 /* =====================================================
    🌍 CORS — MANUAL + GUARANTEED (FIXES PREFLIGHT)
 ===================================================== */
-const allowedOrigins = process.env.CLIENT_URL
-  ? process.env.CLIENT_URL.split(",")
-  : [];
+const allowedOrigins =[
+  "http://localhost:3000",
+  "https://expeditio-travel.vercel.app",
+  "https://projectx-one-pearl.vercel.app",
+];
 
 app.use((req, res, next) => {
   const origin = req.headers.origin;
