@@ -335,16 +335,6 @@ function App() {
     }
   };
 
-
-
-
-
-
-
-
-
-
-
   /* ================= RENDER PAGE ================= */
 
 
@@ -405,7 +395,7 @@ function App() {
 
       {/* ===== MAIN CONTENT AREA ===== */}
       <main
-        className={`px-2 lg:px-4 pb-24 overflow-hidden transition-all duration-500 ${isQrTrip
+        className={` pb-24 overflow-hidden transition-all duration-500 ${isQrTrip
           ? "pt-0 bg-[#f6f7f9]"
           : location.pathname === "/"
             ? "pt-[250px] bg-[#d7f26e]"
@@ -481,8 +471,8 @@ function App() {
                             type="button"
                             onClick={() => setTripType(t.key)}
                             className={`flex-1 rounded-lg px-3 py-2.5 text-sm font-medium
-          transition-all duration-200 ease-out
-          ${tripType === t.key
+                            transition-all duration-200 ease-out
+                            ${tripType === t.key
                                 ? "bg-white text-blue-700 shadow-sm"
                                 : "text-gray-600 hover:text-gray-900"
                               }`}
@@ -537,13 +527,13 @@ function App() {
                         onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
                         placeholder="Enter city or place"
                         className="w-full rounded-xl border border-gray-200 px-4 py-3.5
-               focus:ring-2 focus:ring-[#5b7c67] focus:border-transparent outline-none transition-shadow"
+                          focus:ring-2 focus:ring-[#5b7c67] focus:border-transparent outline-none transition-shadow"
                       />
 
                       {/* ===== SUGGESTIONS DROPDOWN ===== */}
                       {showSuggestions && citySuggestions.length > 0 && (
                         <div className="absolute z-20 w-full bg-white border border-gray-200
-                    rounded-xl shadow-lg mt-2 max-h-60 overflow-y-auto">
+                          rounded-xl shadow-lg mt-2 max-h-60 overflow-y-auto">
                           {citySuggestions.map((city) => (
                             <div
                               key={city.geonameId}
@@ -553,7 +543,7 @@ function App() {
                                 setShowSuggestions(false);
                               }}
                               className="px-4 py-3 hover:bg-gray-50
-                     cursor-pointer text-sm transition-colors border-b border-gray-100 last:border-0"
+                               cursor-pointer text-sm transition-colors border-b border-gray-100 last:border-0"
                             >
                               <strong>{city.name}</strong>, {city.countryName}
                             </div>

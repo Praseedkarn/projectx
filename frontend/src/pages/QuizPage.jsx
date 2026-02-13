@@ -17,7 +17,7 @@ export default function QuizPage({ currentUser, setCurrentUser }) {
   const [earnedTokens, setEarnedTokens] = useState(0);
   const [quizScore, setQuizScore] = useState(0);
   const [quizFinished, setQuizFinished] = useState(false);
-
+  const [quizPassed , setQuizPassed ] = useState(false);
   const cooldownKey = currentUser
     ? `quizCooldownUntil_${currentUser._id}`
     : null;
@@ -110,6 +110,7 @@ export default function QuizPage({ currentUser, setCurrentUser }) {
         });
       setQuizScore(res.score);
       setQuizFinished(true);
+      setQuizPassed(res.passed);
       setCooldownUntil(res.nextQuizAt);
       if (cooldownKey) {
         localStorage.setItem(cooldownKey, res.nextQuizAt);
@@ -180,7 +181,7 @@ export default function QuizPage({ currentUser, setCurrentUser }) {
           </div>
         )}
 
-        {quizFinished && !showRewardCard && quizScore < 3 && (
+        {quizFinished && !showRewardCard && !quizPassed && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
             <div className="bg-white rounded-2xl p-8 max-w-sm w-full text-center shadow-xl space-y-4">
 

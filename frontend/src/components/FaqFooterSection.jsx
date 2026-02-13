@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 const faqs = [
   {
@@ -44,6 +44,9 @@ export default function FaqFooterSection() {
   const [open, setOpen] = useState(null);
   const [footerHero, setFooterHero] = useState(false);
 
+  const location = useLocation();
+  const navigate = useNavigate();
+
   /* ===== FOOTER HERO SCROLL LOGIC ===== */
   useEffect(() => {
     const handleScroll = () => {
@@ -51,7 +54,6 @@ export default function FaqFooterSection() {
       const windowHeight = window.innerHeight;
       const docHeight = document.documentElement.scrollHeight;
 
-      // Trigger hero when near bottom
       const nearBottom = scrollY + windowHeight > docHeight - 220;
       setFooterHero(nearBottom);
     };
@@ -60,14 +62,35 @@ export default function FaqFooterSection() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  /* ===== HANDLE HASH SCROLL (FROM OTHER PAGES) ===== */
+  useEffect(() => {
+    if (location.hash === "#faq") {
+      const el = document.getElementById("faq");
+      if (el) {
+        setTimeout(() => {
+          el.scrollIntoView({ behavior: "smooth" });
+        }, 200);
+      }
+    }
+  }, [location]);
+
+  const handleFaqClick = () => {
+    if (location.pathname !== "/") {
+      navigate("/#faq");
+    } else {
+      const el = document.getElementById("faq");
+      if (el) el.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   return (
     <>
-      {/* ================= FAQ HERO SECTION ================= */}
+      {/* ================= FAQ SECTION ================= */}
       <section
+        id="faq"
         className={`
           relative
           transition-all duration-700 ease-out
-          will-change-transform
           bg-white
           ${footerHero
             ? "rounded-t-[80px] pt-32 pb-40 min-h-[70vh]"
@@ -86,10 +109,14 @@ export default function FaqFooterSection() {
                 <div key={i} className="border-b border-black/10 pb-4">
                   <button
                     onClick={() => setOpen(open === i ? null : i)}
-                    className="w-full flex justify-between items-center text-left text-base font-medium"
+                    className="w-full flex justify-between items-center text-left text-base font-medium hover:text-[#5b7c67] transition"
                   >
                     {item.q}
-                    <span className="text-xl">
+                    <span
+                      className={`text-xl transition-transform duration-300 ${
+                        open === i ? "rotate-180" : ""
+                      }`}
+                    >
                       {open === i ? "−" : "+"}
                     </span>
                   </button>
@@ -106,12 +133,11 @@ export default function FaqFooterSection() {
         </div>
       </section>
 
-      {/* ================= FOOTER HERO ATTACHED ================= */}
+      {/* ================= FOOTER ================= */}
       <footer
         className={`
           relative z-10
           transition-all duration-700 ease-out
-          will-change-transform
           bg-[#d7f26e]
           ${footerHero
             ? "rounded-t-[80px] pt-24 pb-16 -mt-32"
@@ -136,10 +162,29 @@ export default function FaqFooterSection() {
             <div>
               <h4 className="font-semibold mb-3">Support</h4>
               <ul className="space-y-2 text-gray-700">
-                <li>FAQ</li>
-                <li><Link to="/terms">Terms & Conditions</Link></li>
-                <li><Link to="/privacy">Privacy Policy</Link></li>
-                <li>Refunds</li>
+                <li>
+                  <button
+                    onClick={handleFaqClick}
+                    className="hover:underline"
+                  >
+                    FAQ
+                  </button>
+                </li>
+                <li>
+                  <Link to="/terms" className="hover:underline">
+                    Terms & Conditions
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/privacy" className="hover:underline">
+                    Privacy Policy
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/refunds" className="hover:underline">
+                    Refunds
+                  </Link>
+                </li>
               </ul>
             </div>
 
@@ -147,8 +192,16 @@ export default function FaqFooterSection() {
             <div>
               <h4 className="font-semibold mb-3">Resources</h4>
               <ul className="space-y-2 text-gray-700">
-                <li>Travel Guides</li>
-                <li>Destination Guides</li>
+                {/* <li>
+                  <Link to="/guides" className="hover:underline">
+                    Travel Guides
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/destinations" className="hover:underline">
+                    Destination Guides
+                  </Link>
+                </li> */}
               </ul>
             </div>
 
@@ -156,9 +209,26 @@ export default function FaqFooterSection() {
             <div>
               <h4 className="font-semibold mb-3">Community</h4>
               <ul className="space-y-2 text-gray-700">
-                <li>Blog</li>
-                <li>Instagram</li>
-                <li>Local Guides</li>
+                <li>
+                  <Link to="/blogs" className="hover:underline">
+                    Blog
+                  </Link>
+                </li>
+                <li>
+                  <a
+                    href="https://instagram.com/yourusername"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:underline"
+                  >
+                    Instagram
+                  </a>
+                </li>
+                <li>
+                  <Link to="/become-guide" className="hover:underline">
+                    Local Guides
+                  </Link>
+                </li>
               </ul>
             </div>
           </div>
