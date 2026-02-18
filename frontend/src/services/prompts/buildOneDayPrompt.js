@@ -23,15 +23,15 @@ TITLE: ${place} one-day itinerary
 DAY 1
 
 ## Morning
-Write ONE paragraph (2–3 sentences).
+Write ONE paragraph (3–4 sentences).
 End with: Location: <place>.
 
 ## Afternoon
-Write ONE paragraph (2–3 sentences).
+Write ONE paragraph (3–4 sentences).
 End with: Location: <place>.
 
 ## Evening
-Write ONE paragraph (2–3 sentences).
+Write ONE paragraph (3–4 sentences).
 End with: Location: <place>.
 
 Estimated Budget: India: ₹ <min> - ₹ <max>

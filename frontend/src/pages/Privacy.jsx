@@ -95,7 +95,7 @@ const Privacy = () => {
           <p>
             If you have questions about this policy:
             <br />
-            <strong>Email:</strong> praseedkumar104@gmail.com
+            <strong>Email:</strong> expeditio.travel@gmail.com
           </p>
         </section>
 

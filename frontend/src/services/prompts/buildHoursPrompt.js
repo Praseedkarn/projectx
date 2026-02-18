@@ -22,7 +22,7 @@ TITLE: ${place} hourly itinerary
 
 ${Array.from({ length: hours }, (_, i) => `
 ## Hour ${i + 1}
-Write ONE paragraph (2–3 sentences) describing what to do during this hour.
+Write ONE paragraph (3–4 sentences) describing what to do during this hour.
 End with: Location: <place>.
 `).join("")}
 

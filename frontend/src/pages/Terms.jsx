@@ -145,7 +145,7 @@ const Terms = () => {
   <p>
     For questions regarding these Terms:
     <br />
-    <strong>Email:</strong> praseedkumar104@gmail.com
+    <strong>Email:</strong> expeditio.travel@gmail.com
   </p>
 
 </section>
