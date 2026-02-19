@@ -35,13 +35,16 @@ const allowedOrigins =[
   "http://localhost:3000",
   "https://expeditio-travel.vercel.app",
   "https://projectx-one-pearl.vercel.app",
+ "https://expeditio.world",
+  "https://www.expeditio.world",
+
 ];
 
 app.use((req, res, next) => {
   const origin = req.headers.origin;
 
-  if (!origin || allowedOrigins.includes(origin)) {
-    res.setHeader("Access-Control-Allow-Origin", origin || "*");
+  if (origin && allowedOrigins.includes(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader(
       "Access-Control-Allow-Headers",
@@ -53,13 +56,13 @@ app.use((req, res, next) => {
     );
   }
 
-  // 🔥 HANDLE PREFLIGHT
   if (req.method === "OPTIONS") {
     return res.sendStatus(200);
   }
 
   next();
 });
+
 
 /* =====================================================
    🔗 DATABASE
