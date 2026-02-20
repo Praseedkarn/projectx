@@ -45,7 +45,7 @@ const BecomeGuide = () => {
             </a>
 
             <a
-              href="https://instagram.com/praseed_karn"
+              href="https://instagram.com/expeditio_world/"
               target="_blank"
               rel="noreferrer"
               className="block w-full text-center rounded-full

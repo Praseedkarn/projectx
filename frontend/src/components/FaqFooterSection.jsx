@@ -216,7 +216,7 @@ export default function FaqFooterSection() {
                 </li>
                 <li>
                   <a
-                    href="https://instagram.com/yourusername"
+                    href="https://instagram.com/expeditio_world/"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="hover:underline"
