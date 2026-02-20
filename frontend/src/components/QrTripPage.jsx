@@ -1,11 +1,23 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import ReactMarkdown from "react-markdown";
+
+import HoursItinerary from "../components/itinerary/HoursItinerary";
+import OneDayItinerary from "../components/itinerary/OneDayItinerary";
+import MultiDayItinerary from "../components/itinerary/MultiDayItinerary";
+
+import { parseHoursText } from "../utils/parsers/parseHoursText";
+import { parseOneDayText } from "../utils/parsers/parseOneDayText";
+import { parseMultiDayText } from "../utils/parsers/parseMultiDayText";
+
+/* =========================
+   Brand Color
+========================= */
+const BRAND_COLOR = "#6A8F00";
 
 /* =========================
    Helpers
 ========================= */
 
-// Extract destination(s) from itinerary text
 const extractLocation = (text = "") => {
   const match =
     text.match(/Destinations?:\s*(.+)/i) ||
@@ -14,12 +26,18 @@ const extractLocation = (text = "") => {
   return match ? match[1].trim() : null;
 };
 
+const detectTripType = (text = "") => {
+  const lower = text.toLowerCase();
+  if (lower.includes("hour")) return "hours";
+  if (lower.includes("day 1") && lower.includes("day 2")) return "multi";
+  return "day";
+};
+
 const QrTripPage = () => {
   const [tripText, setTripText] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // Extract QR ID from URL
   const path = window.location.pathname;
   const qrTripId = path.split("/qr-trip/")[1];
 
@@ -56,108 +74,130 @@ const QrTripPage = () => {
     fetchTrip();
   }, [qrTripId]);
 
-  /* =========================
-     PDF Download
-  ========================= */
+  const location = extractLocation(tripText);
+  const tripType = useMemo(() => detectTripType(tripText), [tripText]);
+
+  const parsedData = useMemo(() => {
+    try {
+      if (tripType === "hours") return parseHoursText(tripText);
+      if (tripType === "multi") return parseMultiDayText(tripText);
+      return parseOneDayText(tripText);
+    } catch {
+      return null;
+    }
+  }, [tripText, tripType]);
+
   const handleDownloadPDF = () => {
-    window.print(); // browser-native, reliable
+    window.print();
   };
 
+  /* =========================
+     Loading
+  ========================= */
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-gray-600">Loading itinerary…</p>
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="text-center space-y-4">
+          <div
+            className="w-10 h-10 border-4 border-gray-300 rounded-full animate-spin mx-auto"
+            style={{ borderTopColor: BRAND_COLOR }}
+          />
+          <p className="text-gray-500 text-sm">Loading itinerary…</p>
+        </div>
       </div>
     );
   }
 
+  /* =========================
+     Error
+  ========================= */
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-red-500">{error}</p>
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <p className="text-red-500 font-medium">{error}</p>
       </div>
     );
   }
 
-  const location = extractLocation(tripText);
-
   return (
-    <div className="min-h-screen bg-[#f6f7f9] text-gray-800">
+    <div className="min-h-screen bg-white text-gray-900">
 
       {/* ================= HEADER ================= */}
-      <header className="sticky top-0 z-10 bg-white border-b print:hidden">
-        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div className="max-w-5xl mx-auto px-6 pt-14 pb-10 border-b border-gray-100">
 
+        {/* Brand Centered */}
+        <div className="flex flex-col items-center text-center space-y-4">
 
+          
 
-          {/* ACTION */}
-
-        </div>
-      </header>
-
-      {/* ================= CONTENT ================= */}
-      <main className="max-w-5xl mx-auto px-6 py-10 bg-white print:px-0 print:py-0">
-        {/* ===== PROJECT X COMBINED LOGO ===== */}
-        <div className="flex justify-center items-center gap-2 mb-10">
-          <span className="text-3xl md:text-4xl font-bold text-gray-800 tracking-wide">
+          {/* EXPEDITIO */}
+          <h1
+            className="text-3xl sm:text-4xl font-semibold tracking-widest italic"
+            style={{ color: BRAND_COLOR }}
+          >
             EXPEDITIO
-          </span>
+          </h1>
 
-          <img
-            src="/logo.png"
-            alt="X"
-            className="h-10 md:h-12"
-          />
-        </div>
+          {/* Divider */}
+          <div className="w-24 h-[2px] bg-gray-200" />
 
-
-        {/* TITLE */}
-        <div className="mb-8">
-          <h2 className="text-3xl font-semibold">
-            Your Travel Itinerary
-          </h2>
-
+          {/* Destination */}
           {location && (
-            <p className="mt-2 text-gray-600 text-sm">
-              📍 {location}
-            </p>
+            <div className="space-y-2">
+              <h2 className="text-4xl sm:text-5xl font-bold tracking-tight">
+                {location}
+              </h2>
+
+              <p className="text-gray-500 text-lg">
+                {tripType === "hours" && "Hourly Travel Plan"}
+                {tripType === "day" && "1-Day Itinerary"}
+                {tripType === "multi" &&
+                  `${parsedData?.days?.length || ""}-Day Itinerary`}
+              </p>
+            </div>
           )}
         </div>
 
-        {/* ITINERARY */}
-        <article
-          className="
-            prose prose-slate max-w-none
-            prose-headings:font-semibold
-            prose-headings:mt-6
-            prose-p:leading-relaxed
-            prose-li:my-1
-          "
-        >
-          <ReactMarkdown>
-            {tripText}
-          </ReactMarkdown>
-        </article>
+        {/* Download Button */}
+        <div className="print:hidden">
+            <button
+              onClick={handleDownloadPDF}
+              className="px-6 py-2.5 rounded-full border text-sm font-medium transition hover:bg-gray-100"
+              style={{ borderColor: BRAND_COLOR, color: BRAND_COLOR }}
+            >
+              ⬇ Download PDF
+            </button>
+          </div>
+      </div>
 
-        {/* FOOTER */}
-        <footer className="mt-14 pt-6 border-t text-center text-xs text-gray-400">
-          ✨ Generated by Expeditio AI • Shared via QR
-          <br />
-          Plan smarter. Travel better.
-        </footer>
+      {/* ================= CONTENT ================= */}
+      <div className="max-w-5xl mx-auto px-6 py-14">
 
+        {parsedData ? (
+          <>
+            {tripType === "hours" && (
+              <HoursItinerary data={parsedData} city={location} />
+            )}
 
+            {tripType === "day" && (
+              <OneDayItinerary data={parsedData} city={location} />
+            )}
 
-      </main>
+            {tripType === "multi" && (
+              <MultiDayItinerary data={parsedData} city={location} />
+            )}
+          </>
+        ) : (
+          <div className="prose max-w-none">
+            <ReactMarkdown>{tripText}</ReactMarkdown>
+          </div>
+        )}
+      </div>
 
-      <button
-        onClick={handleDownloadPDF}
-        className="rounded-full border px-4 py-2 text-sm 
-                       hover:bg-gray-100 transition"
-      >
-        ⬇ Download PDF
-      </button>
-
+      {/* ================= FOOTER ================= */}
+      <div className="text-center text-xs text-gray-400 pb-10">
+        ✨ Generated by Expeditio AI • Shared via QR
+      </div>
     </div>
   );
 };

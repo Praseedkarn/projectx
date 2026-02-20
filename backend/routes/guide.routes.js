@@ -8,7 +8,7 @@ const router = express.Router();
    =============================== */
 router.get("/", async (req, res) => {
   try {
-    const { city } = req.query;
+    let { city } = req.query;
 
     if (!city) {
       return res.status(400).json({ message: "City is required" });
