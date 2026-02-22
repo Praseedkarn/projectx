@@ -10,26 +10,35 @@ import { parseOneDayText } from "../utils/parsers/parseOneDayText";
 import { parseMultiDayText } from "../utils/parsers/parseMultiDayText";
 
 /* =========================
-   Brand Color
-========================= */
-const BRAND_COLOR = "#6A8F00";
-
-/* =========================
    Helpers
 ========================= */
 
 const extractLocation = (text = "") => {
-  const match =
-    text.match(/Destinations?:\s*(.+)/i) ||
-    text.match(/Destination:\s*(.+)/i);
+  if (!text) return null;
 
-  return match ? match[1].trim() : null;
+  const titleMatch = text.match(/TITLE:\s*(.+)/i);
+  if (titleMatch) {
+    return titleMatch[1].replace(/Itinerary/i, "").trim();
+  }
+
+  const firstLine = text.split("\n")[0];
+  if (firstLine?.toLowerCase().includes("itinerary")) {
+    return firstLine.replace(/itinerary/i, "").trim();
+  }
+
+  return null;
 };
 
 const detectTripType = (text = "") => {
   const lower = text.toLowerCase();
-  if (lower.includes("hour")) return "hours";
-  if (lower.includes("day 1") && lower.includes("day 2")) return "multi";
+
+  if (lower.includes("hour 1")) return "hours";
+
+  const dayMatches = lower.match(/day\s+\d+/g);
+  if (dayMatches && dayMatches.length > 1) return "multi";
+
+  if (lower.includes("day 1")) return "day";
+
   return "day";
 };
 
@@ -38,12 +47,8 @@ const QrTripPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const path = window.location.pathname;
-  const qrTripId = path.split("/qr-trip/")[1];
+  const qrTripId = window.location.pathname.split("/qr-trip/")[1];
 
-  /* =========================
-     Fetch itinerary
-  ========================= */
   useEffect(() => {
     if (!qrTripId) {
       setError("Invalid QR link");
@@ -74,7 +79,7 @@ const QrTripPage = () => {
     fetchTrip();
   }, [qrTripId]);
 
-  const location = extractLocation(tripText);
+  const location = useMemo(() => extractLocation(tripText), [tripText]);
   const tripType = useMemo(() => detectTripType(tripText), [tripText]);
 
   const parsedData = useMemo(() => {
@@ -82,35 +87,27 @@ const QrTripPage = () => {
       if (tripType === "hours") return parseHoursText(tripText);
       if (tripType === "multi") return parseMultiDayText(tripText);
       return parseOneDayText(tripText);
-    } catch {
+    } catch (err) {
+      console.error("QR parsing failed:", err);
       return null;
     }
   }, [tripText, tripType]);
 
-  const handleDownloadPDF = () => {
-    window.print();
-  };
+  const handleDownloadPDF = () => window.print();
 
-  /* =========================
-     Loading
-  ========================= */
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="text-center space-y-4">
-          <div
-            className="w-10 h-10 border-4 border-gray-300 rounded-full animate-spin mx-auto"
-            style={{ borderTopColor: BRAND_COLOR }}
-          />
-          <p className="text-gray-500 text-sm">Loading itinerary…</p>
+        <div className="space-y-4 text-center">
+          <div className="w-10 h-10 border-4 border-gray-300 border-t-[#5b6f00] rounded-full animate-spin mx-auto" />
+          <p className="text-gray-500 text-sm tracking-wide">
+            Preparing your travel document…
+          </p>
         </div>
       </div>
     );
   }
 
-  /* =========================
-     Error
-  ========================= */
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
@@ -120,71 +117,72 @@ const QrTripPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white text-gray-900">
+    <div className="min-h-screen bg-white text-gray-900 print:bg-white">
 
-      {/* ================= HEADER ================= */}
-      <div className="max-w-5xl mx-auto px-6 pt-14 pb-10 border-b border-gray-100">
+      {/* ================= HERO ================= */}
+      <div className="max-w-4xl mx-auto px-6 pt-20 pb-16 text-center">
 
-        {/* Brand Centered */}
-        <div className="flex flex-col items-center text-center space-y-4">
+        {/* BRAND NAME */}
+        <span className="italic text-4xl md:text-4xl text-[#5b6f00]">
+          EXPEDITIO
+        </span>
 
-          
+        <div className="w-16 h-[1px] bg-gray-300 mx-auto my-8" />
 
-          {/* EXPEDITIO */}
-          <h1
-            className="text-3xl sm:text-4xl font-semibold tracking-widest italic"
-            style={{ color: BRAND_COLOR }}
+        {/* DESTINATION */}
+        {location && (
+          <>
+            <h2 className="text-5xl font-bold tracking-tight leading-tight">
+              {location}
+            </h2>
+
+            <p className="mt-4 text-gray-500 text-lg tracking-wide">
+              {tripType === "hours" && "Hourly Travel Plan"}
+              {tripType === "day" && "1-Day Curated Itinerary"}
+              {tripType === "multi" &&
+                `${parsedData?.days?.length || ""}-Day Curated Itinerary`}
+            </p>
+          </>
+        )}
+
+        {/* DOWNLOAD BUTTON */}
+        <div className="mt-10 print:hidden">
+          <button
+            onClick={handleDownloadPDF}
+            className="px-7 py-2.5 rounded-full border text-sm font-medium transition hover:bg-gray-100 border-[#5b6f00] text-[#5b6f00]"
           >
-            EXPEDITIO
-          </h1>
-
-          {/* Divider */}
-          <div className="w-24 h-[2px] bg-gray-200" />
-
-          {/* Destination */}
-          {location && (
-            <div className="space-y-2">
-              <h2 className="text-4xl sm:text-5xl font-bold tracking-tight">
-                {location}
-              </h2>
-
-              <p className="text-gray-500 text-lg">
-                {tripType === "hours" && "Hourly Travel Plan"}
-                {tripType === "day" && "1-Day Itinerary"}
-                {tripType === "multi" &&
-                  `${parsedData?.days?.length || ""}-Day Itinerary`}
-              </p>
-            </div>
-          )}
+            Download PDF
+          </button>
         </div>
-
-        {/* Download Button */}
-        <div className="print:hidden">
-            <button
-              onClick={handleDownloadPDF}
-              className="px-6 py-2.5 rounded-full border text-sm font-medium transition hover:bg-gray-100"
-              style={{ borderColor: BRAND_COLOR, color: BRAND_COLOR }}
-            >
-              ⬇ Download PDF
-            </button>
-          </div>
       </div>
 
       {/* ================= CONTENT ================= */}
-      <div className="max-w-5xl mx-auto px-6 py-14">
+      <div className="max-w-4xl mx-auto px-6 pb-24 leading-relaxed print:pb-12">
 
-        {parsedData ? (
+       {parsedData ? (
           <>
             {tripType === "hours" && (
-              <HoursItinerary data={parsedData} city={location} />
+              <HoursItinerary
+                data={parsedData}
+                city={location}
+                hideHeader
+              />
             )}
 
             {tripType === "day" && (
-              <OneDayItinerary data={parsedData} city={location} />
+              <OneDayItinerary
+                data={parsedData}
+                city={location}
+                hideHeader
+              />
             )}
 
             {tripType === "multi" && (
-              <MultiDayItinerary data={parsedData} city={location} />
+              <MultiDayItinerary
+                data={parsedData}
+                city={location}
+                hideHeader
+              />
             )}
           </>
         ) : (
@@ -195,8 +193,8 @@ const QrTripPage = () => {
       </div>
 
       {/* ================= FOOTER ================= */}
-      <div className="text-center text-xs text-gray-400 pb-10">
-        ✨ Generated by Expeditio AI • Shared via QR
+      <div className="text-center text-xs text-gray-400 pb-12 tracking-wide">
+        Crafted by Expeditio AI • Smart Travel Planning
       </div>
     </div>
   );

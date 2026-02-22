@@ -6,7 +6,7 @@ const getBudgetText = (data) => {
   if (data?.estimatedBudget) return data.estimatedBudget;
 
   const sections = data?.days?.[0]?.sections || [];
-  const budgetSection = sections.find(s =>
+  const budgetSection = sections.find((s) =>
     s.period.toLowerCase().includes("budget")
   );
 
@@ -21,7 +21,11 @@ const isBudgetSection = (section) =>
 
 /* ================= COMPONENT ================= */
 
-const HoursItinerary = ({ data, city }) => {
+const HoursItinerary = ({
+  data,
+  city,
+  hideHeader = false,
+}) => {
   const [showBudgetDetails, setShowBudgetDetails] = useState(false);
 
   if (!data?.days?.length) {
@@ -30,16 +34,10 @@ const HoursItinerary = ({ data, city }) => {
 
   const sections = data.days[0].sections || [];
 
-  /* ================= TRANSPORT ================= */
   const transportSection = sections.find(isTransportSection);
 
-  /* ================= HOURS (STRICT FILTER) ================= */
   const hours = sections
-    .filter(
-      (s) =>
-        !isTransportSection(s) &&
-        !isBudgetSection(s)
-    )
+    .filter((s) => !isTransportSection(s) && !isBudgetSection(s))
     .flatMap((section) =>
       section.activities.map((act) => ({
         description: act.description,
@@ -47,14 +45,13 @@ const HoursItinerary = ({ data, city }) => {
       }))
     );
 
-  /* ================= BUDGET ================= */
   const budgetText = getBudgetText(data);
 
   return (
     <div className="space-y-8 animate-fade-in">
 
       {/* ================= HEADER ================= */}
-      {city && (
+      {!hideHeader && city && (
         <div className="flex items-center gap-3 pb-4 border-b border-gray-100">
           <span className="text-2xl">⏳</span>
           <h2 className="text-xl font-bold text-gray-900">
@@ -67,7 +64,7 @@ const HoursItinerary = ({ data, city }) => {
       {budgetText && (
         <div className="rounded-2xl border border-emerald-100 bg-emerald-50/60 overflow-hidden">
           <button
-            onClick={() => setShowBudgetDetails(v => !v)}
+            onClick={() => setShowBudgetDetails((v) => !v)}
             className="w-full flex items-center justify-between px-5 py-4 text-left"
           >
             <div className="flex items-center gap-2 font-semibold text-emerald-800">
@@ -84,7 +81,7 @@ const HoursItinerary = ({ data, city }) => {
 
           {showBudgetDetails && (
             <div className="px-5 pb-5 pt-2 text-xs text-emerald-700 space-y-1 border-t border-emerald-100">
-              <p>• Estimated for this visit (few hours)</p>
+              <p>• Estimated for this visit</p>
               <p>• Includes food, local transport & entry fees</p>
               <p>• Excludes flights & accommodation</p>
             </div>
@@ -92,7 +89,7 @@ const HoursItinerary = ({ data, city }) => {
         </div>
       )}
 
-      {/* ================= HOURS LIST ================= */}
+      {/* ================= HOURS ================= */}
       <div className="grid gap-4">
         {hours.map((item, index) => (
           <div
@@ -139,7 +136,6 @@ const HoursItinerary = ({ data, city }) => {
           </div>
         </div>
       )}
-
     </div>
   );
 };

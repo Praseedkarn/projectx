@@ -1,12 +1,18 @@
 import React, { useState } from "react";
 
-const MultiDayItinerary = ({ data, city, startDate }) => {
+const MultiDayItinerary = ({
+  data,
+  city,
+  startDate,
+  hideHeader = false,
+}) => {
   const [showBudgetDetails, setShowBudgetDetails] = useState(false);
 
   if (!data?.days?.length) {
     return <p className="text-sm text-gray-500">No itinerary available</p>;
   }
 
+  /* ================= DATE LABEL ================= */
   const getDateLabel = (startDate, index) => {
     if (!startDate) return `Day ${index + 1}`;
 
@@ -20,40 +26,43 @@ const MultiDayItinerary = ({ data, city, startDate }) => {
     });
   };
 
+  /* ================= TRANSPORT ================= */
   const transportSection = data.days
-    .flatMap(d => d.sections || [])
-    .find(s => s.period.toLowerCase() === "transportation");
+    .flatMap((d) => d.sections || [])
+    .find((s) => s.period.toLowerCase() === "transportation");
 
   /* ================= BUDGET ================= */
   let budgetText = data?.estimatedBudget;
 
   if (!budgetText) {
-    const budgetSection = data?.days?.[0]?.sections?.find(
-      s => s.period.toLowerCase().includes("budget")
+    const budgetSection = data?.days?.[0]?.sections?.find((s) =>
+      s.period.toLowerCase().includes("budget")
     );
+
     budgetText = budgetSection?.activities?.[0]?.description;
   }
 
   return (
     <div className="space-y-12 animate-fade-in">
 
-      {/* Header */}
-      {city && (
-        <div className="text-center pb-8 border-b border-gray-100">
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">
-            Your Trip to {city}
+      {/* ================= HEADER ================= */}
+      {/* This shows ONLY on main TripResults page */}
+      {!hideHeader && city && (
+        <div className="text-center pb-10 border-b border-gray-100">
+          <h2 className="text-3xl font-bold text-gray-900">
+            {city}
           </h2>
-          <p className="text-gray-500">
-            A day-by-day roadmap of your adventure
+          <p className="text-gray-500 mt-2">
+            {data.days.length}-Day Travel Plan
           </p>
         </div>
       )}
 
-      {/* Budget */}
+      {/* ================= BUDGET ================= */}
       {budgetText && (
         <div className="mt-6 rounded-2xl border border-emerald-100 bg-emerald-50/60 overflow-hidden">
           <button
-            onClick={() => setShowBudgetDetails(v => !v)}
+            onClick={() => setShowBudgetDetails((v) => !v)}
             className="w-full flex items-center justify-between px-5 py-4 text-left"
           >
             <div className="flex items-center gap-2 text-emerald-800 font-semibold">
@@ -79,11 +88,11 @@ const MultiDayItinerary = ({ data, city, startDate }) => {
         </div>
       )}
 
-      {/* Days */}
+      {/* ================= DAYS ================= */}
       <div className="space-y-16">
         {data.days.map((day, index) => {
           const sections = day.sections.filter(
-            s => s.period.toLowerCase() !== "transportation"
+            (s) => s.period.toLowerCase() !== "transportation"
           );
 
           return (
@@ -125,7 +134,7 @@ const MultiDayItinerary = ({ data, city, startDate }) => {
         })}
       </div>
 
-      {/* Transportation */}
+      {/* ================= TRANSPORT ================= */}
       {transportSection && (
         <div className="mt-12 bg-gray-100 rounded-2xl p-8 shadow-xl">
           <div className="flex gap-4">

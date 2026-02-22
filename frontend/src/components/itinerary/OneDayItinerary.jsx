@@ -4,14 +4,19 @@ const getBudgetText = (data) => {
   if (data?.estimatedBudget) return data.estimatedBudget;
 
   const sections = data?.days?.[0]?.sections || [];
-  const budgetSection = sections.find(s =>
-    s.period.toLowerCase().includes("estimated budget")
+  const budgetSection = sections.find((s) =>
+    s.period.toLowerCase().includes("budget")
   );
 
   return budgetSection?.activities?.[0]?.description || null;
 };
 
-const OneDayItinerary = ({ data, city, startDate }) => {
+const OneDayItinerary = ({
+  data,
+  city,
+  startDate,
+  hideHeader = false,
+}) => {
   const [showBudgetDetails, setShowBudgetDetails] = useState(false);
 
   if (!data?.days?.length) {
@@ -21,21 +26,20 @@ const OneDayItinerary = ({ data, city, startDate }) => {
   const day = data.days[0];
 
   const transportSection = day.sections?.find(
-    s => s.period.toLowerCase() === "transportation"
+    (s) => s.period.toLowerCase() === "transportation"
   );
 
   const normalSections = day.sections?.filter(
-    s => s.period.toLowerCase() !== "transportation"
+    (s) => s.period.toLowerCase() !== "transportation"
   );
 
-  // 🔹 Budget extraction
-const budgetText = getBudgetText(data);
-
-
+  const budgetText = getBudgetText(data);
 
   return (
     <div className="space-y-8 animate-fade-in">
-      {city && (
+
+      {/* ================= HEADER ================= */}
+      {!hideHeader && city && (
         <div className="pb-6 border-b border-gray-100">
           <h2 className="text-2xl font-bold text-gray-900">
             {city}
@@ -53,11 +57,11 @@ const budgetText = getBudgetText(data);
         </div>
       )}
 
-      {/* 💰 Budget */}
+      {/* ================= BUDGET ================= */}
       {budgetText && (
         <div className="rounded-2xl border border-emerald-100 bg-emerald-50/60 overflow-hidden">
           <button
-            onClick={() => setShowBudgetDetails(v => !v)}
+            onClick={() => setShowBudgetDetails((v) => !v)}
             className="w-full flex items-center justify-between px-5 py-4 text-left"
           >
             <div className="font-semibold text-emerald-800">
@@ -82,7 +86,7 @@ const budgetText = getBudgetText(data);
         </div>
       )}
 
-      {/* Timeline */}
+      {/* ================= TIMELINE ================= */}
       <div className="relative border-l-2 border-gray-100 ml-4 pl-8 space-y-10">
         {normalSections.map((section, idx) => (
           <div key={idx} className="relative">
@@ -112,11 +116,13 @@ const budgetText = getBudgetText(data);
         ))}
       </div>
 
-      {/* Transportation */}
+      {/* ================= TRANSPORT ================= */}
       {transportSection && (
         <div className="mt-6 ml-4 pl-8 border-l-2 border-dashed border-gray-200">
           <div className="bg-gray-50 rounded-2xl p-6">
-            <h4 className="font-bold text-gray-900 mb-2">Getting Around</h4>
+            <h4 className="font-bold text-gray-900 mb-2">
+              Getting Around
+            </h4>
             {transportSection.activities.map((act, i) => (
               <p key={i} className="text-sm text-gray-600">
                 {act.description}
