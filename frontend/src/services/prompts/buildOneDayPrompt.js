@@ -3,53 +3,62 @@ export const buildOneDayPrompt = ({
   group,
   suggestions,
 }) => `
-Create a clear, natural-sounding one-day travel itinerary in a professional travel-guide tone.
+You are a professional travel writer creating a REALISTIC, up-to-date one-day travel itinerary.
 
 Destination: ${place}
 Duration: 1 day
-Group: ${group}
+Traveler Type: ${group}
 
 ${suggestions ? `
-User preferences (blend naturally into the paragraphs, do NOT list separately):
+Traveler preferences (blend naturally into the plan, do NOT list separately):
 ${Array.isArray(suggestions)
   ? suggestions.join(", ")
   : suggestions}
 ` : ""}
 
-STRICT FORMAT — FOLLOW EXACTLY:
+STYLE REQUIREMENTS:
+- Write in a soft, human, and friendly tone.
+- Tell the traveler clearly what to do (use action verbs like Visit, Walk, Explore, Try, Head to).
+- Keep a light storytelling flow so Morning connects naturally to Afternoon and Evening.
+- Use simple and easy English so anyone can understand.
+- Keep the plan realistic and up-to-date with current travel trends and popular spots.
+- Prefer places that are active, well-rated, and commonly visited.
+- Avoid outdated or permanently closed attractions.
+- Avoid dramatic or overly poetic language.
+- Avoid robotic phrases like “start your day by”.
+- Do NOT describe emotions deeply.
+- Paragraphs only. No bullet points. No emojis.
 
-TITLE: ${place} one-day itinerary
+STRICT OUTPUT FORMAT:
+
+TITLE: ${place} One-Day Itinerary
 
 DAY 1
 
 ## Morning
-Write ONE paragraph (3–4 sentences).
-End with: Location: <place>.
+Write ONE clear paragraph (3–4 sentences).
+End the paragraph by writing exactly:
+Location: <Place Name>
+at the very end of the same paragraph.
 
 ## Afternoon
-Write ONE paragraph (3–4 sentences).
-End with: Location: <place>.
+Write ONE clear paragraph (3–4 sentences).
+End the paragraph by writing exactly:
+Location: <Place Name>
+at the very end of the same paragraph.
 
 ## Evening
-Write ONE paragraph (3–4 sentences).
-End with: Location: <place>.
+Write ONE clear paragraph (3–4 sentences).
+End the paragraph by writing exactly:
+Location: <Place Name>
+at the very end of the same paragraph.
 
-Estimated Budget: India: ₹ <min> - ₹ <max>
-Write this on ONE line only.
-Exclude flights/hotels. Use a range.
-
+Estimated Budget: India: ₹ <realistic min> - ₹ <realistic max>
+(Write on ONE line only. Exclude flights and hotels.)
 
 ## Transportation
-Write ONE short paragraph explaining how to get around ${place} in one day
-(public transport, walking routes, taxis).
-
-RULES:
-- Use paragraphs ONLY
-- Only DAY 1
-- Transportation must be LAST
-- No emojis
-- No extra sections
-- No bullet points
+Write ONE practical paragraph explaining how to move efficiently around ${place} in one day
+(local transport apps, metro, autos, walking routes, taxis).
 
 END
 `;

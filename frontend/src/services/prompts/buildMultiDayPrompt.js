@@ -4,56 +4,52 @@ export const buildMultiDayPrompt = ({
   group,
   suggestions,
 }) => `
-Create a clear, natural-sounding multi-day travel itinerary in a professional travel-guide tone.
+Create a realistic, up-to-date multi-day travel itinerary.
 
 Destination: ${place}
 Duration: ${days} days
-Group: ${group}
+Traveler Type: ${group}
 
 ${suggestions ? `
-User preferences (blend naturally into the paragraphs, do NOT list separately):
+Traveler preferences (blend naturally, do NOT list separately):
 ${Array.isArray(suggestions)
   ? suggestions.join(", ")
   : suggestions}
 ` : ""}
 
-STRICT FORMAT — FOLLOW EXACTLY:
+STYLE:
+- Soft, friendly, instructional tone.
+- Use action verbs (Visit, Walk, Explore, Try, Head to).
+- Keep language simple and clear.
+- Ensure smooth flow between sections.
+- Keep recommendations practical and realistic.
+- Avoid outdated places, dramatic writing, emojis, or bullet points.
+- Paragraphs only.
 
-TITLE: ${place} itinerary
+FORMAT:
+
+TITLE: ${place} Itinerary
 
 ${Array.from({ length: days }, (_, i) => `
 DAY ${i + 1}
 
 ## Morning
-Write ONE paragraph (2–3 sentences) describing morning activities.
-End with: Location: <place>.
+Write ONE paragraph (2–3 sentences).
+End with: Location: <Place Name> (same line).
 
 ## Afternoon
-Write ONE paragraph (2–3 sentences) describing afternoon activities.
-End with: Location: <place>.
+Write ONE paragraph (2–3 sentences).
+End with: Location: <Place Name> (same line).
 
 ## Evening
-Write ONE paragraph (2–3 sentences) describing evening activities.
-End with: Location: <place>.
+Write ONE paragraph (2–3 sentences).
+End with: Location: <Place Name> (same line).
 `).join("")}
 
-Estimated Budget (Per Person Per Day): <amount>
-Write the budget on ONE line only.
-India: ₹ 
-Exclude flights and accommodation.
-Use a realistic range.
+Estimated Budget: India: ₹ <min> - ₹ <max> (per person per day, one line only)
 
 ## Transportation
-Write ONE concise paragraph explaining how to travel within ${place} across all days
-(public transport, taxis, walking, passes, airport/rail connectivity).
-
-RULES:
-- Use paragraphs ONLY (no bullets, no hyphens)
-- Use DAY 1, DAY 2, etc.
-- Transportation must be LAST
-- Do NOT shorten content
-- No emojis
-- No extra text
+Write ONE concise paragraph about getting around ${place} across all days.
 
 END
 `;

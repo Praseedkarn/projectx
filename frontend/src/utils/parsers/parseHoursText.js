@@ -1,5 +1,8 @@
 export function parseHoursText(text) {
-  const lines = text.split("\n").map(l => l.trim()).filter(Boolean);
+  const lines = text
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean);
 
   const result = {
     title: "",
@@ -14,43 +17,63 @@ export function parseHoursText(text) {
 
   let currentSection = null;
 
-  for (const line of lines) {
-    // TITLE
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+
+    /* ================= TITLE ================= */
     if (line.startsWith("TITLE:")) {
       result.title = line.replace("TITLE:", "").trim();
       continue;
     }
 
-    // BUDGET
+    /* ================= BUDGET ================= */
     if (/^estimated budget/i.test(line)) {
-      result.estimatedBudget = line.replace(/estimated budget[:₹]*/i, "").trim();
+      result.estimatedBudget = line
+        .replace(/estimated budget[:₹]*/i, "")
+        .trim();
       continue;
     }
 
-    // SECTION (Hour X / Transportation)
+    /* ================= SECTION (## Hour / ## Transportation) ================= */
     if (line.startsWith("##")) {
       currentSection = {
         period: line.replace("##", "").trim(),
         activities: [],
       };
+
       result.days[0].sections.push(currentSection);
       continue;
     }
 
     if (!currentSection) continue;
 
-    // ✅ INLINE Location support
+    /* ================= LOCATION HANDLING ================= */
     if (/location:/i.test(line)) {
-      const [desc, loc] = line.split(/location:/i);
+      // Clean emoji if present
+      const cleanLine = line.replace(/📍/g, "");
 
-      currentSection.activities.push({
-        description: desc.trim(),
-        location: loc.trim(),
-      });
+      // Extract text after "Location:"
+      let locationText = cleanLine.split(/location:/i)[1]?.trim() || "";
+
+      // If AI breaks location into next line
+      if (!locationText && lines[i + 1]) {
+        locationText = lines[i + 1]
+          .replace(/📍/g, "")
+          .trim();
+      }
+
+      // Attach location to LAST activity instead of creating new one
+      const lastActivity =
+        currentSection.activities[currentSection.activities.length - 1];
+
+      if (lastActivity) {
+        lastActivity.location = locationText;
+      }
+
       continue;
     }
 
-    // Normal paragraph
+    /* ================= NORMAL PARAGRAPH ================= */
     currentSection.activities.push({
       description: line,
       location: "",

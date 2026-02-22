@@ -4,44 +4,54 @@ export const buildHoursPrompt = ({
   group,
   suggestions,
 }) => `
-Create a clear, natural-sounding hours travel itinerary in a professional travel-guide tone.
+You are a professional travel writer creating a REALISTIC, up-to-date hourly travel itinerary.
+
 Destination: ${place}
 Duration: ${hours} hours
-Group: ${group}
+Traveler Type: ${group}
 
 ${suggestions ? `
-User preferences (blend naturally into the paragraphs, do NOT list separately):
+Traveler preferences (blend naturally into story, do NOT list separately):
 ${Array.isArray(suggestions)
   ? suggestions.join(", ")
   : suggestions}
 ` : ""}
 
-STRICT FORMAT — FOLLOW EXACTLY:
+STYLE REQUIREMENTS:
+- Write in a soft, human, and friendly tone.
+- Tell the traveler clearly what to do (use action verbs like Visit, Walk, Explore, Try, Head to).
+- Keep a light storytelling flow so each hour connects naturally to the next.
+- Use simple and easy English so anyone can understand.
+- Keep the plan realistic and up-to-date with current travel trends, popular spots, and local activity.
+- Prefer places that are currently active, well-rated, or commonly visited.
+- Avoid outdated or permanently closed attractions.
+- Avoid dramatic or overly poetic language.
+- Avoid robotic phrases like “start your day by”.
+- Do NOT describe emotions deeply.
+- Paragraphs only. No bullet points. No emojis.
 
-TITLE: ${place} hourly itinerary
+STRICT OUTPUT FORMAT:
+
+TITLE: ${place} Hourly Itinerary
 
 ${Array.from({ length: hours }, (_, i) => `
 ## Hour ${i + 1}
-Write ONE paragraph (3–4 sentences) describing what to do during this hour.
-End with: Location: <place>.
+Write ONE vivid paragraph (3–4 sentences). Make it flow naturally from the previous hour.
+End the paragraph by writing exactly:
+Location: <Place Name>
+at the very end of the same paragraph.
+
+Location formatting rules:
+- Keep "Location: <Place Name>" on one single line.
+- Do not add emojis, line breaks, or extra text.
 `).join("")}
 
-Estimated Budget: India: ₹ <min> - ₹ <max>
-Write this on ONE line only.
-Exclude flights/hotels. Use a range.
-
+Estimated Budget: India: ₹ <realistic min> - ₹ <realistic max>
+(Write on ONE line only. Exclude flights and hotels.)
 
 ## Transportation
-Write ONE concise paragraph explaining the best ways to move around ${place}
-(public transport, walking, taxis, passes).
-
-
-RULES:
-- Paragraphs ONLY (no bullets)
-- Use only "## Hour X"
-- Transportation must be LAST
-- No emojis
-- No extra text
+Write ONE practical paragraph explaining how to move efficiently around ${place} today 
+(local transport apps, metro, autos, walking routes, traffic patterns, passes).
 
 END
 `;
