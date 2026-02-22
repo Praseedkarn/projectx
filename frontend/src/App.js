@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { initGA, trackPageView } from "./analytics";
 import "./App.css";
 
 /* ===== COMPONENT IMPORTS ===== */
@@ -36,8 +37,18 @@ import { buildPrompt } from "./services/prompts/buildPrompt";
 
 function App() {
   /* ================= ROUTER ================= */
+  
   const navigate = useNavigate();
   const location = useLocation();
+
+  // 🔥 Google Analytics
+useEffect(() => {
+  initGA();
+}, []);
+
+useEffect(() => {
+  trackPageView(location.pathname);
+}, [location]);
   const isQrTrip = location.pathname.startsWith("/qr-trip/");
 
   /* ================= STATE ================= */
