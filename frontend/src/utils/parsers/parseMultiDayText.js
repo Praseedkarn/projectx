@@ -36,13 +36,12 @@ export function parseMultiDayText(text) {
         day: line.toUpperCase(),
         sections: [],
       };
-
       result.days.push(currentDay);
       currentSection = null;
       continue;
     }
 
-    /* ================= SECTION (Morning/Afternoon/Evening/Transportation) ================= */
+    /* ================= SECTION ================= */
     if (line.startsWith("##")) {
       if (!currentDay) continue;
 
@@ -57,26 +56,29 @@ export function parseMultiDayText(text) {
 
     if (!currentSection) continue;
 
-    /* ================= LOCATION HANDLING ================= */
+    /* ================= HANDLE INLINE LOCATION ================= */
     if (/location:/i.test(line)) {
       const cleanLine = line.replace(/📍/g, "");
 
-      let locationText =
-        cleanLine.split(/location:/i)[1]?.trim() || "";
+      const parts = cleanLine.split(/location:/i);
 
-      // If AI breaks location into next line
-      if (!locationText && lines[i + 1]) {
-        locationText = lines[i + 1]
-          .replace(/📍/g, "")
-          .trim();
-      }
+      const description = parts[0].trim();
+      const locationText = parts[1]?.trim() || "";
 
-      // Attach location to LAST activity instead of creating new one
-      const lastActivity =
-        currentSection.activities[currentSection.activities.length - 1];
+      if (description) {
+        // Case: Paragraph and location in SAME line
+        currentSection.activities.push({
+          description,
+          location: locationText,
+        });
+      } else {
+        // Case: Location on separate line
+        const lastActivity =
+          currentSection.activities[currentSection.activities.length - 1];
 
-      if (lastActivity) {
-        lastActivity.location = locationText;
+        if (lastActivity) {
+          lastActivity.location = locationText;
+        }
       }
 
       continue;
