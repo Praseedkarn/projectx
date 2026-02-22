@@ -53,7 +53,7 @@ End the paragraph by writing exactly:
 Location: <Place Name>
 at the very end of the same paragraph.
 
-Estimated Budget: India: ₹ <realistic min> - ₹ <realistic max>
+Estimated Budget: India: ₹ <min> - ₹ <max>
 (Write on ONE line only. Exclude flights and hotels.)
 
 ## Transportation

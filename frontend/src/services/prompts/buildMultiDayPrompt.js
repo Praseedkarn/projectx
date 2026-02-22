@@ -45,7 +45,7 @@ End the paragraph with: Location: <Place Name> (same line).
 `).join("")}
 
 
-Estimated Budget: India: ₹ <realistic min> - ₹ <realistic max>
+Estimated Budget: India: ₹ <min> - ₹ <max>
 (Write on ONE line only.Per person, per day. Exclude flights and hotels.)
 
 ## Transportation

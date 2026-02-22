@@ -46,7 +46,7 @@ Location formatting rules:
 - Do not add emojis, line breaks, or extra text.
 `).join("")}
 
-Estimated Budget: India: ₹ <realistic min> - ₹ <realistic max>
+Estimated Budget: India: ₹ <min> - ₹ < max>
 (Write on ONE line only. Exclude flights and hotels.)
 
 ## Transportation
