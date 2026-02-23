@@ -1,4 +1,4 @@
-# 🌍 Project X — AI Travel Planner
+# Expeditio— AI Travel Planner
 
 ![React](https://img.shields.io/badge/React-18-blue)
 ![Tailwind](https://img.shields.io/badge/TailwindCSS-3.x-38bdf8)
@@ -8,7 +8,7 @@
 ![Render](https://img.shields.io/badge/Backend-Render-purple)
 ![AI](https://img.shields.io/badge/AI-Groq%20(LLaMA%203.1)-orange)
 
-**Project X** is a full-stack **AI-powered travel planning platform** that generates reliable, structured itineraries using prompt engineering, real-world data, and a token-based AI system.
+**Expeditio** is a full-stack **AI-powered travel planning platform** that generates reliable, structured itineraries using prompt engineering, real-world data, and a token-based AI system.
 
 🔗 **Live App:** https://projectx-one-pearl.vercel.app  
 🔗 **Backend API:** Deployed on Render
