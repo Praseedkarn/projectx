@@ -100,7 +100,7 @@ router.post("/itinerary", async (req, res) => {
 
     const now = new Date();
 
-    // Reset after 24h
+  
    
 
     if (!guest) {

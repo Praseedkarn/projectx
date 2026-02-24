@@ -36,9 +36,15 @@ import { buildPrompt } from "./services/prompts/buildPrompt";
 
 
 function App() {
+
+ // 🔥 Guarantee guestId immediately
+  if (!localStorage.getItem("guestId")) {
+    localStorage.setItem("guestId", crypto.randomUUID());
+  }
+
+  const navigate = useNavigate();
   /* ================= ROUTER ================= */
   
-  const navigate = useNavigate();
   const location = useLocation();
 
   // 🔥 Google Analytics
@@ -46,14 +52,7 @@ useEffect(() => {
   initGA();
 }, []);
 
-useEffect(() => {
-  let guestId = localStorage.getItem("guestId");
 
-  if (!guestId) {
-    guestId = crypto.randomUUID();
-    localStorage.setItem("guestId", guestId);
-  }
-}, []);
 
 useEffect(() => {
   trackPageView(location.pathname);
@@ -356,7 +355,7 @@ const handleLogout = () => {
 
   // 🔥 Backend limit reached
   if (err.status === 429) {
-    setShowSignIn(true);
+    setShowFreePopup(true);
     return;
   }
 
