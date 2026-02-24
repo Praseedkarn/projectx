@@ -47,6 +47,15 @@ useEffect(() => {
 }, []);
 
 useEffect(() => {
+  let guestId = localStorage.getItem("guestId");
+
+  if (!guestId) {
+    guestId = crypto.randomUUID();
+    localStorage.setItem("guestId", guestId);
+  }
+}, []);
+
+useEffect(() => {
   trackPageView(location.pathname);
 }, [location]);
   const isQrTrip = location.pathname.startsWith("/qr-trip/");
@@ -68,7 +77,7 @@ const [freeRemaining, setFreeRemaining] = useState(null);
   /* ================= REFS ================= */
   const formCardRef = useRef(null);
   const headerRef = useRef(null);
-
+const [popupMessage, setPopupMessage] = useState("");
   /* ================= AI ================= */
   const [apiStatus, setApiStatus] = useState("checking");
   /* ================= USER ================= */
@@ -128,16 +137,7 @@ const [freeRemaining, setFreeRemaining] = useState(null);
         setCurrentUser(user);
         localStorage.setItem("user", JSON.stringify(user));
 
-        // ✅ Show login success popup ONCE
-        const loginFlag = sessionStorage.getItem("loginSuccess", true);
-        if (loginFlag) {
-          setShowLoginPopup(true);
-          sessionStorage.removeItem("loginSuccess");
-
-          setTimeout(() => {
-            setShowLoginPopup(false);
-          }, 2500);
-        }
+        
       })
       .catch(() => {
         // ❌ Invalid / expired token
@@ -228,23 +228,41 @@ const [freeRemaining, setFreeRemaining] = useState(null);
 
 
   /* ================= AUTH ================= */
-  const handleLoginSuccess = (user) => {
-    const safeUser =
-      user.role === "admin"
-        ? { ...user, tokens: Infinity }
-        : user;
+ const handleLoginSuccess = (user) => {
+  const safeUser =
+    user.role === "admin"
+      ? { ...user, tokens: Infinity }
+      : user;
 
-    setCurrentUser(safeUser);
-  };
+  setCurrentUser(safeUser);
 
+  // 🎯 Dynamic popup message
+  setPopupMessage(
+    ` Welcome to Expeditio! You have ${safeUser.tokens} travel tokens.`
+  );
 
+  setShowLoginPopup(true);
 
-  const handleLogout = () => {
-    localStorage.clear();
-    sessionStorage.clear();
-    setCurrentUser(null);
-    navigate("/");
-  };
+  setTimeout(() => {
+    setShowLoginPopup(false);
+  }, 3000);
+};
+
+const handleLogout = () => {
+  localStorage.clear();
+  sessionStorage.clear();
+  setCurrentUser(null);
+
+  setPopupMessage(" You’ve been logged out successfully.");
+
+  setShowLoginPopup(true);
+
+  setTimeout(() => {
+    setShowLoginPopup(false);
+  }, 2000);
+
+  navigate("/");
+};
 
 
  const runGeneration = async () => {
@@ -375,24 +393,27 @@ const handleSubmit = (e) => {
 
 
       {/* ✅ LOGIN SUCCESS POPUP */}
-      {showLoginPopup && (
-        <div
-          style={{
-            position: "fixed",
-            top: "20px",
-            right: "20px",
-            background: "#2e7d32",
-            color: "#fff",
-            padding: "12px 18px",
-            borderRadius: "10px",
-            boxShadow: "0 10px 25px rgba(0,0,0,0.2)",
-            zIndex: 9999,
-            fontSize: "14px",
-          }}
-        >
-          ✅ Logged in successfully
-        </div>
-      )}
+{showLoginPopup && (
+  <div
+    style={{
+      position: "fixed",
+      top: "20px",
+      right: "20px",
+      background: popupMessage.includes("logged")
+        ? "#374151"
+        : "linear-gradient(135deg, #5b7c67, #4a6a58)",
+      color: "#fff",
+      padding: "16px 22px",
+      borderRadius: "14px",
+      boxShadow: "0 20px 40px rgba(0,0,0,0.25)",
+      zIndex: 9999,
+      fontSize: "14px",
+      animation: "slideIn 0.4s ease-out",
+    }}
+  >
+    {popupMessage}
+  </div>
+)}
       {authLoading && <LogoLoader />}
 
 
@@ -452,19 +473,27 @@ const handleSubmit = (e) => {
           homeContent={
             <>
               {/* HERO SECTION */}
-              <div className="max-w-6xl mx-auto mb-24 grid grid-cols-1 md:grid-cols-2 gap-16 items-center mt-60 md:mt-60">
+              <div className="max-w-6xl mx-auto mb-24 grid grid-cols-1 md:grid-cols-2 gap-16 items-center mt-56 md:mt-60">
                 <div className="space-y-6 text-center md:text-left">
-                  <h2 className="text-3xl md:text-4xl font-semibold text-gray-800 leading-tight">
-                    What is EXPEDITIO ?
-                  </h2>
-                  <p className="text-gray-600 leading-relaxed">
-                    Expeditio is an AI-powered travel planning platform designed to help travelers create realistic, well-paced itineraries based on their available time, travel style, budget, and destination.
-                  </p>
+   <h2 className="font-serif text-3xl sm:text-4xl md:text-4xl font-medium leading-[1.05] tracking-tight text-[#2f3e2f]">
+  Stop Planning . 
+  {"  "} 
+  <span className="text-[#5b7c67] italic">
+     Start Exploring.
+  </span>
+  <br />
+ 
+</h2>
+
+<p className="mt-4 text-lg italic text-gray-700">
+  Expeditio creates intelligent, well-paced travel itineraries
+  tailored to your time, style, and destination - in seconds.
+</p>
                   <button
                     onClick={() => formCardRef.current?.scrollIntoView({ behavior: "smooth" })}
                     className="rounded-full bg-[#5b7c67] px-8 py-3.5 text-white font-medium hover:bg-[#4a6a58] transition-all shadow-md hover:shadow-lg"
                   >
-                    Start Planning
+                    Start my trip →
                   </button>
                 </div>
 

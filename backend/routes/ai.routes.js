@@ -9,7 +9,7 @@ import { generateItinerary } from "../services/ai.service.js";
 const router = express.Router();
 const TOKEN_COST = 25;
 const MAX_PROMPT_LENGTH = 2500;
-const GUEST_DAILY_LIMIT = 2;
+const GUEST_LIMIT = 2;
 
 router.post("/itinerary", async (req, res) => {
   try {
@@ -90,28 +90,31 @@ router.post("/itinerary", async (req, res) => {
       req.headers["x-forwarded-for"]?.split(",")[0] ||
       req.socket.remoteAddress;
 
-    let guest = await GuestUsage.findOne({ ip });
+    const guestId = req.headers["x-guest-id"];
+
+      if (!guestId) {
+        return res.status(400).json({ message: "Guest ID missing" });
+      }
+
+      let guest = await GuestUsage.findOne({ guestId });
 
     const now = new Date();
 
     // Reset after 24h
-    const DAY = 24 * 60 * 60 * 1000;
-
-    if (guest && now.getTime() - guest.lastUsed.getTime() > DAY) {
-      guest.count = 0;
-    }
+   
 
     if (!guest) {
       guest = await GuestUsage.create({
+        guestId,
         ip,
         count: 0,
         lastUsed: now,
       });
     }
 
-    if (guest.count >= GUEST_DAILY_LIMIT) {
+    if (guest.count >= GUEST_LIMIT) {
       return res.status(429).json({
-        message: "Free limit reached. Please login.",
+        message: "You’ve used your 2 free travel plans 🎉 Create a free account to unlock 100 travel tokens.",
       });
     }
 
@@ -132,7 +135,7 @@ router.post("/itinerary", async (req, res) => {
     return res.json({
       text: result.text,
       guest: true,
-      remainingFree: GUEST_DAILY_LIMIT - guest.count,
+      remainingFree: GUEST_LIMIT - guest.count,
     });
 
   } catch (err) {

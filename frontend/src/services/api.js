@@ -25,14 +25,16 @@ const throwApiError = async (response) => {
 
 export const generateTravelItinerary = async (description, detailLevel) => {
   const token = getToken();
+  const guestId = localStorage.getItem("guestId");
 
   const headers = {
     "Content-Type": "application/json",
   };
 
-  // ✅ Only attach token if it exists
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
+  } else if (guestId) {
+    headers["X-Guest-Id"] = guestId;
   }
 
   const response = await fetch(`${API_BASE_URL}/api/ai/itinerary`, {
