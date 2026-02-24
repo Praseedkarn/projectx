@@ -4,54 +4,42 @@ export const buildHoursPrompt = ({
   group,
   suggestions,
 }) => `
-You are a professional travel writer creating a REALISTIC, up-to-date hourly travel itinerary.
+You are a professional travel writer creating a realistic, up-to-date hourly itinerary.
 
 Destination: ${place}
 Duration: ${hours} hours
 Traveler Type: ${group}
+${suggestions ? `Preferences: ${
+  Array.isArray(suggestions) ? suggestions.join(", ") : suggestions
+}` : ""}
 
-${suggestions ? `
-Traveler preferences (blend naturally into story, do NOT list separately):
-${Array.isArray(suggestions)
-  ? suggestions.join(", ")
-  : suggestions}
-` : ""}
+STYLE:
+- Soft, friendly, instructional tone.
+- Use action verbs (Visit, Walk, Explore, Try, Head to).
+- Keep language simple and clear.
+- Keep recommendations practical and realistic.
+- Paragraphs only. No emojis.
 
-STYLE REQUIREMENTS:
-- Write in a soft, human, and friendly tone.
-- Tell the traveler clearly what to do (use action verbs like Visit, Walk, Explore, Try, Head to).
-- Keep a light storytelling flow so each hour connects naturally to the next.
-- Use simple and easy English so anyone can understand.
-- Keep the plan realistic and up-to-date with current travel trends, popular spots, and local activity.
-- Prefer places that are currently active, well-rated, or commonly visited.
-- Avoid outdated or permanently closed attractions.
-- Avoid dramatic or overly poetic language.
-- Avoid robotic phrases like “start your day by”.
-- Do NOT describe emotions deeply.
-- Paragraphs only. No bullet points. No emojis.
-
-STRICT OUTPUT FORMAT:
+STRICT FORMAT (follow exactly):
 
 TITLE: ${place} Hourly Itinerary
 
-${Array.from({ length: hours }, (_, i) => `
-## Hour ${i + 1}
-Write ONE vivid paragraph (3–4 sentences). Make it flow naturally from the previous hour.
-End the paragraph by writing exactly:
-Location: <Place Name>
-at the very end of the same paragraph.
+For each hour, use this structure exactly:
 
-Location formatting rules:
-- Keep "Location: <Place Name>" on one single line.
-- Do not add emojis, line breaks, or extra text.
-`).join("")}
+## Hour 1
+One paragraph (3–4 sentences).
+Location: Place Name
 
-Estimated Budget: India: ₹ <min> - ₹ < max>
-(Write on ONE line only. Exclude flights and hotels.)
+Repeat this format sequentially until:
+
+## Hour ${hours}
+
+After all hours write:
+
+Estimated Budget: India: ₹ <min> - ₹ <max>
 
 ## Transportation
-Write ONE practical paragraph explaining how to move efficiently around ${place} today 
-(local transport apps, metro, autos, walking routes, traffic patterns, passes).
+One practical paragraph about moving efficiently around ${place} today.
 
 END
 `;

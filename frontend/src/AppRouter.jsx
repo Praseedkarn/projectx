@@ -32,11 +32,12 @@ const AppRouter = ({
   handleLogout,
   navigate,
   homeContent,
+  openLogin,
 }) => {
   return (
     <Routes>
       <Route path="/" element={homeContent} />
-      <Route path="/results" element={<TripResults />} />
+      <Route path="/results" element={<TripResults  openLogin={openLogin}/>} />
 
       {/* ITINERARIES */}
       <Route

@@ -5,6 +5,8 @@ const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 
 export const generateItinerary = async (prompt) => {
   try {
+//     console.log("📝 Prompt length (characters):", prompt.length);
+// console.log("📝 Prompt preview:", prompt.substring(0, 200) + "...");
     if (!prompt || prompt.length < 20) {
       throw new Error("Invalid prompt");
     }

@@ -30,7 +30,7 @@ import AppRouter from "./AppRouter";
 // import QuizPage from "./pages/QuizPage";
 // import { logTokenChange } from "./services/api";
 import LogoLoader from "./components/LogoLoader";
-
+import FreeGenerationPopup from "./components/FreeGenerationsPopup";
 import CitySlider from "./components/CitySlider";
 import { buildPrompt } from "./services/prompts/buildPrompt";
 
@@ -61,7 +61,9 @@ useEffect(() => {
   // const [selectedCity, setSelectedCity] = useState(null);
   // const [showBecomeGuide, setShowBecomeGuide] = useState(false);
   const [showLoginPopup, setShowLoginPopup] = useState(false);
-
+const [showFreePopup, setShowFreePopup] = useState(false);
+const [freeRemaining, setFreeRemaining] = useState(null);
+//const [pendingSubmitEvent, setPendingSubmitEvent] = useState(null);
 
   /* ================= REFS ================= */
   const formCardRef = useRef(null);
@@ -245,106 +247,123 @@ useEffect(() => {
   };
 
 
-  /* ================= NAV ================= */
+ const runGeneration = async () => {
+  if (!place.trim()) {
+    alert("Please enter a destination");
+    return;
+  }
+
+  setLoading(true);
+
+  const cleanedPlace = place.trim();
+  const isDemoRequest = cleanedPlace.toLowerCase() === "demo";
+
+  try {
+    let result;
+    let aiResponse;
+
+    /* ================= DEMO ================= */
+    if (isDemoRequest) {
+      result = { text: demoItinerary.text };
+    } else {
+      const prompt = buildPrompt({
+        tripType,
+        place: cleanedPlace,
+        hours,
+        days,
+        group,
+        suggestions,
+      });
+
+      // console.log("Prompt length:", prompt.length);
+
+      // ✅ Increment guest free count BEFORE API call
+    
+      aiResponse = await generateTravelItinerary(prompt);
+
+      // 🔥 Guest remaining free count
+     
+      if (!aiResponse?.text) {
+        throw new Error("AI_EMPTY");
+      }
+
+       if (
+          !currentUser &&
+          typeof aiResponse.remainingFree === "number" &&
+          !showFreePopup
+        ) {
+          setFreeRemaining(aiResponse.remainingFree);
+          setShowFreePopup(true);
+        }
+
+      result = { text: aiResponse.text };
+
+      /* ================= TOKENS ================= */
+      if (
+        currentUser &&
+        currentUser.role !== "admin" &&
+        typeof aiResponse.remainingTokens === "number"
+      ) {
+        const updatedUser = {
+          ...currentUser,
+          tokens: aiResponse.remainingTokens,
+        };
+
+        const storage =
+          localStorage.getItem("user") ? localStorage : sessionStorage;
+
+        storage.setItem("user", JSON.stringify(updatedUser));
+        setCurrentUser(updatedUser);
+      }
+    }
+
+    /* ================= SAVE RESULT ================= */
+    localStorage.setItem("lastTripResult", JSON.stringify(result));
+
+    setTimeout(() => {
+      navigate("/results", {
+        state: {
+          suggestions: result,
+          city: isDemoRequest ? "Demo City" : cleanedPlace,
+          tripType,
+          isDemo: isDemoRequest,
+        },
+      });
+      setLoading(false);
+    }, 1500);
+
+  } catch (err) {
+    console.error("AI ERROR:", err);
+    setLoading(false);
+
+  // 🔥 Backend limit reached
+  if (err.status === 429) {
+    setShowSignIn(true);
+    return;
+  }
+
+    // ✅ Token exhausted case
+    if (err.code === "NO_TOKENS") {
+      navigate("/quiz");
+      return;
+    }
+
+    // ❌ Real AI crash only
+    navigate("/ai-failed", {
+      state: { reason: "AI service temporarily unavailable" },
+    });
+  }
+};
 
 
   /* ================= SUBMIT ================= */
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+const handleSubmit = (e) => {
+  e.preventDefault();
 
-    if (!currentUser) {
-      setShowSignIn(true);
-      return;
-    }
+ 
 
-    if (!place.trim()) {
-      alert("Please enter a destination");
-      return;
-    }
-
-    setLoading(true);
-
-    const cleanedPlace = place.trim();
-    const isDemoRequest = cleanedPlace.toLowerCase() === "demo";
-
-    try {
-      let result;
-      let aiResponse;
-
-
-      /* ================= DEMO ================= */
-      if (isDemoRequest) {
-        result = { text: demoItinerary.text };
-      }
-      /* ================= AI ================= */
-      else {
-        // 🔥 STEP 2 — SELECT PROMPT BASED ON TRIP TYPE
-        const prompt = buildPrompt({
-          tripType,
-          place: cleanedPlace,
-          hours,
-          days,
-          group,
-          suggestions,
-        });
-
-
-        aiResponse = await generateTravelItinerary(prompt);
-
-        if (!aiResponse?.text) {
-          throw new Error("AI_EMPTY");
-        }
-
-        result = { text: aiResponse.text };
-
-        /* ================= TOKENS ================= */
-        if (
-          currentUser.role !== "admin" &&
-          typeof aiResponse.remainingTokens === "number"
-        ) {
-          const updatedUser = {
-            ...currentUser,
-            tokens: aiResponse.remainingTokens,
-          };
-
-          const storage =
-            localStorage.getItem("user") ? localStorage : sessionStorage;
-
-          storage.setItem("user", JSON.stringify(updatedUser));
-          setCurrentUser(updatedUser);
-        }
-      }
-
-      /* ================= SAVE ================= */
-      localStorage.setItem("lastTripResult", JSON.stringify(result));
-
-      /* ================= NAVIGATE ================= */
-      setTimeout(() => {
-        navigate("/results", {
-          state: {
-            suggestions: result,
-            city: isDemoRequest ? "Demo City" : cleanedPlace,
-            tripType, // ✅ IMPORTANT
-            isDemo: isDemoRequest,
-          },
-        });
-        setLoading(false);
-      }, 5000);
-
-    } catch (err) {
-      console.error("AI ERROR:", err);
-      setLoading(false);
-
-      if (err.code === "NO_TOKENS") {
-        navigate("/quiz");
-        return;
-      }
-
-      navigate("/ai-failed", {
-        state: { reason: "AI service temporarily unavailable" },
-      });
-    }
-  };
+  runGeneration();
+};
 
   /* ================= RENDER PAGE ================= */
 
@@ -404,6 +423,16 @@ useEffect(() => {
         />
       )}
 
+      {showFreePopup && !currentUser && (
+        <FreeGenerationPopup
+          remaining={freeRemaining}
+          onClose={() => setShowFreePopup(false)}
+          onContinue={() => {
+            setShowFreePopup(false);
+          }}
+        />
+      )}
+
       {/* ===== MAIN CONTENT AREA ===== */}
       <main
         className={` pb-24 overflow-hidden transition-all duration-500 ${isQrTrip
@@ -417,8 +446,8 @@ useEffect(() => {
         <AppRouter
           currentUser={currentUser}
           handleLogout={handleLogout}
-
           navigate={navigate}
+           openLogin={() => setShowSignIn(true)}
           // QUICK FIX: Pass your entire Home logic as a prop so variables stay linked
           homeContent={
             <>
@@ -628,7 +657,7 @@ useEffect(() => {
                         disabled={loading}
                         className="w-full rounded-full bg-[#5b7c67] py-4 text-white font-semibold hover:bg-[#4a6a58] transition-all shadow-md hover:shadow-lg disabled:opacity-60 disabled:cursor-not-allowed"
                       >
-                        {loading ? "Planning your trip..." : "Generate itinerary"}
+                        {loading ? "Planning your trip..." : "Create My Travel Plan"}
                       </button>
                       {loading && <p className="text-center text-sm text-gray-500 mt-3">Analyzing destinations, routes & experiences...</p>}
                     </div>

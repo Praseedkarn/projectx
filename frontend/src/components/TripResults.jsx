@@ -50,7 +50,7 @@ const TextSkeleton = ({ lines = 6 }) => (
 );
 
 
-const TripResults = () => {
+const TripResults = ({openLogin}) => {
   const location = useLocation();
   const navigate = useNavigate();
   const city = location.state?.city;
@@ -62,7 +62,9 @@ const TripResults = () => {
   const [imageLoading, setImageLoading] = useState(false);
   // const [menuOpen, setMenuOpen] = useState(false);
   const [startDate, setStartDate] = useState(null); // yyyy-mm-dd
-
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+  const [pendingQRSave, setPendingQRSave] = useState(false);
+  const [loginSuccessMessage, setLoginSuccessMessage] = useState(false);
  
 
   const fetchPlaceImages = async (place, osmAttractions = []) => {
@@ -511,18 +513,13 @@ const TripResults = () => {
     return () => clearInterval(typingInterval);
   }, [suggestions]);
 
-  /* ================= QR ================= */
-  const handleGenerateQR = async () => {
+  const generateQR = useCallback(
+  async (token) => {
     if (!finalText || qrLoading) return;
 
     setQrLoading(true);
 
-
     try {
-      const token =
-        sessionStorage.getItem("token") ||
-        localStorage.getItem("token");
-
       const res = await fetch(
         `${API_BASE_URL}/api/qr-trips`,
         {
@@ -535,18 +532,67 @@ const TripResults = () => {
         }
       );
 
-
-
       const data = await res.json();
       if (!res.ok) throw new Error();
 
       setQrTripId(data.qrTripId);
-    } catch {
 
+      setTimeout(() => {
+  document
+    .querySelector("#qr-section")
+    ?.scrollIntoView({ behavior: "smooth" });
+}, 300);
+
+      setLoginSuccessMessage(true);
+
+      setTimeout(() => {
+        setLoginSuccessMessage(false);
+      }, 4000);
+
+    } catch (err) {
+      console.error("QR save failed", err);
     } finally {
       setQrLoading(false);
     }
-  };
+  },
+  [finalText, city, qrLoading]
+);
+
+  useEffect(() => {
+  if (!pendingQRSave) return;
+
+  const interval = setInterval(() => {
+    const token =
+      sessionStorage.getItem("token") ||
+      localStorage.getItem("token");
+
+    if (token) {
+      clearInterval(interval);
+      setPendingQRSave(false);
+      setShowLoginPrompt(false);
+      generateQR(token);
+    }
+  }, 500);
+
+  return () => clearInterval(interval);
+}, [pendingQRSave , generateQR]);
+
+  /* ================= QR ================= */
+  const handleGenerateQR = async () => {
+  const token =
+    sessionStorage.getItem("token") ||
+    localStorage.getItem("token");
+
+  // 🔥 Not logged in → show popup
+  if (!token) {
+    setPendingQRSave(true);
+    setShowLoginPrompt(true);
+    return;
+  }
+
+  await generateQR(token);
+};
+
 
 
 
@@ -912,8 +958,17 @@ const TripResults = () => {
         </div>
       </div>
 
+      {loginSuccessMessage && (
+        <div className="fixed top-6 right-6 bg-green-600 text-white px-6 py-3 rounded-xl shadow-lg animate-fade-in z-50">
+          ✅ Your trip has been saved to your profile
+        </div>
+      )}
+
       {/* ================= SAVE TRIP - Smart Insight Style ================= */}
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-32">
+     <div
+        id="qr-section"
+        className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-32"
+      >
         <div className="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 rounded-3xl p-12 relative overflow-hidden">
 
           {/* Decorative Element */}
@@ -922,10 +977,10 @@ const TripResults = () => {
           <div className="relative z-10 text-center space-y-6">
             <div className="space-y-3">
               <h3 className="text-3xl sm:text-4xl font-bold text-gray-900">
-                Save for Later
+                Save This Trip
               </h3>
               <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                Generate a QR code to access this itinerary on any device, anytime
+                Save this itinerary to your profile and get a QR code for quick access on any device.
               </p>
             </div>
 
@@ -935,7 +990,7 @@ const TripResults = () => {
                 disabled={!finalText || qrLoading}
                 className="bg-gray-900 text-white px-10 py-4 rounded-xl font-semibold hover:bg-gray-800 transition-all hover:scale-105 disabled:opacity-40 disabled:hover:scale-100 disabled:cursor-not-allowed shadow-lg"
               >
-                {qrLoading ? "Generating..." : "Generate QR Code"}
+                {qrLoading ? "Saving..." : "Save Trip and Get QR "}
               </button>
             ) : (
               <div className="space-y-8 animate-fade-in">
@@ -996,6 +1051,44 @@ const TripResults = () => {
         )}
 
       </div>
+        {showLoginPrompt && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+            <div className="bg-white rounded-2xl p-8 w-full max-w-md text-center space-y-6 shadow-xl animate-fade-in">
+
+              <h3 className="text-2xl font-bold text-gray-900">
+                Login Required
+              </h3>
+
+              <p className="text-gray-600 text-sm">
+                To download and save this itinerary,
+                please login to your account.
+              </p>
+
+              <div className="flex gap-4 justify-center">
+                <button
+                  onClick={() => {
+                    setShowLoginPrompt(false);
+                    if (openLogin) openLogin();// or open your login modal
+                  }}
+                  className="bg-gray-900 text-white px-6 py-3 rounded-xl font-medium hover:bg-gray-800 transition"
+                >
+                  Login
+                </button>
+
+                <button
+                  onClick={() => {
+                    setShowLoginPrompt(false);
+                    setPendingQRSave(false);
+                  }}
+                  className="px-6 py-3 rounded-xl font-medium text-gray-600 hover:bg-gray-100 transition"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
 
       {/* ================= MODAL: REORDER ================= */}
       {showReorderModal && (

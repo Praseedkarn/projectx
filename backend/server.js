@@ -5,6 +5,7 @@ import express from "express";
 import passport from "passport";
 import "./config/passport.js";
 import cookieParser from "cookie-parser";
+import rateLimit from "express-rate-limit";
 
 // 🔗 DB
 import connectDB from "./config/db.js";
@@ -27,6 +28,7 @@ import historyRoutes from "./routes/history.routes.js";
 import cityMetaRoutes from "./routes/cityMeta.routes.js";
 
 const app = express();
+app.set("trust proxy", 1);
 
 /* =====================================================
    🌍 CORS — MANUAL + GUARANTEED (FIXES PREFLIGHT)
@@ -75,6 +77,16 @@ app.use(cookieParser());
 ===================================================== */
 app.use(express.json());
 app.use(passport.initialize());
+
+const aiLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 20, // 20 requests per hour per IP
+  message: { message: "Too many AI requests. Try later." },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+app.use("/api/ai", aiLimiter);
 
 /* =====================================================
    🛣️ ROUTES

@@ -28,25 +28,28 @@ STRICT OUTPUT FORMAT:
 
 TITLE: ${place} Itinerary
 
-${Array.from({ length: days }, (_, i) => `
-DAY ${i + 1}
+Use exactly "DAY 1", "DAY 2", up to "DAY ${days}".
+
+For EACH day, follow this exact structure:
+
+DAY 1
 
 ## Morning
 Write ONE paragraph (3–4 sentences).
-End the paragraph with: Location: <Place Name> (same line).
+End with: Location: <Place Name>
 
 ## Afternoon
 Write ONE paragraph (3–4 sentences).
-End the paragraph with: Location: <Place Name> (same line).
+End with: Location: <Place Name>
 
 ## Evening
 Write ONE paragraph (3–4 sentences).
-End the paragraph with: Location: <Place Name> (same line).
-`).join("")}
+End with: Location: <Place Name>
 
+Repeat the same structure sequentially until DAY ${days}.
 
 Estimated Budget: India: ₹ <min> - ₹ <max>
-(Write on ONE line only.Per person, per day. Exclude flights and hotels.)
+(Write on ONE line only. Per person, per day. Exclude flights and hotels.)
 
 ## Transportation
 Write ONE paragraph explaining how to travel within ${place} across all days.
@@ -55,7 +58,7 @@ RULES:
 - Use exactly "DAY 1", "DAY 2", etc.
 - Use exactly "## Morning", "## Afternoon", "## Evening".
 - Use exactly "## Transportation".
-- Write "Location: <Place Name>" at the end of each section paragraph on the same line.
+- Write "Location: <Place Name>" after each section paragraph.
 - Do not add extra sections.
 - Do not add emojis.
 - Do not add extra text before or after this format.

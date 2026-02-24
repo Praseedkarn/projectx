@@ -1,9 +1,4 @@
 export function parseOneDayText(text) {
-  const lines = text
-    .split("\n")
-    .map((l) => l.trim())
-    .filter(Boolean);
-
   const result = {
     title: "",
     estimatedBudget: "",
@@ -14,6 +9,13 @@ export function parseOneDayText(text) {
       },
     ],
   };
+
+  if (!text) return result;
+
+  const lines = text
+    .split("\n")
+    .map((l) => l.trim())
+    .filter((l) => l.length > 0);
 
   let currentSection = null;
 
@@ -26,7 +28,7 @@ export function parseOneDayText(text) {
       continue;
     }
 
-    /* ================= BUDGET ================= */
+    /* ================= ESTIMATED BUDGET ================= */
     if (/^estimated budget/i.test(line)) {
       result.estimatedBudget = line
         .replace(/estimated budget[:₹]*/i, "")
@@ -34,8 +36,8 @@ export function parseOneDayText(text) {
       continue;
     }
 
-    /* ================= SECTION (Morning / Afternoon / Evening / Transportation) ================= */
-    if (line.startsWith("##")) {
+    /* ================= SECTION HEADERS ================= */
+    if (/^##\s*(Morning|Afternoon|Evening|Transportation)/i.test(line)) {
       currentSection = {
         period: line.replace("##", "").trim(),
         activities: [],
@@ -47,27 +49,23 @@ export function parseOneDayText(text) {
 
     if (!currentSection) continue;
 
-    /* ================= LOCATION HANDLING ================= */
-    if (/location:/i.test(line)) {
-      const cleanLine = line.replace(/📍/g, "");
+    /* ================= HANDLE PARAGRAPH + LOCATION (same line) ================= */
 
-      let locationText =
-        cleanLine.split(/location:/i)[1]?.trim() || "";
+    // Case: paragraph ends with "Location: XYZ"
+    const locationMatch = line.match(/location:\s*(.*)$/i);
 
-      // If AI breaks location into next line
-      if (!locationText && lines[i + 1]) {
-        locationText = lines[i + 1]
-          .replace(/📍/g, "")
-          .trim();
-      }
+    if (locationMatch) {
+      const locationText = locationMatch[1].trim();
 
-      // Attach location to LAST activity instead of creating new one
-      const lastActivity =
-        currentSection.activities[currentSection.activities.length - 1];
+      // Remove location part from description
+      const description = line
+        .replace(/location:\s*(.*)$/i, "")
+        .trim();
 
-      if (lastActivity) {
-        lastActivity.location = locationText;
-      }
+      currentSection.activities.push({
+        description,
+        location: locationText,
+      });
 
       continue;
     }

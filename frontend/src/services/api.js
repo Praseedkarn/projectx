@@ -12,11 +12,11 @@ const throwApiError = async (response) => {
   try {
     const data = await response.json();
     message = data?.message || message;
-  } catch {
-    // ignore JSON parse errors
-  }
+  } catch {}
 
-  throw new Error(message); // ✅ always throw Error
+  const error = new Error(message);
+  error.status = response.status; // 🔥 attach status
+  throw error;
 };
 
 /* =====================================================
@@ -26,12 +26,18 @@ const throwApiError = async (response) => {
 export const generateTravelItinerary = async (description, detailLevel) => {
   const token = getToken();
 
+  const headers = {
+    "Content-Type": "application/json",
+  };
+
+  // ✅ Only attach token if it exists
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
   const response = await fetch(`${API_BASE_URL}/api/ai/itinerary`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
+    headers,
     body: JSON.stringify({ description, detailLevel }),
   });
 
