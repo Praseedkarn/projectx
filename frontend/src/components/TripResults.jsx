@@ -65,7 +65,12 @@ const TripResults = ({openLogin}) => {
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [pendingQRSave, setPendingQRSave] = useState(false);
   const [loginSuccessMessage, setLoginSuccessMessage] = useState(false);
- 
+const weatherFromState = location.state?.weather || null;
+const tripDateFromState = location.state?.tripDate || null;
+
+const [weather, setWeather] = useState(weatherFromState);
+const [climate, setClimate] = useState(null);
+const [climateLoading, setClimateLoading] = useState(false);
 
   const fetchPlaceImages = async (place, osmAttractions = []) => {
     const queries = [
@@ -365,6 +370,46 @@ const TripResults = ({openLogin}) => {
 
     fetchGuide();
   }, [city]);
+
+useEffect(() => {
+  if (!city) return;
+
+  const fetchWeatherAndClimate = async () => {
+    try {
+      setClimateLoading(true);
+
+      // Always fetch climate
+      const climateRes = await fetch(
+        `${API_BASE_URL}/api/climate?city=${encodeURIComponent(city)}`
+      );
+
+      if (climateRes.ok) {
+        const climateData = await climateRes.json();
+        setClimate(climateData);
+      }
+
+      // 🔥 Only fetch weather if NOT already passed from form
+      if (!weatherFromState) {
+        const weatherRes = await fetch(
+          `${API_BASE_URL}/api/weather?city=${encodeURIComponent(city)}`
+        );
+
+        if (weatherRes.ok) {
+          const weatherData = await weatherRes.json();
+          setWeather(weatherData);
+        }
+      }
+
+    } catch (err) {
+      console.error("Weather/Climate fetch error:", err);
+    } finally {
+      setClimateLoading(false);
+    }
+  };
+
+  fetchWeatherAndClimate();
+
+}, [city, weatherFromState]);
 
 
 
@@ -787,6 +832,67 @@ const TripResults = ({openLogin}) => {
         )}
 
       </div>
+
+ {climateLoading ? (
+  <div className="max-w-6xl mx-auto px-4 mt-12">
+    <div className="h-40 bg-gray-100 rounded-2xl animate-pulse" />
+  </div>
+) : (weather || climate) && (
+  <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
+    
+    <div className="grid md:grid-cols-2 gap-6">
+
+      {/* 🌦 Weather Card */}
+      {weather && (
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 transition hover:shadow-md">
+
+          <h2 className="text-lg font-semibold text-[#5b6f00] mb-3">
+            {tripDateFromState
+              ? `Weather on ${tripDateFromState}`
+              : "Current Weather"}
+          </h2>
+
+          <div className="text-3xl font-bold text-gray-900">
+            {weather.temperature}°C
+          </div>
+
+          <div className="text-sm text-gray-500 mt-1">
+            {weather.condition}
+          </div>
+
+          <div className="mt-4 text-sm text-gray-600">
+            Wind Speed: {weather.windSpeed} km/h
+          </div>
+
+        </div>
+      )}
+
+      {/* 🌤 Climate Card */}
+      {climate && (
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 transition hover:shadow-md">
+
+          <h2 className="text-lg font-semibold text-[#5b6f00] mb-3">
+            Best Time to Visit
+          </h2>
+
+          <div className="text-xl font-semibold text-gray-900">
+            {climate.bestTimeRange}
+          </div>
+
+          <div className="text-sm text-gray-600 mt-2">
+            {climate.explanation}
+          </div>
+
+          <div className="mt-4 text-sm text-gray-500">
+            Comfort Index: {climate.travelComfortIndex}/100
+          </div>
+
+        </div>
+      )}
+
+    </div>
+  </div>
+)}
 
       {/* ================= ITINERARY SECTION ================= */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-24">

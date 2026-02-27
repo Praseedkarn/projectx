@@ -5,6 +5,8 @@ export const buildPrompt = ({
   hours,
   group,
   suggestions,
+   weatherData,
+  tripDate
 }) => {
   const durationText =
     tripType === "hours"

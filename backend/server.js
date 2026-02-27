@@ -26,7 +26,8 @@ import osmRoutes from "./routes/osm.routes.js";
 import quizAdminRoutes from "./routes/quiz.admin.js";
 import historyRoutes from "./routes/history.routes.js";
 import cityMetaRoutes from "./routes/cityMeta.routes.js";
-
+import weatherRoutes from "./routes/weather.router.js";
+import climateRoutes from "./routes/climate.router.js";
 const app = express();
 app.set("trust proxy", 1);
 
@@ -106,8 +107,10 @@ app.use("/api/osm", osmRoutes);
 app.use("/api/admin/quiz", quizAdminRoutes);
 app.use("/api/history", historyRoutes);
 app.use("/api/city-meta", cityMetaRoutes);
+app.use("/api/weather", weatherRoutes);
+app.use("/api/climate", climateRoutes);
 
-/* =====================================================
++/* =====================================================
    ❤️ HEALTH CHECKS
 ===================================================== */
 app.get("/api/health", (req, res) => {

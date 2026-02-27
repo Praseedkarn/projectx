@@ -2,12 +2,33 @@ export const buildOneDayPrompt = ({
   place,
   group,
   suggestions,
+  weatherData,
+  tripDate
 }) => `
 You are a professional travel writer creating a REALISTIC, up-to-date one-day travel itinerary.
 
 Destination: ${place}
 Duration: 1 day
 Traveler Type: ${group}
+${tripDate ? `Travel Date: ${tripDate}` : ""}
+
+${
+  weatherData
+    ? `
+Weather Conditions for that date:
+- Temperature: ${weatherData.temperature}°C
+- Condition: ${weatherData.condition}
+- Wind Speed: ${weatherData.windSpeed} km/h
+
+IMPORTANT:
+Adapt the itinerary according to the weather.
+If it is hot, reduce long outdoor walking in the afternoon.
+If it is rainy, include indoor attractions or covered areas.
+If it is cold, suggest warm indoor spots or cozy cafes.
+If the weather is pleasant, include outdoor sightseeing and walking routes.
+`
+    : ""
+}
 
 ${suggestions ? `
 Traveler preferences (blend naturally into the plan, do NOT list separately):

@@ -9,6 +9,8 @@ export const buildPrompt = ({
   days,
   group,
   suggestions,
+   weatherData,
+  tripDate
 }) => {
   if (!tripType || !place) {
     throw new Error("Missing tripType or place");
@@ -32,6 +34,8 @@ export const buildPrompt = ({
       place,
       group,
       suggestions,
+       weatherData,
+  tripDate
     });
   }
 

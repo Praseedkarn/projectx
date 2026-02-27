@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { initGA, trackPageView } from "./analytics";
 import "./App.css";
+import API_BASE_URL from "./services/apiClient";
 
 /* ===== COMPONENT IMPORTS ===== */
 import Header from "./components/Header";
@@ -80,7 +81,7 @@ const [popupMessage, setPopupMessage] = useState("");
   /* ================= AI ================= */
   const [apiStatus, setApiStatus] = useState("checking");
   /* ================= USER ================= */
-
+const [tripDate, setTripDate] = useState("");
 
   const [currentUser, setCurrentUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
@@ -165,6 +166,8 @@ const [popupMessage, setPopupMessage] = useState("");
   const [suggestions, setSuggestions] = useState("");
   const [citySuggestions, setCitySuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+// const [step, setStep] = useState(1);
+// const [travelDate, setTravelDate] = useState("");
 
   /* ================= AI ================= */
 
@@ -264,7 +267,10 @@ const handleLogout = () => {
 };
 
 
- const runGeneration = async () => {
+const runGeneration = async () => {
+
+  console.log("TripType:", tripType);
+console.log("TripDate:", tripDate);
   if (!place.trim()) {
     alert("Please enter a destination");
     return;
@@ -278,11 +284,29 @@ const handleLogout = () => {
   try {
     let result;
     let aiResponse;
+    let weatherData = null;
 
     /* ================= DEMO ================= */
     if (isDemoRequest) {
       result = { text: demoItinerary.text };
     } else {
+
+      /* ================= WEATHER (ONLY IF DATE SELECTED) ================= */
+    if (tripType === "day" && tripDate) {
+  try {
+    const weatherRes = await fetch(
+      `${API_BASE_URL}/api/weather?city=${encodeURIComponent(cleanedPlace)}&date=${tripDate}`
+    );
+
+          if (weatherRes.ok) {
+            weatherData = await weatherRes.json();
+          }
+        } catch (err) {
+          console.error("Weather fetch failed:", err);
+        }
+      }
+
+      /* ================= BUILD PROMPT ================= */
       const prompt = buildPrompt({
         tripType,
         place: cleanedPlace,
@@ -290,32 +314,30 @@ const handleLogout = () => {
         days,
         group,
         suggestions,
+        weatherData,   // 🔥 inject here
+        tripDate       // 🔥 inject here
       });
 
-      // console.log("Prompt length:", prompt.length);
-
-      // ✅ Increment guest free count BEFORE API call
-    
+      /* ================= CALL AI ================= */
       aiResponse = await generateTravelItinerary(prompt);
 
-      // 🔥 Guest remaining free count
-     
       if (!aiResponse?.text) {
         throw new Error("AI_EMPTY");
       }
 
-       if (
-          !currentUser &&
-          typeof aiResponse.remainingFree === "number" &&
-          !showFreePopup
-        ) {
-          setFreeRemaining(aiResponse.remainingFree);
-          setShowFreePopup(true);
-        }
+      /* ================= GUEST FREE COUNT ================= */
+      if (
+        !currentUser &&
+        typeof aiResponse.remainingFree === "number" &&
+        !showFreePopup
+      ) {
+        setFreeRemaining(aiResponse.remainingFree);
+        setShowFreePopup(true);
+      }
 
       result = { text: aiResponse.text };
 
-      /* ================= TOKENS ================= */
+      /* ================= TOKEN UPDATE ================= */
       if (
         currentUser &&
         currentUser.role !== "admin" &&
@@ -344,28 +366,28 @@ const handleLogout = () => {
           city: isDemoRequest ? "Demo City" : cleanedPlace,
           tripType,
           isDemo: isDemoRequest,
+          weather: weatherData || null,  // 🔥 pass weather
+          tripDate: tripDate || null     // 🔥 pass date
         },
       });
+
       setLoading(false);
-    }, 1500);
+    }, 1200);
 
   } catch (err) {
     console.error("AI ERROR:", err);
     setLoading(false);
 
-  // 🔥 Backend limit reached
-  if (err.status === 429) {
-    setShowFreePopup(true);
-    return;
-  }
+    if (err.status === 429) {
+      setShowFreePopup(true);
+      return;
+    }
 
-    // ✅ Token exhausted case
     if (err.code === "NO_TOKENS") {
       navigate("/quiz");
       return;
     }
 
-    // ❌ Real AI crash only
     navigate("/ai-failed", {
       state: { reason: "AI service temporarily unavailable" },
     });
@@ -568,17 +590,23 @@ const handleSubmit = (e) => {
                         />
                       </div>
                     )}
-
+       
                     {tripType === "multi" && (
                       <div className="space-y-3">
                         <label className="text-sm font-medium text-gray-700">
-                          Number of days
+                          Number of days (Max 7)
                         </label>
                         <input
                           type="number"
                           min={2}
+                          max={7}   // 👈 ADD THIS
                           value={days}
-                          onChange={(e) => setDays(Number(e.target.value))}
+                          onChange={(e) => {
+                            const value = Number(e.target.value);
+                            if (value <= 7) {
+                              setDays(value);
+                            }
+                          }}
                           className="w-full rounded-xl border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                         />
                       </div>
@@ -619,6 +647,21 @@ const handleSubmit = (e) => {
                         </div>
                       )}
                     </div>
+                    {tripType === "day" && (
+  <div className="space-y-4">
+    <div className="space-y-3">
+      <label className="text-sm font-medium text-gray-700">
+        Trip Date (Optional)
+      </label>
+      <input
+        type="date"
+        value={tripDate}
+        onChange={(e) => setTripDate(e.target.value)}
+        className="w-full rounded-xl border border-gray-200 px-4 py-3.5 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+      />
+    </div>
+  </div>
+)}
 
 
                     <div className="space-y-4">
@@ -704,6 +747,7 @@ const handleSubmit = (e) => {
                 </div>
               </div>
 
+        
               {/* LOWER SECTIONS */}
               <AiFeedbackBanner source="AI Planner" />
               <FeatureCards onNavigate={(path) => navigate(path)} />
