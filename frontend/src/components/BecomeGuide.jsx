@@ -5,7 +5,7 @@ const BecomeGuide = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen pt-28 px-4 bg-transprent">
+    <div className="bg-white min-h-screen pt-28 px-4 bg-transprent">
       <div className="max-w-xl mx-auto">
 
         {/* Card */}

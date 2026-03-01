@@ -138,7 +138,7 @@ export default function FaqFooterSection() {
         className={`
           relative z-10
           transition-all duration-700 ease-out
-          bg-[#d7f26e]
+          bg-[#cfec42]
           ${footerHero
             ? "rounded-t-[80px] pt-24 pb-16 -mt-32"
             : "rounded-t-[48px] pt-16 pb-10 -mt-20"}

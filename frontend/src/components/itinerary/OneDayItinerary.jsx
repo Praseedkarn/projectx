@@ -39,23 +39,23 @@ const OneDayItinerary = ({
     <div className="space-y-8 animate-fade-in">
 
       {/* ================= HEADER ================= */}
-      {!hideHeader && city && (
-        <div className="pb-6 border-b border-gray-100">
-          <h2 className="text-2xl font-bold text-gray-900">
-            {city}
-            <span className="text-gray-400 font-normal mx-2">·</span>
-            <span className="text-gray-500 text-lg font-normal">
-              {startDate
-                ? new Date(startDate).toLocaleDateString(undefined, {
-                    weekday: "long",
-                    month: "long",
-                    day: "numeric",
-                  })
-                : "1-Day Guide"}
-            </span>
-          </h2>
-        </div>
-      )}
+     {!hideHeader && city && (
+  <div className="pb-8 border-b border-gray-100">
+    <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
+      {city}
+      <span className="text-gray-400 font-light mx-2">·</span>
+      <span className="text-gray-500 text-base font-normal">
+        {startDate
+          ? new Date(startDate).toLocaleDateString(undefined, {
+              weekday: "long",
+              month: "long",
+              day: "numeric",
+            })
+          : "One-Day Itinerary"}
+      </span>
+    </h2>
+  </div>
+)}
 
       {/* ================= BUDGET ================= */}
       {budgetText && (

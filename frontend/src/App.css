@@ -5,7 +5,7 @@
 /* ================= GLOBAL ================= */
 html,
 body {
-  background-color: #d7f26e;
+  background-color: #cfec42;
   overscroll-behavior: none;
   scroll-behavior: smooth;
 }
@@ -28,6 +28,7 @@ body {
     opacity: 0;
     transform: translateY(12px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -50,10 +51,15 @@ body {
 
 /* ================= CURSOR BLINK ================= */
 @keyframes blink {
-  0%, 50%, 100% {
+
+  0%,
+  50%,
+  100% {
     opacity: 1;
   }
-  25%, 75% {
+
+  25%,
+  75% {
     opacity: 0;
   }
 }
@@ -68,10 +74,12 @@ body {
     width: 0%;
     opacity: 0.6;
   }
+
   50% {
     width: 80%;
     opacity: 1;
   }
+
   100% {
     width: 100%;
     opacity: 0.6;
@@ -100,6 +108,7 @@ body {
     transform: translateY(-20px);
     opacity: 0;
   }
+
   to {
     transform: translateY(0);
     opacity: 1;

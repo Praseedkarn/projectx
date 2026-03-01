@@ -38,7 +38,7 @@ export default function AiFeedbackBanner({ source = "AI Planner" }) {
 
   return (
     <section className="relative my-16">
-      <div className="rounded-[36px] bg-[#d7f26e]/80 px-6 py-12 md:px-14 md:py-16">
+      <div className="rounded-[36px] bg-#cfec42 px-6 py-12 md:px-14 md:py-16">
         <div className="max-w-4xl">
           <h2 className="text-3xl md:text-4xl font-semibold text-black">
             Having trouble with AI results?

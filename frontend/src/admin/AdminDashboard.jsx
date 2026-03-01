@@ -41,7 +41,7 @@ const AdminDashboard = () => {
   const userSearches = searches.filter((s) => !s.isGuest);
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-8">
+    <div className=" bg-white max-w-6xl mx-auto p-6 space-y-8">
       <h1 className="text-2xl font-semibold">Admin Dashboard</h1>
 
       {/* ================= STATS ================= */}

@@ -54,9 +54,11 @@ router.post("/itinerary", async (req, res) => {
     /* ================= LOGGED-IN USER ================= */
     if (user) {
       if (user.tokens < TOKEN_COST) {
-        return res.status(403).json({ message: "Not enough tokens" });
+        return res.status(403).json({
+          message: "Not enough tokens",
+          code: "NO_TOKENS",
+        });
       }
-
       const result = await generateItinerary(description);
 
       user.tokens -= TOKEN_COST;
@@ -86,17 +88,20 @@ router.post("/itinerary", async (req, res) => {
     /* ================= GUEST ================= */
 
     // 🔥 Correct IP detection for Render / proxies
-    const ip =
-      req.headers["x-forwarded-for"]?.split(",")[0] ||
-      req.socket.remoteAddress;
+   const ip =
+  req.headers["x-forwarded-for"]?.split(",")[0] ||
+  req.socket.remoteAddress;
 
-    const guestId = req.headers["x-guest-id"];
+const guestId = req.headers["x-guest-id"];
 
-      if (!guestId) {
-        return res.status(400).json({ message: "Guest ID missing" });
-      }
+if (!guestId) {
+  return res.status(400).json({ message: "Guest ID missing" });
+}
 
-      let guest = await GuestUsage.findOne({ guestId });
+// 🔒 Check by guestId OR IP (stronger protection)
+let guest = await GuestUsage.findOne({
+  $or: [{ guestId }, { ip }],
+});
 
     const now = new Date();
 

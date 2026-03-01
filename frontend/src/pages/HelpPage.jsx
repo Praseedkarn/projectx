@@ -14,7 +14,7 @@ const HelpPage = () => {
   );
 
   return (
-    <div className="pt-28 px-4 max-w-4xl mx-auto pb-24">
+    <div className="bg-white pt-28 px-4 max-w-4xl mx-auto pb-24">
       <div className="bg-white rounded-3xl shadow p-6 sm:p-8 space-y-10">
 
         {/* HEADER */}

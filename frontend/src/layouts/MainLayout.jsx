@@ -1,17 +1,24 @@
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import Header from "../components/Header";
+import FaqFooterSection from "../components/FaqFooterSection";
 
-const MainLayout = ({ user, onLogoutClick }) => {
+const MainLayout = ({ user, onLogoutClick, onSignInClick }) => {
   const location = useLocation();
   const navigate = useNavigate();
 
   const isHome = location.pathname === "/";
   const isQrTrip = location.pathname.startsWith("/qr-trip/");
 
+  // Header hidden only on QR trip pages
+  const showHeader = !isQrTrip;
+
+  // Footer visible ONLY on home page
+  const showFooter = isHome;
+
   return (
     <>
-      {/* ===== HEADER (HIDDEN ON QR PAGE) ===== */}
-      {!isQrTrip && (
+      {/* ===== HEADER ===== */}
+      {showHeader && (
         <>
           <Header
             user={user}
@@ -22,21 +29,21 @@ const MainLayout = ({ user, onLogoutClick }) => {
             onBlogsClick={() => navigate("/blogs")}
             onCitClick={() => navigate("/cities")}
             onLogoutClick={onLogoutClick}
+            onSignInClick={onSignInClick}
           />
 
-          {/* ===== HEADER SPACER ===== */}
-          <div className={isHome ? "h-[520px]" : "h-[88px]"} />
+          {/* Header Spacer */}
+          <div className={isHome ? "h-[400px]" : "h-[88px]"} />
         </>
       )}
 
       {/* ===== PAGE CONTENT ===== */}
-      <main
-        className={`min-h-screen ${
-          isHome ? "bg-[#d7f26e]" : "bg-[#f6f8f5]"
-        }`}
-      >
+      <main className="min-h-screen">
         <Outlet />
       </main>
+
+      {/* ===== FOOTER (HOME ONLY) ===== */}
+      {showFooter && <FaqFooterSection />}
     </>
   );
 };

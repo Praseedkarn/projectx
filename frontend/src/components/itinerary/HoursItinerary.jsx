@@ -51,14 +51,14 @@ const HoursItinerary = ({
     <div className="space-y-8 animate-fade-in">
 
       {/* ================= HEADER ================= */}
-      {!hideHeader && city && (
-        <div className="flex items-center gap-3 pb-4 border-b border-gray-100">
-          <span className="text-2xl">⏳</span>
-          <h2 className="text-xl font-bold text-gray-900">
-            Hourly Plan for {city}
-          </h2>
-        </div>
-      )}
+    {!hideHeader && city && (
+  <div className="pb-6 border-b border-gray-100">
+    <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
+      {city}
+      <span className="text-gray-400 font-medium"> · Hour-by-Hour Plan</span>
+    </h2>
+  </div>
+)}
 
       {/* ================= BUDGET ================= */}
       {budgetText && (

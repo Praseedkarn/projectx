@@ -1,278 +1,289 @@
-import { useState ,useEffect} from "react";
+import React from "react";
 
-const TripPlannerPage = ({
-  tripType = "multi",
-  setTripType = () => {},
-  days = 3,
-  setDays = () => {},
-  hours = 4,
-  setHours = () => {},
-  place = "",
-  setPlace = () => {},
-  group = "Family",
-  setGroup = () => {},
-  suggestions = "",
-  setSuggestions = () => {},
-  onSubmit = () => {},
-  loading = false,
-}) => {
-
-  const [step, setStep] = useState(1);
-  const [destinationMode, setDestinationMode] = useState("single");
-  const [citySuggestions, setCitySuggestions] = useState([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-
-
-  useEffect(() => {
-    if (!place || place.length < 3) {
-      setCitySuggestions([]);
-      return;
-    }
-
-    const timer = setTimeout(async () => {
-      try {
-        const res = await fetch(
-          `https://secure.geonames.org/searchJSON?q=${encodeURIComponent(
-            place
-          )}&maxRows=8&featureClass=P&username=praseed`
-        );
-
-        const data = await res.json();
-        setCitySuggestions(data.geonames || []);
-        setShowSuggestions(true);
-      } catch (err) {
-        console.error("GeoNames error");
-      }
-    }, 400);
-
-    return () => clearTimeout(timer);
-  }, [place]);
-
-  // single | multi
-
+function PlanPage({
+  formCardRef,
+  handleSubmit,
+  tripType,
+  setTripType,
+  hours,
+  setHours,
+  days,
+  setDays,
+  multiStartDate,
+  setMultiStartDate,
+  place,
+  setPlace,
+  group,
+  setGroup,
+  suggestions,
+  setSuggestions,
+  addSuggestion,
+  loading,
+  citySuggestions,
+  showSuggestions,
+  setShowSuggestions,
+  tripDate,
+  setTripDate,
+}) {
   return (
-    <div className="min-h-screen bg-[#f8fafc] flex items-center justify-center px-4">
-      <div className="w-full max-w-3xl bg-white rounded-3xl shadow-xl p-8">
-        
-        {/* ===== HEADER ===== */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-semibold text-gray-800">
-            Build your trip, step by step
+    <div className="min-h-screen bg-white relative overflow-hidden">
+
+      <div ref={formCardRef} className="max-w-4xl mx-auto px-6 py-20 md:py-32 relative z-10">
+
+        {/* ================= HEADER ================= */}
+        <header className="mb-20 space-y-6">
+          <h1 className="text-4xl md:text-6xl font-semibold text-[#1a1a1a]">
+            Design Your <br />
+            <span className="text-[#5b6f00]">Perfect Trip.</span>
           </h1>
-          <p className="text-gray-500 mt-2">
-            Answer a few questions and let AI plan the rest.
-          </p>
-        </div>
+        </header>
 
-        {/* ===== PROGRESS ===== */}
-        <div className="flex items-center justify-between mb-10">
-          {[1, 2, 3].map((s) => (
-            <div
-              key={s}
-              className={`flex-1 h-1 mx-1 rounded-full ${
-                step >= s ? "bg-[#5b7c67]" : "bg-gray-200"
-              }`}
-            />
-          ))}
-        </div>
+        <form onSubmit={handleSubmit} className="space-y-24">
 
-        {/* ================= STEP 1 ================= */}
-        {step === 1 && (
-          <div className="space-y-6">
-            <h2 className="text-xl font-medium text-gray-800">
-              What kind of trip is this?
+          {/* ================= TRIP TYPE ================= */}
+          <section className="space-y-8">
+            <h2 className="text-sm uppercase font-bold text-[#5b6f00]">
+              Trip Style
             </h2>
 
-            {/* Single / Multi destination */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="inline-flex p-1.5 bg-gray-100 rounded-[24px] border">
               {[
-                { key: "single", label: "Single destination" },
-                { key: "multi", label: "Multiple destinations" },
-              ].map((d) => (
+                { id: "hours", label: "Few Hours" },
+                { id: "day", label: "One Day" },
+                { id: "multi", label: "Multi-Day" }
+              ].map((style) => (
                 <button
-                  key={d.key}
+                  key={style.id}
                   type="button"
-                  onClick={() => setDestinationMode(d.key)}
-                  className={`rounded-xl border p-4 text-sm font-medium transition
-                    ${
-                      destinationMode === d.key
-                        ? "border-[#5b7c67] bg-[#5b7c67]/10"
-                        : "border-gray-300 hover:bg-gray-50"
+                  onClick={() => setTripType(style.id)}
+                  className={`px-8 py-3 rounded-[20px] transition ${tripType === style.id
+                    ? "bg-white text-[#5b6f00] shadow"
+                    : "text-gray-500"
                     }`}
                 >
-                  {d.label}
+                  {style.label}
                 </button>
               ))}
             </div>
+          </section>
 
-            {/* Destination input */}
+          {/* ================= DESTINATION ================= */}
+          <section className="space-y-8">
+            <h2 className="text-sm uppercase font-bold text-[#5b6f00]">
+              Destination
+            </h2>
+
             <div className="relative">
-              <label className="text-sm font-medium text-gray-700">
-                Destination {destinationMode === "multi" && "(comma separated)"}
-              </label>
               <input
                 value={place}
                 onChange={(e) => setPlace(e.target.value)}
                 onFocus={() => setShowSuggestions(true)}
-                onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
-                placeholder={
-                  destinationMode === "single"
-                    ? "e.g. Jaipur"
-                    : "e.g. Delhi, Jaipur, Jaisalmer"
-                }
-                className="mt-2 w-full rounded-xl border px-4 py-3"
+                onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                placeholder="Where are you heading?"
+                className="w-full text-3xl border-b-2 border-gray-200 focus:border-[#5b6f00] outline-none py-4"
               />
 
-              {/* Autocomplete */}
-              {showSuggestions && citySuggestions.length > 0 && destinationMode === "single" && (
-                <div className="absolute z-20 mt-1 w-full bg-white border rounded-xl shadow-lg max-h-60 overflow-auto">
+              {showSuggestions && citySuggestions?.length > 0 && (
+                <div className="absolute w-full bg-white border rounded-xl shadow mt-2 z-50">
                   {citySuggestions.map((city) => (
-                    <div
+                    <button
                       key={city.geonameId}
-                      className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm"
                       onMouseDown={(e) => {
                         e.preventDefault();
                         setPlace(`${city.name}, ${city.countryName}`);
                         setShowSuggestions(false);
                       }}
+                      className="block w-full text-left px-6 py-3 hover:bg-gray-50"
                     >
-                      <strong>{city.name}</strong>
-                      {city.adminName1 ? `, ${city.adminName1}` : ""}
-                      {city.countryName ? `, ${city.countryName}` : ""}
-                    </div>
+                      <strong>{city.name}</strong>, {city.countryName}
+                    </button>
                   ))}
                 </div>
               )}
             </div>
-          </div>
-        )}
+          </section>
 
-        {/* ================= STEP 2 ================= */}
-        {step === 2 && (
-          <div className="space-y-6">
-            <h2 className="text-xl font-medium text-gray-800">
-              How long is your trip?
+          {/* ================= DATE & DURATION ================= */}
+          <section className="grid md:grid-cols-2 gap-16">
+
+            {/* DATE */}
+            <div className="space-y-6">
+              <h2 className="text-sm uppercase font-bold text-[#5b6f00]">
+                Starting
+              </h2>
+
+              {tripType === "day" || tripType === "multi" ? (
+                <input
+                  type="date"
+                  min={new Date().toISOString().split("T")[0]}
+                  value={tripType === "day" ? tripDate : multiStartDate}
+                  onChange={(e) =>
+                    tripType === "day"
+                      ? setTripDate(e.target.value)
+                      : setMultiStartDate(e.target.value)
+                  }
+                  className="w-full rounded-xl bg-gray-50 px-6 py-4"
+                />
+              ) : (
+                <div className="p-6 bg-gray-50 rounded-xl text-gray-500">
+                  No fixed date required.
+                </div>
+              )}
+            </div>
+
+            {/* DURATION */}
+            <div className="space-y-6">
+              <h2 className="text-sm uppercase font-bold text-[#5b6f00]">
+                Duration
+              </h2>
+
+              {/* HOURS */}
+              {tripType === "hours" && (
+                <DurationControl
+                  value={hours}
+                  setValue={setHours}
+                  min={1}
+                  max={12}
+                  label="Hour"
+                />
+              )}
+
+              {/* ONE DAY */}
+              {tripType === "day" && (
+                <div className="p-6 bg-gray-50 rounded-full text-center max-w-[200px]">
+                  <div className="text-2xl font-bold">1</div>
+                  <div className="text-xs uppercase text-gray-400">Day</div>
+                </div>
+              )}
+
+              {/* MULTI DAY */}
+              {tripType === "multi" && (
+                <DurationControl
+                  value={days}
+                  setValue={setDays}
+                  min={1}
+                  max={14}
+                  label="Day"
+                />
+              )}
+            </div>
+          </section>
+
+          {/* ================= TRAVEL GROUP ================= */}
+          <section className="space-y-6">
+            <h2 className="text-sm uppercase font-bold text-[#5b6f00]">
+              Travel Group
             </h2>
 
-            {/* Trip type */}
-            <div className="grid grid-cols-3 gap-4">
-              {[
-                { key: "hours", label: "Few hours" },
-                { key: "day", label: "One day" },
-                { key: "multi", label: "Multiple days" },
-              ].map((t) => (
+            <div className="flex flex-wrap gap-4">
+              {["Solo", "Couple", "Family", "Friends"].map((g) => (
                 <button
-                  key={t.key}
+                  key={g}
                   type="button"
-                  onClick={() => setTripType(t.key)}
-                  className={`rounded-xl border p-4 text-sm font-medium transition
-                    ${
-                      tripType === t.key
-                        ? "border-[#5b7c67] bg-[#5b7c67]/10"
-                        : "border-gray-300 hover:bg-gray-50"
+                  onClick={() => setGroup(g)}
+                  className={`px-6 py-3 rounded-full border ${group === g
+                    ? "bg-[#5b6f00] text-white"
+                    : "bg-white text-gray-600"
                     }`}
                 >
-                  {t.label}
+                  {g}
                 </button>
               ))}
             </div>
+          </section>
 
-            {tripType === "hours" && (
-              <input
-                type="number"
-                min={1}
-                max={12}
-                value={hours}
-                onChange={(e) => setHours(Number(e.target.value))}
-                className="w-full rounded-xl border px-4 py-3"
-                placeholder="Number of hours"
-              />
-            )}
-
-            {tripType === "multi" && (
-              <input
-                type="number"
-                min={2}
-                value={days}
-                onChange={(e) => setDays(Number(e.target.value))}
-                className="w-full rounded-xl border px-4 py-3"
-                placeholder="Number of days"
-              />
-            )}
-          </div>
-        )}
-
-        {/* ================= STEP 3 ================= */}
-        {step === 3 && (
-          <div className="space-y-6">
-            <h2 className="text-xl font-medium text-gray-800">
-              Final details
+          {/* ================= ACTIVITIES ================= */}
+          <section className="space-y-6">
+            <h2 className="text-sm uppercase font-bold text-[#5b6f00]">
+              Activities
             </h2>
 
-            {/* Travel group */}
-            <div>
-              <label className="text-sm font-medium text-gray-700">
-                Travel group
-              </label>
-              <div className="grid grid-cols-4 gap-2 mt-2">
-                {["Solo", "Couple", "Family", "Friends"].map((g) => (
-                  <button
-                    key={g}
-                    type="button"
-                    onClick={() => setGroup(g)}
-                    className={`rounded-lg border px-3 py-2 text-sm transition
-                      ${
-                        group === g
-                          ? "border-[#5b7c67] bg-[#5b7c67]/10"
-                          : "hover:bg-gray-50"
-                      }`}
-                  >
-                    {g}
-                  </button>
-                ))}
-              </div>
+            <div className="flex flex-wrap gap-3">
+              {[
+                "Nature",
+                "Culture",
+                "Hidden Gems",
+                "Photography",
+                "Cafes",
+                "Adventure",
+                "Museums",
+                "Relaxation",
+                "Nightlife",
+                "Shopping",
+              ].map((activity) => (
+                <button
+                  key={activity}
+                  type="button"
+                  onClick={() => addSuggestion(activity)}
+                  className="px-4 py-2 rounded-full border text-sm"
+                >
+                  + {activity}
+                </button>
+              ))}
             </div>
+          </section>
 
-            {/* Preferences */}
-            <input
+          {/* ================= PREFERENCES ================= */}
+          <section className="space-y-6">
+            <h2 className="text-sm uppercase font-bold text-[#5b6f00]">
+              Special Preferences
+            </h2>
+
+            <textarea
               value={suggestions}
               onChange={(e) => setSuggestions(e.target.value)}
-              placeholder="Any preferences? (cafes, slow pace, nature…)"
-              className="w-full rounded-xl border px-4 py-3"
+              placeholder="Vegetarian food, avoid stairs..."
+              className="w-full rounded-xl bg-gray-50 p-6 min-h-[120px]"
             />
-          </div>
-        )}
+          </section>
 
-        {/* ===== ACTIONS ===== */}
-        <div className="flex justify-between mt-10">
-          <button
-            disabled={step === 1}
-            onClick={() => setStep((s) => s - 1)}
-            className="px-6 py-3 rounded-full border disabled:opacity-40"
-          >
-            Back
-          </button>
-
-          {step < 3 ? (
+          {/* ================= CTA ================= */}
+          <div className="pt-12 text-center">
             <button
-              onClick={() => setStep((s) => s + 1)}
-              className="px-6 py-3 rounded-full bg-[#5b7c67] text-white"
-            >
-              Next
-            </button>
-          ) : (
-            <button
-              onClick={onSubmit}
+              type="submit"
               disabled={loading}
-              className="px-6 py-3 rounded-full bg-[#5b7c67] text-white disabled:opacity-60"
+              className="rounded-full bg-black text-white px-12 py-5 disabled:opacity-50"
             >
-              {loading ? "Planning…" : "Generate itinerary"}
+              {loading
+                ? "Calculating Route..."
+                : "Generate My Itinerary"}
             </button>
-          )}
-        </div>
+          </div>
+
+        </form>
       </div>
     </div>
   );
-};
+}
 
-export default TripPlannerPage;
+/* ================= REUSABLE DURATION CONTROL ================= */
+function DurationControl({ value, setValue, min, max, label }) {
+  return (
+    <div className="flex items-center justify-between p-3 rounded-full bg-gray-50 border max-w-[280px]">
+      <button
+        type="button"
+        onClick={() => setValue(Math.max(min, value - 1))}
+        className="w-10 h-10 bg-white rounded-full shadow"
+      >
+        –
+      </button>
+
+      <div className="text-center">
+        <span className="text-2xl font-bold">{value}</span>
+        <span className="block text-xs uppercase text-gray-400">
+          {value === 1 ? label : label + "s"}
+        </span>
+      </div>
+
+      <button
+        type="button"
+        onClick={() => setValue(Math.min(max, value + 1))}
+        className="w-10 h-10 bg-white rounded-full shadow"
+      >
+        +
+      </button>
+    </div>
+  );
+}
+
+export default PlanPage;

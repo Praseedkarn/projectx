@@ -60,8 +60,12 @@ const TripResults = ({openLogin}) => {
 
   const [placeImages, setPlaceImages] = useState([]);
   const [imageLoading, setImageLoading] = useState(false);
+  const [qrTripId, setQrTripId] = useState(null);
+const [qrLoading, setQrLoading] = useState(false);
   // const [menuOpen, setMenuOpen] = useState(false);
-  const [startDate, setStartDate] = useState(null); // yyyy-mm-dd
+  const [startDate, setStartDate] = useState(
+     location.state?.startDate ||null 
+    ); // yyyy-mm-dd
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [pendingQRSave, setPendingQRSave] = useState(false);
   const [loginSuccessMessage, setLoginSuccessMessage] = useState(false);
@@ -71,6 +75,21 @@ const tripDateFromState = location.state?.tripDate || null;
 const [weather, setWeather] = useState(weatherFromState);
 const [climate, setClimate] = useState(null);
 const [climateLoading, setClimateLoading] = useState(false);
+// const [showExitPopup, setShowExitPopup] = useState(false);
+const [showSaveReminder, setShowSaveReminder] = useState(false);
+
+
+useEffect(() => {
+  if (qrTripId) return; // if saved → no reminder
+
+  const timer = setTimeout(() => {
+    setShowSaveReminder(true);
+  }, 30000); // 30 seconds
+
+  return () => clearTimeout(timer);
+}, [qrTripId]);
+
+
 
   const fetchPlaceImages = async (place, osmAttractions = []) => {
     const queries = [
@@ -217,8 +236,6 @@ const [climateLoading, setClimateLoading] = useState(false);
   const [finalText, setFinalText] = useState("");
   const [isEditing, setIsEditing] = useState(false);
 
-  const [qrTripId, setQrTripId] = useState(null);
-  const [qrLoading, setQrLoading] = useState(false);
 
   const [guide, setGuide] = useState(null);
 
@@ -228,7 +245,7 @@ const [climateLoading, setClimateLoading] = useState(false);
   // const [osmLoading, setOsmLoading] = useState(false);
   const [osmError, setOsmError] = useState("");
 
-  const [viewMode, setViewMode] = useState("days"); // text | json|Days
+  const viewMode = "days";// text | json|Days
   const [jsonData, setJsonData] = useState(null);
   const [showReorderModal, setShowReorderModal] = useState(false);
   const [tempDays, setTempDays] = useState([]);
@@ -325,21 +342,7 @@ const [climateLoading, setClimateLoading] = useState(false);
 
 
 
-  const handleViewChange = (mode) => {
-    setViewMode(mode);
-
-    if (mode === "text") {
-      setJsonError("");
-      return;
-    }
-
-    if (!finalText) {
-      setJsonError("Text not ready");
-      return;
-    }
-
-  };
-
+ 
 
   /* ================= HARD REDIRECT IF NOTHING ================= */
   useEffect(() => {
@@ -531,8 +534,8 @@ useEffect(() => {
 
 
   /* ================= TYPE EFFECT ================= */
-  useEffect(() => {
-    if (!suggestions?.text) return;
+ useEffect(() => {
+  if (!suggestions?.text || finalText) return;
 
 
     setIsTyping(true);
@@ -556,7 +559,7 @@ useEffect(() => {
     }, 220 + Math.random() * 80);
 
     return () => clearInterval(typingInterval);
-  }, [suggestions]);
+  }, [suggestions , finalText]);
 
   const generateQR = useCallback(
   async (token) => {
@@ -697,7 +700,10 @@ useEffect(() => {
 
         {/* Back Button - Minimal */}
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => {
+ 
+  navigate(-1);
+}}
           className="inline-flex items-center gap-2 text-sm font-medium text-gray-400 hover:text-gray-900 transition-colors group"
         >
           <span className="group-hover:-translate-x-1 transition-transform">←</span>
@@ -907,7 +913,7 @@ useEffect(() => {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
 
             {/* View Mode Toggle */}
-            <div className="inline-flex bg-gray-100 p-1 rounded-xl">
+            {/* <div className="inline-flex bg-gray-100 p-1 rounded-xl">
               {["days", "text", "json"].map((m) => (
                 <button
                   key={m}
@@ -920,7 +926,7 @@ useEffect(() => {
                   {m === "days" ? "Timeline" : m.charAt(0).toUpperCase() + m.slice(1)}
                 </button>
               ))}
-            </div>
+            </div> */}
 
             {/* Trip Actions - Subtle */}
             <div className="flex items-center gap-4">
@@ -1077,54 +1083,125 @@ useEffect(() => {
       >
         <div className="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 rounded-3xl p-12 relative overflow-hidden">
 
-          {/* Decorative Element */}
+          {/* Decorative Glow */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-indigo-200/30 to-purple-200/30 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
 
-          <div className="relative z-10 text-center space-y-6">
+          <div className="relative z-10 text-center space-y-8">
+
+            {/* Header */}
             <div className="space-y-3">
-              <h3 className="text-3xl sm:text-4xl font-bold text-gray-900">
-                Save This Trip
+              <h3 className="text-3xl sm:text-4xl font-bold text-gray-900 flex items-center justify-center gap-3">
+                Share Your Trip Instantly
+                <span className="text-green-500 text-3xl"></span>
               </h3>
+
               <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                Save this itinerary to your profile and get a QR code for quick access on any device.
+                Send it on <span className="font-semibold text-green-600">WhatsApp</span>, 
+                copy the link, or let friends scan your QR code.
               </p>
             </div>
 
-            {!qrTripId ? (
-              <button
-                onClick={handleGenerateQR}
-                disabled={!finalText || qrLoading}
-                className="bg-gray-900 text-white px-10 py-4 rounded-xl font-semibold hover:bg-gray-800 transition-all hover:scale-105 disabled:opacity-40 disabled:hover:scale-100 disabled:cursor-not-allowed shadow-lg"
-              >
-                {qrLoading ? "Saving..." : "Save Trip and Get QR "}
-              </button>
-            ) : (
-              <div className="space-y-8 animate-fade-in">
-                <div className="inline-block bg-white p-6 rounded-2xl shadow-lg">
-                  <QRCodeCanvas
-                    value={`${window.location.origin}/qr-trip/${qrTripId}`}
-                    size={220}
-                  />
-                </div>
+           {!qrTripId ? (
+            <button
+              onClick={handleGenerateQR}
+              disabled={!finalText || qrLoading}
+              className="bg-gray-900 text-white px-10 py-4 rounded-xl font-semibold hover:bg-gray-800 transition-all hover:scale-105 disabled:opacity-40 disabled:hover:scale-100 disabled:cursor-not-allowed shadow-lg text-lg"
+            >
+              {qrLoading ? "Saving..." : "Save Trip & Unlock Sharing"}
+            </button>
+          ) : (
+            <div className="bg-white p-10 rounded-3xl shadow-2xl space-y-8 animate-fade-in">
 
-                <div className="space-y-3">
-                  <a
-                    href={`${window.location.origin}/qr-trip/${qrTripId}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-block text-indigo-600 font-medium hover:text-indigo-700 transition-colors break-all px-4"
-                  >
-                    {window.location.origin}/qr-trip/{qrTripId}
-                  </a>
-                  <p className="text-sm text-gray-400">Expires in 7 days</p>
-                </div>
-
-                <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-green-100 text-green-700 rounded-full text-sm font-medium">
-                  <span>✓</span>
-                  <span>Saved successfully</span>
-                </div>
+              {/* Header */}
+              <div className="space-y-2">
+                <h4 className="text-2xl font-bold text-gray-900">
+                Your Trip is Ready to Share
+                </h4>
+                <p className="text-gray-600">
+                  Send it on <span className="font-semibold text-green-600">WhatsApp</span>, 
+                  copy the link, or let friends scan the QR below.
+                </p>
               </div>
-            )}
+
+              {/* QR */}
+              <div className="flex justify-center">
+                <QRCodeCanvas
+                  value={`${window.location.origin}/qr-trip/${qrTripId}`}
+                  size={200}
+                />
+              </div>
+
+              <p className="text-sm text-gray-400">
+                Scan to open instantly on any device
+              </p>
+
+              {/* 🔥 Primary WhatsApp Share */}
+              <a
+                href={`https://wa.me/?text=${encodeURIComponent(
+                  `Check out my ${city} travel itinerary planned using Expeditio 🌍\n\n${window.location.origin}/qr-trip/${qrTripId}`
+                )}`}
+                target="_blank"
+                rel="noreferrer"
+                className="block w-full text-center bg-green-500 text-white py-4 rounded-xl font-semibold hover:bg-green-600 transition text-lg shadow-md hover:scale-[1.02]"
+              >
+                📲 Share on WhatsApp
+              </a>
+
+              {/* Secondary Options */}
+              <div className="grid grid-cols-2 gap-4">
+
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(
+                      `${window.location.origin}/qr-trip/${qrTripId}`
+                    );
+                    alert("Link copied!");
+                  }}
+                  className="bg-gray-100 py-3 rounded-xl font-medium hover:bg-gray-200 transition"
+                >
+                  🔗 Copy Link
+                </button>
+
+                <button
+                  onClick={async () => {
+                    if (navigator.share) {
+                      await navigator.share({
+                        title: `${city} Trip`,
+                        text: `Check out my AI travel itinerary`,
+                        url: `${window.location.origin}/qr-trip/${qrTripId}`,
+                      });
+                    } else {
+                      alert("Sharing not supported on this device");
+                    }
+                  }}
+                  className="bg-gray-100 py-3 rounded-xl font-medium hover:bg-gray-200 transition"
+                >
+                  📤 More
+                </button>
+
+              </div>
+
+              {/* Direct Link */}
+              <div className="pt-4 border-t border-gray-100">
+                <a
+                  href={`${window.location.origin}/qr-trip/${qrTripId}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-indigo-600 font-medium hover:text-indigo-700 transition break-all"
+                >
+                  {window.location.origin}/qr-trip/{qrTripId}
+                </a>
+                <p className="text-xs text-gray-400 mt-2">
+                  Link expires in 7 days
+                </p>
+              </div>
+
+              <p className="text-xs text-gray-400">
+                Powered by Expeditio AI
+              </p>
+
+            </div>
+          )}
           </div>
         </div>
       </div>
@@ -1262,6 +1339,45 @@ useEffect(() => {
           </div>
         </div>
       )}
+
+      {showSaveReminder && !qrTripId && (
+  <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
+    <div className="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl text-center space-y-6 animate-fade-in">
+
+      <h3 className="text-xl font-bold text-gray-900">
+        Want to access this later?
+      </h3>
+
+      <p className="text-sm text-gray-600">
+        Save your itinerary now so you can share it or revisit it anytime.
+      </p>
+
+      <div className="flex gap-3 justify-center">
+
+        <button
+          onClick={() => {
+            setShowSaveReminder(false);
+            document
+              .getElementById("qr-section")
+              ?.scrollIntoView({ behavior: "smooth" });
+          }}
+          className="px-6 py-3 rounded-xl bg-[#5b7c67] text-white font-semibold hover:bg-[#4a6a58] transition"
+        >
+          Save Now
+        </button>
+
+        <button
+          onClick={() => setShowSaveReminder(false)}
+          className="px-6 py-3 rounded-xl bg-gray-100 text-gray-700 font-medium hover:bg-gray-200 transition"
+        >
+          Maybe Later
+        </button>
+
+      </div>
+    </div>
+  </div>
+)}
+
 
     </div>
   );

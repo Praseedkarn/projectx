@@ -47,16 +47,14 @@ const MultiDayItinerary = ({
 
       {/* ================= HEADER ================= */}
       {/* This shows ONLY on main TripResults page */}
-      {!hideHeader && city && (
-        <div className="text-center pb-10 border-b border-gray-100">
-          <h2 className="text-3xl font-bold text-gray-900">
-            {city}
-          </h2>
-          <p className="text-gray-500 mt-2">
-            {data.days.length}-Day Travel Plan
-          </p>
-        </div>
-      )}
+   {!hideHeader && city && (
+  <div className="text-center pb-10 border-b border-gray-100">
+    <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight">
+      {city}
+      <span className="text-gray-400 font-medium"> · {data.days.length}-Day Itinerary</span>
+    </h2>
+  </div>
+)}
 
       {/* ================= BUDGET ================= */}
       {budgetText && (
