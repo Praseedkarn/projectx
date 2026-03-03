@@ -91,38 +91,40 @@ export default function FaqFooterSection() {
         className={`
           relative
           transition-all duration-700 ease-out
-          bg-white
+          bg-[#fafaf7]
           ${footerHero
-            ? "rounded-t-[80px] pt-32 pb-40 min-h-[70vh]"
-            : "rounded-t-[48px] pt-20 pb-28"}
+            ? "rounded-t-[80px] pt-32 pb-48 min-h-[70vh]"
+            : "rounded-t-[48px] pt-24 pb-32"}
         `}
       >
-        <div className="max-w-7xl mx-auto px-10 md:px-20">
-          <div className="grid md:grid-cols-[260px_1fr] gap-14">
+        <div className="max-w-7xl mx-auto px-6 md:px-20">
+          <div className="grid md:grid-cols-[300px_1fr] gap-16">
 
-            <h2 className="text-3xl md:text-4xl font-semibold leading-tight">
-              Have <br /> questions?
-            </h2>
+            <div className="space-y-4 text-center md:text-left">
+              <div className="text-xs font-bold text-[#5b6f00] uppercase tracking-widest">Questions</div>
+              <h2 className="text-3xl md:text-5xl font-serif text-[#1f2d1f] leading-tight">
+                Everything you need to know
+              </h2>
+            </div>
 
-            <div className="space-y-5">
+            <div className="space-y-6">
               {faqs.map((item, i) => (
-                <div key={i} className="border-b border-black/10 pb-4">
+                <div key={i} className="border-b border-[#1f2d1f]/5 pb-6">
                   <button
                     onClick={() => setOpen(open === i ? null : i)}
-                    className="w-full flex justify-between items-center text-left text-base font-medium hover:text-[#5b7c67] transition"
+                    className="w-full flex justify-between items-center text-left text-lg font-medium text-[#1f2d1f] hover:text-[#5b6f00] transition-colors gap-8"
                   >
-                    {item.q}
+                    <span className="flex-1 text-base md:text-lg">{item.q}</span>
                     <span
-                      className={`text-xl transition-transform duration-300 ${
-                        open === i ? "rotate-180" : ""
-                      }`}
+                      className={`text-3xl font-light text-[#5b6f00] transition-transform duration-300 ${open === i ? "rotate-180" : ""
+                        }`}
                     >
                       {open === i ? "−" : "+"}
                     </span>
                   </button>
 
                   {open === i && (
-                    <p className="mt-3 text-sm text-gray-700 max-w-2xl">
+                    <p className="mt-4 text-base text-[#4b5563] max-w-2xl leading-relaxed animate-page">
                       {item.a}
                     </p>
                   )}
@@ -138,50 +140,53 @@ export default function FaqFooterSection() {
         className={`
           relative z-10
           transition-all duration-700 ease-out
-          bg-[#cfec42]
+          bg-[#1f2d1f] text-[#f3f4ee]
           ${footerHero
-            ? "rounded-t-[80px] pt-24 pb-16 -mt-32"
-            : "rounded-t-[48px] pt-16 pb-10 -mt-20"}
+            ? "rounded-t-[80px] pt-32 pb-20 -mt-32"
+            : "rounded-t-[48px] pt-24 pb-12 -mt-20"}
         `}
       >
-        <div className="max-w-7xl mx-auto px-10 md:px-20">
+        <div className="max-w-7xl mx-auto px-6 md:px-20">
 
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-10 text-sm">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-12 md:gap-16 text-sm">
 
             {/* BRAND */}
-            <div className="md:col-span-2 space-y-3">
-              <h3 className="text-2xl font-semibold tracking-wide">
-                EXPEDITIO
-              </h3>
-              <p className="text-gray-700 max-w-xs">
-                Experience the world, your way.
+            <div className="md:col-span-2 space-y-6 text-center md:text-left">
+              <div className="space-y-2">
+                <h3 className="text-2xl font-serif font-bold tracking-tight text-white">
+                  EXPEDITIO
+                </h3>
+                <div className="w-12 h-[2px] bg-[#5b6f00] mx-auto md:mx-0" />
+              </div>
+              <p className="text-[#f3f4ee]/60 max-w-xs leading-relaxed text-base mx-auto md:mx-0">
+                Experience the world, your way. Smarter, clearer, and more realistic travel planning.
               </p>
             </div>
 
             {/* SUPPORT */}
-            <div>
-              <h4 className="font-semibold mb-3">Support</h4>
-              <ul className="space-y-2 text-gray-700">
+            <div className="space-y-4 md:space-y-6 text-center md:text-left">
+              <h4 className="font-bold uppercase tracking-wider text-xs text-[#5b6f00]">Support</h4>
+              <ul className="space-y-3 text-[#f3f4ee]/70">
                 <li>
                   <button
                     onClick={handleFaqClick}
-                    className="hover:underline"
+                    className="hover:text-white transition-colors"
                   >
                     FAQ
                   </button>
                 </li>
                 <li>
-                  <Link to="/terms" className="hover:underline">
+                  <Link to="/terms" className="hover:text-white transition-colors">
                     Terms & Conditions
                   </Link>
                 </li>
                 <li>
-                  <Link to="/privacy" className="hover:underline">
+                  <Link to="/privacy" className="hover:text-white transition-colors">
                     Privacy Policy
                   </Link>
                 </li>
                 <li>
-                  <Link to="/refunds" className="hover:underline">
+                  <Link to="/refunds" className="hover:text-white transition-colors">
                     Refunds
                   </Link>
                 </li>
@@ -189,29 +194,29 @@ export default function FaqFooterSection() {
             </div>
 
             {/* RESOURCES */}
-            <div>
-              <h4 className="font-semibold mb-3">Resources</h4>
-              <ul className="space-y-2 text-gray-700">
-                {/* <li>
-                  <Link to="/guides" className="hover:underline">
-                    Travel Guides
+            <div className="space-y-4 md:space-y-6 text-center md:text-left">
+              <h4 className="font-bold uppercase tracking-wider text-xs text-[#5b6f00]">Resources</h4>
+              <ul className="space-y-3 text-[#f3f4ee]/70">
+                <li>
+                  <Link to="/cities" className="hover:text-white transition-colors">
+                    Explore Cities
                   </Link>
                 </li>
                 <li>
-                  <Link to="/destinations" className="hover:underline">
-                    Destination Guides
+                  <Link to="/itineraries" className="hover:text-white transition-colors">
+                    Travel Itineraries
                   </Link>
-                </li> */}
+                </li>
               </ul>
             </div>
 
             {/* COMMUNITY */}
-            <div>
-              <h4 className="font-semibold mb-3">Community</h4>
-              <ul className="space-y-2 text-gray-700">
+            <div className="space-y-4 md:space-y-6 text-center md:text-left">
+              <h4 className="font-bold uppercase tracking-wider text-xs text-[#5b6f00]">Community</h4>
+              <ul className="space-y-3 text-[#f3f4ee]/70">
                 <li>
-                  <Link to="/blogs" className="hover:underline">
-                    Blog
+                  <Link to="/blogs" className="hover:text-white transition-colors">
+                    Travel Blog
                   </Link>
                 </li>
                 <li>
@@ -219,22 +224,26 @@ export default function FaqFooterSection() {
                     href="https://instagram.com/expeditio_world/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:underline"
+                    className="hover:text-white transition-colors"
                   >
                     Instagram
                   </a>
                 </li>
                 <li>
-                  <Link to="/become-guide" className="hover:underline">
-                    Local Guides
+                  <Link to="/become-guide" className="hover:text-white transition-colors">
+                    Become a Guide
                   </Link>
                 </li>
               </ul>
             </div>
           </div>
 
-          <div className="mt-8 pt-4 border-t border-black/10 text-xs text-gray-700">
-            © 2026 Expeditio. All rights reserved.
+          <div className="mt-20 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6 text-xs text-[#f3f4ee]/40">
+            <div>© 2026 Expeditio Travel. All rights reserved.</div>
+            <div className="flex gap-8">
+              <span>Built with AI</span>
+              <span>Made for Explorers</span>
+            </div>
           </div>
         </div>
       </footer>

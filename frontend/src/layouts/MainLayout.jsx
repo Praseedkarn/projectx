@@ -33,7 +33,7 @@ const MainLayout = ({ user, onLogoutClick, onSignInClick }) => {
           />
 
           {/* Header Spacer */}
-          <div className={isHome ? "h-[400px]" : "h-[88px]"} />
+          <div className={isHome ? "h-[24px]" : "h-[88px]"} />
         </>
       )}
 

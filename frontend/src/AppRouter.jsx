@@ -81,39 +81,45 @@ const AppRouter = ({
         />
 
        
+  <Route
+  path="/plan"
+  element={
+    <div className="min-h-screen bg-[#f7f6f1] pt-28">
 
-        <Route
-          path="/plan"
-          element={
-            <PlanPage
-              formCardRef={formCardRef}
-              handleSubmit={handleSubmit}
-              tripType={tripType}
-              setTripType={setTripType}
-              hours={hours}
-              setHours={setHours}
-              days={days}
-              setDays={setDays}
-              multiStartDate={multiStartDate}
-              setMultiStartDate={setMultiStartDate}
-              place={place}
-              setPlace={setPlace}
-              group={group}
-              setGroup={setGroup}
-              suggestions={suggestions}
-              setSuggestions={setSuggestions}
-              addSuggestion={addSuggestion}
-              loading={loading}
-              currentUser={currentUser}
-              apiStatus={apiStatus}
-              citySuggestions={citySuggestions}
-              showSuggestions={showSuggestions}
-              setShowSuggestions={setShowSuggestions}
-              tripDate={tripDate}
-              setTripDate={setTripDate}
-            />
-          }
+      <div className="max-w-5xl mx-auto px-6">
+
+        {/* PLANNER AT TOP */}
+        <PlanPage
+          formCardRef={formCardRef}
+          handleSubmit={handleSubmit}
+          tripType={tripType}
+          setTripType={setTripType}
+          hours={hours}
+          setHours={setHours}
+          days={days}
+          setDays={setDays}
+          multiStartDate={multiStartDate}
+          setMultiStartDate={setMultiStartDate}
+          place={place}
+          setPlace={setPlace}
+          group={group}
+          setGroup={setGroup}
+          suggestions={suggestions}
+          setSuggestions={setSuggestions}
+          addSuggestion={addSuggestion}
+          loading={loading}
+          citySuggestions={citySuggestions}
+          showSuggestions={showSuggestions}
+          setShowSuggestions={setShowSuggestions}
+          tripDate={tripDate}
+          setTripDate={setTripDate}
         />
+
+      </div>
+
+    </div>
+  }
+/>
 
         {/* ITINERARIES */}
         <Route path="/itineraries" element={<ItineraryPage />} />

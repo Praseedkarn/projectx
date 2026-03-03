@@ -8,7 +8,7 @@ const Header = forwardRef(({ user, variant = "home", onSignInClick, onLogoutClic
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [hideHeader, setHideHeader] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
-  const [showHero, setShowHero] = useState(true);
+
 
   const closeAllMenus = () => {
     setIsMenuOpen(false);
@@ -36,9 +36,6 @@ const go = (path) => {
         } else {
           setHideHeader(false);
         }
-
-        if (currentY < 100) setShowHero(true);
-        else if (currentY > 160) setShowHero(false);
 
         setLastScrollY(currentY);
         ticking = false;
@@ -69,342 +66,238 @@ const go = (path) => {
 }, []);
 
 
-  return (
-    <header
-      ref={ref}
-      className={`fixed top-0 left-0 w-full z-50 transition-transform duration-500
-        ${hideHeader ? "-translate-y-full" : "translate-y-0"}`}
-    >
-      <div
-        className={`relative bg-[#fdfcf7] px-6 pt-5 transition-all duration-500
-          ${
-            variant === "home" && showHero
-              ? "rounded-b-[72px] pb-24 max-h-[520px]"
-              : "pb-9 max-h-[95px]"
-          }`}
-      >
-        {/* ===== TOP BAR ===== */}
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          {/* LOGO */}
-          <button
-            onClick={() => {
-              closeAllMenus();
-              navigate("/");
-            }}
-            className="flex items-center gap-3"
-          >
-                        {/* <img src="/logo3.png" alt="logo" className="w-12 h-12" /> */}
-
-            <span className="italic text-3xl md:text-4xl text-[#5b6f00]">
-              EXPEDITIO
-            </span>
-            {/* <img src="/logo3.png" alt="logo" className="w-12 h-12" /> */}
-          </button>
-
-          {/* DESKTOP NAV */}
-          <nav className="hidden md:flex gap-6 text-sm font-medium text-[#5b6f00]">
-            <button onClick={() => navigate("/")}>Home</button>
-            <button onClick={() => navigate("/blogs")}>Blogs</button>
-
-            {user && (
-              <>
-                <button onClick={() => navigate("/itineraries")}>
-                  Itineraries
-                </button>
-                <button onClick={() => navigate("/saved")}>Saved</button>
-              </>
-            )}
-              <button onClick={() => navigate("/help")}>
-                Help
-              </button>
-
-          </nav>
-
-                    {/* TOKEN BADGE */}
-                  {user && (
-                    <div
-                    onClick={()=>go("/tokens")}
-                    title="view token history"
-                      className="
-                        hidden md:flex
-                        items-center gap-1
-                        px-3 py-1.5
-                        rounded-full
-                        bg-[#5b6f00]/10
-                        text-[#5b6f00]
-                        text-sm
-                        font-semibold
-                        border border-[#5b6f00]/20
-                      "
-                    >
-                      <span>🪙</span>
-                      <span>{user.role === "admin" ? "∞" : user.tokens}</span>
-                    </div>
-                  )}
-
-
-
-
-          {/* RIGHT */}
-          <div ref={profileMenuRef} className="relative flex items-center gap-3">
-
-  {/* ===== DESKTOP PROFILE OR SIGN IN ===== */}
-  {user ? (
-    <button
-      onClick={(e) => {
-        e.stopPropagation();
-        setShowProfileMenu((p) => !p);
-      }}
-      className="hidden md:flex items-center gap-2 px-3 py-1.5 border rounded-full"
-    >
-      <span className="w-7 h-7 rounded-full bg-[#5b6f00]/10 flex items-center justify-center">
-        {user.name?.[0]?.toUpperCase() || "U"}
-      </span>
-      <span>{user.name}</span>
-    </button>
-  ) : (
-    <button
-      onClick={() => onSignInClick?.()}
-      className="hidden md:block px-4 py-2 rounded-full bg-[#5b7c67] text-white text-sm"
-    >
-      Sign in
-    </button>
-  )}
-
-  {/* ===== MOBILE LOGIN BUTTON (ONLY IF NOT LOGGED IN) ===== */}
-  {!user && (
-    <button
-      onClick={() => {
-        closeAllMenus();
-        onSignInClick?.();
-      }}
-      className="md:hidden px-4 py-1.5 rounded-full border border-[#5b6f00] text-[#5b6f00] text-sm font-medium"
-    >
-      Login
-    </button>
-  )}
-
-  {/* ===== HAMBURGER ===== */}
-  <button
-    onClick={() => setIsMenuOpen((p) => !p)}
-    className="md:hidden w-9 h-9 rounded-full border flex items-center justify-center"
+return (
+  <header
+    ref={ref}
+    className={`fixed top-0 left-0 w-full z-50 bg-[#fdfcf7] border-b border-gray-100 transition-transform duration-500 ${
+      hideHeader ? "-translate-y-full" : "translate-y-0"
+    }`}
   >
-    ☰
-  </button>
+    <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+      
+      {/* ===== LOGO ===== */}
+      <button
+        onClick={() => {
+          closeAllMenus();
+          navigate("/");
+        }}
+        className="flex items-center gap-2"
+      >
+        <span className="italic text-2xl md:text-3xl text-[#5b6f00] tracking-wide">
+          EXPEDITIO
+        </span>
+      </button>
 
-  {/* ===== DESKTOP PROFILE DROPDOWN ===== */}
-  {showProfileMenu && user && (
-    <div className="absolute right-0 top-12 w-56 rounded-xl bg-white shadow-2xl border border-gray-200">
-
-      <div className="px-4 py-3">
-        <p className="font-semibold">{user.name}</p>
-        <p className="text-xs text-gray-500">{user.email}</p>
-      </div>
-
-      <div className="border-t">
-        <button onClick={() => go("/profile")} className="menu-item">
-          My profile
-        </button>
-        <button onClick={() => go("/packing")} className="menu-item">
-          Packing list
-        </button>
-        <button
-          onClick={onLogoutClick}
-          className="menu-item text-red-600"
-        >
-          Logout
-        </button>
-
-        {user.role === "admin" && (
-          <button
-            onClick={() => go("/admin")}
-            className="menu-item"
-          >
-            Admin Dashboard
-          </button>
-        )}
-      </div>
-    </div>
-  )}
-
-  {/* ===== MOBILE MENU ===== */}
-  {isMenuOpen && (
-    <div className="
-      absolute right-0 top-12 w-64
-      rounded-xl bg-white p-4
-      shadow-2xl border border-gray-200 z-50
-    ">
-
-      {/* USER INFO */}
-      {user && (
-        <div className="pb-3 border-b space-y-1">
-          <p className="font-semibold">{user.name}</p>
-          <p className="text-xs text-gray-500">{user.email}</p>
-
-          <div
-            onClick={() => go("/tokens")}
-            className="mt-2 inline-flex items-center gap-2 text-sm
-              bg-[#5b6f00]/10 text-[#5b6f00]
-              px-3 py-1.5 rounded-full"
-          >
-            🪙 {user.role === "admin" ? "∞" : user.tokens}
-          </div>
-        </div>
-      )}
-
-      {/* NAVIGATION */}
-      <div className="pt-2">
-        <button onClick={() => go("/")} className="menu-item">Home</button>
-        <button onClick={() => go("/blogs")} className="menu-item">Blogs</button>
-        <button onClick={() => go("/help")} className="menu-item">Help</button>
+      {/* ===== DESKTOP NAV ===== */}
+      <nav className="hidden md:flex gap-8 text-sm font-medium text-[#5b6f00]">
+        <button onClick={() => navigate("/")}>Home</button>
+        <button onClick={() => navigate("/blogs")}>Blogs</button>
 
         {user && (
           <>
-            <button onClick={() => go("/itineraries")} className="menu-item">
+            <button onClick={() => navigate("/itineraries")}>
               Itineraries
             </button>
-            <button onClick={() => go("/saved")} className="menu-item">
+            <button onClick={() => navigate("/saved")}>
               Saved
-            </button>
-            <button onClick={() => go("/packing")} className="menu-item">
-              Packing list
             </button>
           </>
         )}
-      </div>
 
-      {/* ACCOUNT */}
-      {user && (
-        <div className="pt-2 border-t mt-2">
-          <button onClick={() => go("/profile")} className="menu-item">
-            My profile
+        <button onClick={() => navigate("/help")}>Help</button>
+      </nav>
+
+      {/* ===== RIGHT SIDE ===== */}
+      <div ref={profileMenuRef} className="relative flex items-center gap-4">
+        
+        {/* TOKEN BADGE (DESKTOP) */}
+        {user && (
+          <div
+            onClick={() => go("/tokens")}
+            className="hidden md:flex items-center gap-1 px-3 py-1.5 rounded-full bg-[#5b6f00]/10 text-[#5b6f00] text-sm font-semibold border border-[#5b6f00]/20 cursor-pointer"
+          >
+            🪙 {user.role === "admin" ? "∞" : user.tokens}
+          </div>
+        )}
+
+        {/* DESKTOP PROFILE / SIGN IN */}
+        {user ? (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowProfileMenu((p) => !p);
+            }}
+            className="hidden md:flex items-center gap-2 px-3 py-1.5 border rounded-full"
+          >
+            <span className="w-7 h-7 rounded-full bg-[#5b6f00]/10 flex items-center justify-center">
+              {user.name?.[0]?.toUpperCase() || "U"}
+            </span>
+            <span className="text-sm">{user.name}</span>
           </button>
+        ) : (
+          <button
+            onClick={() => onSignInClick?.()}
+            className="hidden md:block px-4 py-2 rounded-full bg-[#5b7c67] text-white text-sm"
+          >
+            Sign in
+          </button>
+        )}
 
+        {/* MOBILE LOGIN BUTTON */}
+        {!user && (
           <button
             onClick={() => {
               closeAllMenus();
-              onLogoutClick();
+              onSignInClick?.();
             }}
-            className="menu-item text-red-600"
+            className="md:hidden px-4 py-1.5 rounded-full border border-[#5b6f00] text-[#5b6f00] text-sm font-medium"
           >
-            Logout
+            Login
           </button>
+        )}
+
+        {/* MOBILE HAMBURGER */}
+        <button
+          onClick={() => setIsMenuOpen((p) => !p)}
+          className="md:hidden w-9 h-9 rounded-full border flex items-center justify-center"
+        >
+          ☰
+        </button>
+
+        {/* ===== DESKTOP PROFILE DROPDOWN ===== */}
+        {showProfileMenu && user && (
+          <div className="absolute right-0 top-12 w-56 rounded-xl bg-white shadow-2xl border border-gray-200">
+            <div className="px-4 py-3">
+              <p className="font-semibold">{user.name}</p>
+              <p className="text-xs text-gray-500">{user.email}</p>
+            </div>
+
+            <div className="border-t">
+              <button onClick={() => go("/profile")} className="menu-item">
+                My profile
+              </button>
+              <button onClick={() => go("/packing")} className="menu-item">
+                Packing list
+              </button>
+              <button
+                onClick={onLogoutClick}
+                className="menu-item text-red-600"
+              >
+                Logout
+              </button>
 
               {user.role === "admin" && (
-      <button
-        onClick={() => go("/admin")}
-        className="menu-item"
-      >
-        Admin Dashboard
-      </button>
-    )}
+                <button
+                  onClick={() => go("/admin")}
+                  className="menu-item"
+                >
+                  Admin Dashboard
+                </button>
+              )}
+            </div>
+          </div>
+        )}
 
-        </div>
-      )}
+        {/* ===== MOBILE MENU ===== */}
+        {isMenuOpen && (
+          <div className="absolute right-0 top-12 w-64 rounded-xl bg-white p-4 shadow-2xl border border-gray-200 z-50">
+            
+            {user && (
+              <div className="pb-3 border-b space-y-1">
+                <p className="font-semibold">{user.name}</p>
+                <p className="text-xs text-gray-500">{user.email}</p>
 
-      {!user && (
-        <button
-          onClick={() => {
-            closeAllMenus();
-            onSignInClick?.();
-          }}
-          className="mt-3 w-full rounded-lg bg-[#5b7c67] text-white py-2 text-sm"
-        >
-          Sign in
-        </button>
-      )}
+                <div
+                  onClick={() => go("/tokens")}
+                  className="mt-2 inline-flex items-center gap-2 text-sm bg-[#5b6f00]/10 text-[#5b6f00] px-3 py-1.5 rounded-full"
+                >
+                  🪙 {user.role === "admin" ? "∞" : user.tokens}
+                </div>
+              </div>
+            )}
 
-    </div>
-  )}
+            <div className="pt-2">
+              <button onClick={() => go("/")} className="menu-item">
+                Home
+              </button>
+              <button onClick={() => go("/blogs")} className="menu-item">
+                Blogs
+              </button>
+              <button onClick={() => go("/help")} className="menu-item">
+                Help
+              </button>
 
-</div>
-        </div>
-        {variant === "home" && (
-          <img
-            src="/airplane.png"
-            alt="Travel path"
-            className="
-            hidden md:block
-              absolute
-            bottom-[220px] md:bottom-[80px]   /* 👈 much higher on mobile */
-            left-1/2 -translate-x-1/2         /* center on mobile */
-            md:left-24 md:translate-x-0
-            w-20 md:w-36
-            opacity-20
-            drop-shadow-[0_20px_30px_rgba(91,111,0,0.25)]
-            pointer-events-none
-            z-0
-            "
-          />
-          )}
-          {variant === "home" && (
-          <img
-            src="/t.png"
-            alt="Travel path right"
-            className="
-              hidden md:block                /* 👈 hide on mobile */
-              absolute
-              bottom-[130px]
-              right-24
-              w-32
-              opacity-20
-              rotate-6
-              scale-x-[-1]
-              pointer-events-none
-              z-0
-            "
-          />
-          )}
+              {user && (
+                <>
+                  <button onClick={() => go("/itineraries")} className="menu-item">
+                    Itineraries
+                  </button>
+                  <button onClick={() => go("/saved")} className="menu-item">
+                    Saved
+                  </button>
+                  <button onClick={() => go("/packing")} className="menu-item">
+                    Packing list
+                  </button>
+                </>
+              )}
+            </div>
 
+            {user && (
+              <div className="pt-2 border-t mt-2">
+                <button onClick={() => go("/profile")} className="menu-item">
+                  My profile
+                </button>
+                <button
+                  onClick={() => {
+                    closeAllMenus();
+                    onLogoutClick();
+                  }}
+                  className="menu-item text-red-600"
+                >
+                  Logout
+                </button>
 
-        {/* ===== HERO (HOME ONLY) ===== */}
-        {variant === "home" && (
-          <div
-            className={`relative mt-40 text-center max-w-3xl mx-auto transition-all duration-500
-              ${
-                showHero
-                  ? "opacity-100 translate-y-0"
-                  : "opacity-0 -translate-y-6 pointer-events-none"
-              }`}
-          >
-            {/* MOBILE HERO IMAGE */}
-        {/* <div className="md:hidden absolute -top-24 left-1/2 -translate-x-1/2 z-0 ">
-          <img
-            src="/p.png"
-            alt="Travel illustration"
-            className="
-              w-36
-      opacity-30
-      drop-shadow-[0_12px_20px_rgba(91,111,0,0.18)]
-      pointer-events-none
-            "
-          />
-        </div> */}
+                {user.role === "admin" && (
+                  <button
+                    onClick={() => go("/admin")}
+                    className="menu-item"
+                  >
+                    Admin Dashboard
+                  </button>
+                )}
+              </div>
+            )}
 
-            <h1 className="-mt-4 text-5xl md:text-6xl italic text-[#5b6f00]">
-              Off the beaten path
-            </h1>
-            <p className="mt-4 text-lg italic text-gray-500">
-              thoughtful trips built around how you travel
-            </p>
+            {!user && (
+              <button
+                onClick={() => {
+                  closeAllMenus();
+                  onSignInClick?.();
+                }}
+                className="mt-3 w-full rounded-lg bg-[#5b7c67] text-white py-2 text-sm"
+              >
+                Sign in
+              </button>
+            )}
           </div>
         )}
       </div>
+    </div>
 
-      <style>{`
-        .menu-item {
-          display: block;
-          width: 100%;
-          padding: 0.6rem 1rem;
-          text-align: left;
-          font-size: 0.875rem;
-        }
-        .menu-item:hover {
-          background: #f9fafb;
-        }
-      `}</style>
-    </header>
-  );
+    <style>{`
+      .menu-item {
+        display: block;
+        width: 100%;
+        padding: 0.6rem 1rem;
+        text-align: left;
+        font-size: 0.875rem;
+      }
+      .menu-item:hover {
+        background: #f9fafb;
+      }
+    `}</style>
+  </header>
+);
 });
 
 export default Header;

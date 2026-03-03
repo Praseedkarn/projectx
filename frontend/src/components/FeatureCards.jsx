@@ -11,7 +11,7 @@ import img4 from "../assets/illustrations/undraw_selfie-fun_0qzh.svg"
 // const highlights = [
 //   {
 //     id: "itineraries",
-   
+
 //     title: "100+ Ready Itineraries",
 //     desc: "Carefully crafted itineraries for cities, weekends, and long trips.",
 //     action: "Explore itineraries",
@@ -20,7 +20,7 @@ import img4 from "../assets/illustrations/undraw_selfie-fun_0qzh.svg"
 //   },
 //   {
 //     id: "distance",
- 
+
 //     title: "Distance & Transport Aware",
 //     desc: "Realistic routes and transport suggestions that actually make sense.",
 //     action: "See how it works",
@@ -29,7 +29,7 @@ import img4 from "../assets/illustrations/undraw_selfie-fun_0qzh.svg"
 //   },
 //   {
 //     id: "packing",
-   
+
 //     title: "Smart Packing Lists",
 //     desc: "Packing lists that auto-adjust based on destination and duration.",
 //     action: "View packing tools",
@@ -38,7 +38,7 @@ import img4 from "../assets/illustrations/undraw_selfie-fun_0qzh.svg"
 //   },
 //   {
 //     id: "cities",
-  
+
 //     title: "Cities Across the World",
 //     desc: "Plan trips anywhere — from India to international destinations.",
 //     action: "Explore cities",
@@ -50,212 +50,234 @@ import img4 from "../assets/illustrations/undraw_selfie-fun_0qzh.svg"
 
 export default function FeatureCards({ onNavigate }) {
   return (
-    <section className="bg-white pt-28 pb-32 rounded-t-[48px]">
+    <section className="bg-[#f3f4ee]/50 pt-28 pb-32 rounded-t-[48px]">
       <div className="max-w-7xl mx-auto px-6 space-y-28">
 
         {/* ===================== */}
         {/* OVERVIEW GRID (TOP) */}
         {/* ===================== */}
 
-<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
 
-  {/* ================= HERO CARD ================= */}
-  <motion.div
-    initial={{ opacity: 0, y: 40 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.7 }}
-    viewport={{ once: true }}
-    className="
-      md:col-span-2
-      bg-[#5b6f00] text-white
-      rounded-3xl md:rounded-[40px]
-      p-6 sm:p-8 md:p-12
-      shadow-lg
-      hover:scale-[1.02]
-      transition-all duration-500
-      flex justify-between items-center gap-6
-    "
-  >
-    {/* TEXT */}
-    <div className="w-2/3">
-      <h1 className="text-2xl sm:text-3xl md:text-5xl font-semibold mb-4 leading-tight">
-        Plan smarter journeys
-      </h1>
-
-      <p className="text-white/80 text-sm sm:text-base mb-4">
-        AI-powered travel planning that builds structured itineraries in seconds.
-      </p>
-
-      <ul className="space-y-2 text-white/80 text-xs sm:text-sm">
-        <li>• Hourly trips</li>
-        <li>• One-day plans</li>
-        <li>• Multi-day journeys</li>
-        <li>• Budget aware</li>
-        <li>• Distance optimized</li>
-      </ul>
-    </div>
-
-    {/* IMAGE */}
-    <div className="w-1/3 flex justify-end">
-      <img
-        src={HeroIllustration}
-        alt="Travel illustration"
-        className="w-32 sm:w-40 md:w-60 lg:w-80 object-contain"
-      />
-    </div>
-  </motion.div>
-
-
-  {/* ================= SMALL CARD 1 ================= */}
- 
-<motion.div
+          {/* ================= HERO CARD ================= */}
+       <motion.div
   initial={{ opacity: 0, y: 40 }}
   whileInView={{ opacity: 1, y: 0 }}
   transition={{ duration: 0.7 }}
   viewport={{ once: true }}
   className="
-    bg-[#5b6f00] text-white
-    rounded-2xl md:rounded-[32px]
-    p-6 md:p-8
-    shadow-md
-    hover:scale-[1.02]
+    relative
+    md:col-span-2 lg:col-span-2
+    bg-white text-[#1f2d1f]
+    rounded-[32px] md:rounded-[48px]
+    p-6 sm:p-10 md:p-14
+    shadow-[0_15px_40px_rgba(0,0,0,0.06)]
+    md:hover:scale-[1.01] md:hover:-translate-y-1
+    transition-all duration-500
+    flex flex-col md:flex-row justify-between items-start md:items-center gap-10
+    border border-[#5b6f00]/5
+  "
+>
+
+  {/* TEXT */}
+  <div className="w-full md:w-2/3">
+    <div className="inline-block px-4 py-1.5 rounded-full bg-[#5b6f00]/10 text-[#5b6f00] text-xs font-bold uppercase tracking-wider mb-6">
+      Smart Algorithm
+    </div>
+
+    <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold mb-6 leading-tight text-[#1f2d1f]">
+      Plan smarter journeys
+    </h2>
+
+    <p className="text-[#4b5563] text-base md:text-lg mb-8 leading-relaxed">
+      AI-powered travel planning that builds structured itineraries in seconds.
+    </p>
+
+    <ul className="grid grid-cols-2 gap-y-3 gap-x-4 text-[#6b7280] text-sm font-medium">
+      <li className="flex items-center gap-2">
+        <span className="w-1.5 h-1.5 rounded-full bg-[#5b6f00]" /> Hourly trips
+      </li>
+      <li className="flex items-center gap-2">
+        <span className="w-1.5 h-1.5 rounded-full bg-[#5b6f00]" /> One-day plans
+      </li>
+      <li className="flex items-center gap-2">
+        <span className="w-1.5 h-1.5 rounded-full bg-[#5b6f00]" /> Multi-day journeys
+      </li>
+      <li className="flex items-center gap-2">
+        <span className="w-1.5 h-1.5 rounded-full bg-[#5b6f00]" /> Budget aware
+      </li>
+      <li className="flex items-center gap-2">
+        <span className="w-1.5 h-1.5 rounded-full bg-[#5b6f00]" /> Distance optimized
+      </li>
+    </ul>
+  </div>
+
+  {/* IMAGE - DESKTOP ONLY */}
+  <div className="hidden md:flex md:w-1/3 justify-end">
+    <img
+      src={HeroIllustration}
+      alt="Travel illustration"
+      className="w-48 h-auto opacity-80"
+    />
+  </div>
+
+</motion.div>
+
+
+          {/* ================= SMALL CARD 1 ================= */}
+
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7 }}
+            viewport={{ once: true }}
+            className="
+    bg-white text-[#1f2d1f]
+    rounded-[32px]
+    p-6 md:p-10
+    shadow-[0_15px_40px_rgba(0,0,0,0.06)]
+    md:hover:scale-[1.02] md:hover:-translate-y-1
     transition-all duration-500
     flex flex-row md:flex-col
     items-center
     justify-between
     gap-6
+    border border-[#5b6f00]/5
   "
->
+          >
 
-  {/* TEXT */}
-  <div className="flex-1 text-left md:text-center">
-    <h3 className="text-lg md:text-xl font-semibold mb-2">
-      AI Itinerary Engine
-    </h3>
-    <p className="text-white/80 text-xs sm:text-sm">
-      Structured, realistic routes based on time and preferences.
-    </p>
-  </div>
+            {/* TEXT */}
+            <div className="flex-1 text-left md:text-center">
+              <h3 className="text-xl md:text-2xl font-semibold mb-3 text-[#1f2d1f]">
+                AI Itinerary Engine
+              </h3>
+              <p className="text-[#6b7280] text-sm leading-relaxed">
+                Structured, realistic routes based on time and preferences.
+              </p>
+            </div>
 
-  {/* IMAGE */}
-  <div className="flex justify-end md:justify-center">
-    <img
-      src={img3}
-      alt="Adventure"
-      className="w-20 sm:w-24 md:w-32 object-contain"
-    />
-  </div>
+            {/* IMAGE */}
+            <div className="flex justify-end md:justify-center">
+              <img
+                src={img3}
+                alt="Adventure"
+                className="w-24 sm:w-28 md:w-40 object-contain"
+              />
+            </div>
 
-</motion.div>
-  {/* ================= SMALL CARD 2 ================= */}
-  <motion.div
-    initial={{ opacity: 0, y: 40 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.7, delay: 0.2 }}
-    viewport={{ once: true }}
-    className="
-      bg-[#5b6f00] text-white
-      rounded-2xl md:rounded-[32px]
-      p-6
-      shadow-md
-      hover:scale-[1.02]
+          </motion.div>
+          {/* ================= SMALL CARD 2 ================= */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.2 }}
+            viewport={{ once: true }}
+            className="
+      bg-white text-[#1f2d1f]
+      rounded-[32px]
+      p-6 md:p-8
+      shadow-[0_15px_40px_rgba(0,0,0,0.06)]
+      md:hover:scale-[1.02] md:hover:-translate-y-1
       transition-all duration-500
       flex justify-between items-center
+      border border-[#5b6f00]/5
     "
-  >
-    <div className="w-2/3">
-      <h3 className="text-lg md:text-xl font-semibold mb-2">
-        Smart Budget Split
-      </h3>
-      <p className="text-white/80 text-xs sm:text-sm">
-        Clear spending estimates before your trip even starts.
-      </p>
-    </div>
+          >
+            <div className="w-2/3">
+              <h3 className="text-xl md:text-2xl font-semibold mb-3 text-[#1f2d1f]">
+                Smart Budget Split
+              </h3>
+              <p className="text-[#6b7280] text-sm leading-relaxed">
+                Clear spending estimates before your trip even starts.
+              </p>
+            </div>
 
-    <img
-      src={img4}
-      alt="Budget"
-      className="w-20 sm:w-24 md:w-28 object-contain"
-    />
-  </motion.div>
+            <img
+              src={img4}
+              alt="Budget"
+              className="w-24 sm:w-28 md:w-32 object-contain"
+            />
+          </motion.div>
 
 
-  {/* ================= MEDIUM CARD ================= */}
-  <motion.div
-    initial={{ opacity: 0, y: 40 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.7, delay: 0.3 }}
-    viewport={{ once: true }}
-    className="
-      bg-[#5b6f00] text-white
-      rounded-2xl md:rounded-[32px]
-      p-6
-      shadow-md
-      hover:scale-[1.02]
+          {/* ================= MEDIUM CARD ================= */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.3 }}
+            viewport={{ once: true }}
+            className="
+      bg-white text-[#1f2d1f]
+      rounded-[32px]
+      p-6 md:p-8
+      shadow-[0_15px_40px_rgba(0,0,0,0.06)]
+      md:hover:scale-[1.02] md:hover:-translate-y-1
       transition-all duration-500
       flex justify-between items-center
+      border border-[#5b6f00]/5
     "
-  >
-    <div className="w-2/3">
-      <h3 className="text-lg md:text-xl font-semibold mb-2">
-        Discover Beyond Lists
-      </h3>
-      <p className="text-white/80 text-xs sm:text-sm">
-        Hidden gems and smarter experiences.
-      </p>
-    </div>
+          >
+            <div className="w-2/3">
+              <h3 className="text-xl md:text-2xl font-semibold mb-3 text-[#1f2d1f]">
+                Discover Beyond Lists
+              </h3>
+              <p className="text-[#6b7280] text-sm leading-relaxed">
+                Hidden gems and smarter experiences.
+              </p>
+            </div>
 
-    <img
-      src={Nature}
-      alt="Discover"
-      className="w-24 sm:w-28 md:w-32 object-contain"
-    />
-  </motion.div>
+            <img
+              src={Nature}
+              alt="Discover"
+              className="w-28 sm:w-32 md:w-40 object-contain"
+            />
+          </motion.div>
 
 
-  {/* ================= TALL CARD ================= */}
-  <motion.div
-    initial={{ opacity: 0, y: 40 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.7, delay: 0.15 }}
-    viewport={{ once: true }}
-    className="
-      md:row-span-2
-      bg-[#5b6f00] text-white
-      rounded-3xl md:rounded-[40px]
-      p-6 sm:p-8
-      shadow-lg
-      hover:scale-[1.02]
+          {/* ================= TALL CARD ================= */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.15 }}
+            viewport={{ once: true }}
+            className="
+      md:row-span-2 lg:col-span-1
+      bg-white text-[#1f2d1f]
+      rounded-[32px] md:rounded-[48px]
+      p-6 sm:p-10
+      shadow-[0_15px_40px_rgba(0,0,0,0.06)]
+      md:hover:scale-[1.02] md:hover:-translate-y-1
       transition-all duration-500
-      flex justify-between items-center
+      flex justify-between items-center md:flex-col md:justify-center md:text-center
+      border border-[#5b6f00]/5
     "
-  >
-    <div className="w-2/3">
-      <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold mb-3">
-        Travel on your terms
-      </h2>
+          >
+            <div className="w-2/3">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold mb-4 text-[#1f2d1f]">
+                Travel on your terms
+              </h2>
 
-      <p className="text-white/80 text-xs sm:text-sm">
-        No chaos. No spreadsheet planning.
-        <br />
-        Just clarity.
-      </p>
-    </div>
+              <p className="text-[#6b7280] text-base leading-relaxed">
+                No chaos. No spreadsheet planning.
+                <br />
+                Just clarity.
+              </p>
+            </div>
 
-    <img
-      src={img2}
-      alt="Travel together"
-      className="w-28 sm:w-32 md:w-40 object-contain"
-    />
-  </motion.div>
+            <img
+              src={img2}
+              alt="Travel together"
+              className="w-32 sm:w-40 md:w-52 object-contain"
+            />
+          </motion.div>
 
-</div>
+        </div>
         {/* ===================== */}
         {/* ORIGINAL HEADER */}
         {/* ===================== */}
 
-       {/* ================= HEADER ================= */}
-{/* <div className="text-center space-y-4 mb-16">
+        {/* ================= HEADER ================= */}
+        {/* <div className="text-center space-y-4 mb-16">
   <h2 className="text-3xl md:text-4xl font-semibold text-gray-800">
     Thoughtfully built for smarter travel
   </h2>

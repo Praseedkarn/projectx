@@ -32,7 +32,8 @@ import LogoLoader from "./components/LogoLoader";
 import FreeGenerationPopup from "./components/FreeGenerationsPopup";
 import CitySlider from "./components/CitySlider";
 import { buildPrompt } from "./services/prompts/buildPrompt";
-
+import PlanPage from "./pages/TripPlanner";
+import heroImage from "./assets/illustrations/bg1.webp";
 
 function App() {
 
@@ -476,98 +477,225 @@ function App() {
         homeContent={
           <>
             {/* HERO SECTION */}
-            <div className="max-w-6xl mx-auto mb-24 grid grid-cols-1 md:grid-cols-2 gap-16 items-center mt-16 md:mt-18">
-              <div className="space-y-6 text-center md:text-left">
-                <h2 className="font-serif text-3xl sm:text-4xl md:text-4xl font-medium leading-[1.05] tracking-tight text-[#2f3e2f]">
-                  Stop Planning.
-                  <span className="text-[#5b7c67] italic"> Start Exploring.</span>
-                </h2>
+  <div className="relative max-w-7xl mx-auto mt-4 md:mt-14 px-4 md:px-4">
 
-                <p className="mt-4 text-lg italic text-gray-700">
-                  Expeditio creates intelligent, well-paced travel itineraries
-                  tailored to your time, style, and destination — in seconds.
-                </p>
+  {/* ================= MOBILE ================= */}
+ {/* ================= MOBILE ================= */}
+<div className="block md:hidden relative">
 
-                <button
-                  onClick={() => navigate("/plan")}
-                  className="rounded-full bg-[#5b7c67] px-8 py-3.5 text-white font-medium hover:bg-[#4a6a58] transition-all shadow-md hover:shadow-lg"
-                >
-                  Start my trip →
-                </button>
-              </div>
+  {/* ===== FULL BLEED HERO ===== */}
+  <div className="relative left-1/2 right-1/2 -mx-[50vw] w-screen h-[82vh] overflow-hidden">
 
-              <div className="flex justify-center md:justify-end">
-                <img
-                  src="/world_map_PNG34.png"
-                  alt="Map"
-                  className="w-72 md:w-96 opacity-95 -rotate-2 drop-shadow-[0_25px_40px_rgba(91,124,103,0.35)]"
-                />
-              </div>
-            </div>
+    {/* Background Image */}
+    <img
+      src={heroImage}
+      alt="Travel"
+      className="absolute inset-0 w-full h-full object-cover scale-110"
+    />
 
-            {/* ================= ROUNDED PREMIUM BLOCK ================= */}
-            <div className="relative rounded-[48px] bg-white px-10 md:px-20 py-36 text-center overflow-hidden shadow-[0_40px_80px_rgba(0,0,0,0.06)] border border-gray-100">
-              {/* Soft Olive Glow */}
-              <div className="absolute inset-0 flex justify-center">
-                <div className="w-[600px] h-[600px] bg-[#5b6f00]/8 rounded-full blur-[120px] -translate-y-1/3"></div>
-              </div>
+    {/* Cinematic Overlay */}
+    <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/30 to-black/70 backdrop-blur-[4px]" />
 
-              <div className="relative z-10 max-w-5xl mx-auto">
-                <p className="text-sm tracking-[0.35em] uppercase text-[#5b6f00] font-semibold mb-8">
-                  Intelligent Travel
-                </p>
+    {/* Smooth fade into form */}
+    <div className="absolute bottom-0 left-0 w-full h-40 bg-gradient-to-t from-[#f7f6f1] to-transparent" />
 
-                <h2 className="text-4xl md:text-6xl lg:text-7xl font-semibold leading-[1.05] tracking-tight text-[#1f2d1f]">
-                  Plan Smarter.
-                  <br />
-                  <span className="text-[#5b6f00]">Travel Better.</span>
-                </h2>
+    {/* HERO CONTENT */}
+    <div className="relative z-10 h-full flex flex-col justify-center items-center text-center px-7">
 
-                <p className="mt-10 text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                  Expeditio builds structured, balanced itineraries powered by AI — so you spend less time planning and more time experiencing.
-                </p>
+      <div className="mb-8 tracking-[0.6em] uppercase text-white/80 font-semibold text-sm">
+        EXPEDITIO
+      </div>
 
-                <div className="mt-14">
-                  <button
-                    onClick={() => navigate("/plan")}
-                    className="rounded-full bg-[#1f2d1f] px-10 py-4 text-white text-lg font-medium 
-                    hover:bg-[#5b6f00] transition-all duration-300 
-                    shadow-[0_20px_40px_rgba(31,45,31,0.25)] 
-                    hover:shadow-[0_25px_60px_rgba(91,111,0,0.35)]"
-                  >
-                    Start My Trip →
-                  </button>
-                </div>
-              </div>
-            </div>
+      <div className="mb-6 text-[11px] tracking-[0.45em] uppercase text-white/70 font-semibold">
+        Smart Travel Planning
+      </div>
+
+      <h1 className="font-serif text-[46px] leading-[1.05] font-semibold text-white">
+        Plan Smart.
+        <br />
+        <span className="text-[#dce775]">
+          Travel Better.
+        </span>
+      </h1>
+
+      <p className="mt-7 text-[17px] text-white/85 leading-relaxed max-w-sm">
+        AI builds refined itineraries in seconds —
+        from short city escapes to immersive journeys.
+      </p>
+
+      <button
+        onClick={() =>
+          formCardRef.current?.scrollIntoView({ behavior: "smooth" })
+        }
+        className="mt-10 w-full rounded-full bg-[#5b6f00] px-8 py-5 text-lg font-semibold text-white shadow-[0_20px_50px_rgba(0,0,0,0.35)] active:scale-95 transition"
+      >
+        Generate My Itinerary →
+      </button>
+
+    </div>
+  </div>
+
+
+ 
+{/* ===== CLEAN CONNECTED FORM ===== */}
+<div
+  ref={formCardRef}
+  className="-mt-16 relative z-40 "
+>
+  <div className="
+    bg-white
+    rounded-3xl
+    shadow-[0_20px_60px_rgba(0,0,0,0.08)]
+    p-6
+  ">
+
+    <PlanPage
+      formCardRef={formCardRef}
+      handleSubmit={handleSubmit}
+      tripType={tripType}
+      setTripType={setTripType}
+      hours={hours}
+      setHours={setHours}
+      days={days}
+      setDays={setDays}
+      multiStartDate={multiStartDate}
+      setMultiStartDate={setMultiStartDate}
+      place={place}
+      setPlace={setPlace}
+      group={group}
+      setGroup={setGroup}
+      suggestions={suggestions}
+      setSuggestions={setSuggestions}
+      addSuggestion={addSuggestion}
+      loading={loading}
+      citySuggestions={citySuggestions}
+      showSuggestions={showSuggestions}
+      setShowSuggestions={setShowSuggestions}
+      tripDate={tripDate}
+      setTripDate={setTripDate}
+    />
+
+  </div>
+</div>
+</div>
+
+
+
+  {/* ================= DESKTOP ================= */}
+  <div className="hidden md:grid md:grid-cols-[1fr_1.35fr] gap-12 items-center mb-20">
+
+    {/* LEFT TEXT */}
+    <div className="relative space-y-6 text-left z-20">
+
+      <div className="inline-flex items-center gap-2 text-xs tracking-[0.25em] uppercase text-[#5b6f00] font-semibold">
+        <span className="w-6 h-[1px] bg-[#5b6f00]" />
+        Smart Travel Planning
+      </div>
+
+      <h1 className="font-serif text-5xl lg:text-7xl font-semibold leading-[1.05] tracking-tight text-[#1f2d1f]">
+        Plan Smart.
+        <br />
+        <span className="relative inline-block text-[#5b6f00]">
+          Travel Better.
+          <span className="absolute left-0 bottom-2 w-full h-3 bg-[#5b6f00]/10 -z-10 rounded" />
+        </span>
+      </h1>
+
+      <p className="text-xl text-[#4b5563] max-w-lg leading-relaxed">
+        AI builds your itinerary in seconds — whether it’s a few hours,
+        one perfect day, or a complete multi-day escape.
+      </p>
+
+      <button
+        onClick={() =>
+          formCardRef.current?.scrollIntoView({ behavior: "smooth" })
+        }
+        className="rounded-full bg-[#5b6f00] px-10 py-4 text-white font-semibold 
+        hover:bg-[#4a5a00] transition-all duration-300 
+        shadow-[0_10px_30px_rgba(91,111,0,0.25)]"
+      >
+        Generate My Itinerary →
+      </button>
+    </div>
+
+    {/* RIGHT SIDE WITH FLOATING IMAGE + FORM */}
+    <div className="relative flex justify-end">
+
+      <div className="relative w-full max-w-xl">
+
+        <div className="absolute -left-40 top-1/2 -translate-y-1/2 z-0">
+          <div className="absolute inset-0 -m-20 bg-[#5b6f00]/10 rounded-full blur-[100px]" />
+
+          <div className="relative w-[420px] h-[600px] rounded-[220px] overflow-hidden shadow-[0_30px_70px_rgba(0,0,0,0.08)]">
+            <img
+              src={heroImage}
+              alt="Travel Destination"
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-[#f7f6f1]/60" />
+          </div>
+        </div>
+
+        <div className="relative z-20">
+          <PlanPage
+            formCardRef={formCardRef}
+            handleSubmit={handleSubmit}
+            tripType={tripType}
+            setTripType={setTripType}
+            hours={hours}
+            setHours={setHours}
+            days={days}
+            setDays={setDays}
+            multiStartDate={multiStartDate}
+            setMultiStartDate={setMultiStartDate}
+            place={place}
+            setPlace={setPlace}
+            group={group}
+            setGroup={setGroup}
+            suggestions={suggestions}
+            setSuggestions={setSuggestions}
+            addSuggestion={addSuggestion}
+            loading={loading}
+            citySuggestions={citySuggestions}
+            showSuggestions={showSuggestions}
+            setShowSuggestions={setShowSuggestions}
+            tripDate={tripDate}
+            setTripDate={setTripDate}
+          />
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
 
             {/* LOWER SECTIONS */}
-            <AiFeedbackBanner source="AI Planner" />
-
             <FeatureCards onNavigate={(path) => navigate(path)} />
+
             <ItinerarySlider
               onItineraryClick={(slug) => {
                 navigate(`/itineraries/${slug}`);
               }}
             />
             <CitySlider onCityClick={(slug) => navigate(`/cities/${slug}`)} />
-
-            <div className="mt-24">
-              <div className=" py-20 px-6 text-center">
-                <div className="max-w-3xl mx-auto space-y-8">
+            <AiFeedbackBanner source="AI Planner" />
+            <div className="mt-16 md:mt-24">
+              <div className="py-12 md:py-20 px-6 text-center">
+                <div className="max-w-3xl mx-auto space-y-6 md:space-y-8">
                   <div className="w-16 h-1 bg-black/30 mx-auto rounded-full" />
-                  <h2 className="text-3xl md:text-4xl font-serif text-black leading-tight">
+                  <h2 className="text-2xl md:text-4xl font-serif text-[#1f2d1f] leading-tight">
                     You too can earn while on the move
                   </h2>
                   <button
                     onClick={() => navigate("/become-guide")}
-                    className="inline-flex items-center justify-center rounded-full bg-[#556b00] px-10 py-4 text-white text-lg font-semibold hover:scale-105 transition-all shadow-lg hover:shadow-xl"
+                    className="w-full md:w-auto inline-flex items-center justify-center rounded-full bg-[#5b6f00] px-10 py-4 text-white text-lg font-semibold hover:scale-105 transition-all shadow-lg hover:shadow-xl"
                   >
                     Become a local guide
                   </button>
                 </div>
               </div>
             </div>
+
           </>
         }
         formCardRef={formCardRef}
